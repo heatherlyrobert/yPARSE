@@ -3,30 +3,40 @@
 #define   YPARSE_HGUARD       loaded
 
 
+
 /*===[[ PUBLIC FUNCTIONS ]]===============================*/
-/*--------- ----------- ----------- ----------- ------------------------------*/
+
+
+
+/*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
 char        yPARSE_init             (void *a_verber, char a_reusing);
+char        yPARSE_force            (void);
 
-/*---(parsing)--------------*/
-char        yPARSE_stdin            (void);
-/*> char        yPARSE_file             (FILE *a_file);                               <*/
-char        yPARSE_load             (char *a_recd);
-char        yPARSE_reload           (int a_line, char *a_label);
-char        yPARSE_hidden           (char *a_recd);
 
-/*---(pushing)--------------*/
+
+/*---(yPARSE_line.c)--------*/
+char        yPARSE_stdin            (int *n, int *c);
+char        yPARSE_load             (int *n, int *c, char *a_recd);
+char        yPARSE_reload           (int *n, int *c, int a_line, char *a_label);
+char        yPARSE_hidden           (int *n, int *c, char *a_recd);
+
+
+
+/*---(yPARSE_queue.c)-------*/
 char        yPARSE_purge            (void);
-
-/*---(pop strings)----------*/
 char        yPARSE_toss             (void);
 char        yPARSE_popstr           (char *a_item);
+char        yPARSE_adjval           (float a_old, const char *a_entry, float *a_new);
+char        yPARSE_adjfrom          (float a_old, const char *a_entry, float *a_new);
+char        yPARSE_popval           (float a_old, float *a_new);
+char        yPARSE_popfrom          (float a_old, float *a_new);
 
-/*---(pop values)-----------*/
-char        yPARSE_adjval           (const float a_old, const char *a_entry, float *a_new);
-char        yPARSE_adjfrom          (const float a_old, const char *a_entry, float *a_new);
-char        yPARSE_popval           (const float a_old, float *a_new);
-char        yPARSE_popfrom          (const float a_old, float *a_new);
+
+
+/*---(external testing)-----*/
+char        yPARSE_push             (char *a_item);
+
 
 
 #endif

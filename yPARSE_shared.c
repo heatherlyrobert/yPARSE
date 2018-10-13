@@ -43,6 +43,13 @@ yPARSE_init             (void *a_verber, char a_reusing)
 }
 
 char
+yPARSE_force            (void)
+{
+   myPARSE.good = 'y';
+   return 0;
+}
+
+char
 yparse__unit_verb       (void)
 {
    char       *x_masking   = " ik_pure ik_from fk_pure fk_from ";

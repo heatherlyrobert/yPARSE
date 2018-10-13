@@ -22,8 +22,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.2a"
-#define   YPARSE_VER_TXT      "unit testing is pretty good, ready for arachne trial"
+#define   YPARSE_VER_NUM      "0.2b"
+#define   YPARSE_VER_TXT      "create a record reading by-pass to test primatives"
 
 
 
@@ -58,7 +58,7 @@ extern   tACCESSOR  myPARSE;
 
 
 
-char        yparse__main            (int a_line, char *a_recd, char *a_label);
+char        yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label);
 char        yparse_reusable         (const char a_masked);
 char        yparse_peek             (const int a_ref, char *a_item);
 

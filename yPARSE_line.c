@@ -192,7 +192,7 @@ yparse__existing        (int a_line, char *a_label)
 }
 
 char  /*--> parse a full record -------------------[ ------ [ ------ ]-*/
-yparse__main            (int a_line, char *a_recd, char *a_label)
+yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;                /* return code for errors    */
@@ -223,6 +223,8 @@ yparse__main            (int a_line, char *a_recd, char *a_label)
       DEBUG_YPARSE   yLOG_value   ("hidden"    , myPARSE.cline);
       myPARSE.hidden = 'y';
    }
+   if (n != NULL)  *n = myPARSE.nline;
+   if (c != NULL)  *c = myPARSE.cline;
    /*---(read)---------------------------*/
    DEBUG_YPARSE   yLOG_point   ("a_recd"    , a_recd);
    if (a_recd == NULL) {
@@ -252,7 +254,6 @@ yparse__main            (int a_line, char *a_recd, char *a_label)
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   myPARSE.good = 'y';
    /*---(load the queue)-----------------*/
    rc = yparse_recd  (myPARSE.recd);
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
@@ -260,10 +261,13 @@ yparse__main            (int a_line, char *a_recd, char *a_label)
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
+   /*---(set as good)-----------------*/
+   myPARSE.good = 'y';
    /*---(pop verb)--------------------*/
    rc = yparse_peek   (0, myPARSE.verb);
    rc = myPARSE.verber ();
    if (rc < 0) {
+      myPARSE.good = '-';
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
@@ -280,10 +284,10 @@ yparse__main            (int a_line, char *a_recd, char *a_label)
    return 1;
 }
 
-char yPARSE_stdin       (void)                      { return yparse__main (-1, NULL, NULL); }
-char yPARSE_load        (char *a_recd)              { return yparse__main (-1, a_recd, NULL); }
-char yPARSE_reload      (int a_line, char *a_label) { return yparse__main (a_line, NULL, a_label); }
-char yPARSE_hidden      (char *a_recd)              { return yparse__main ( 0, a_recd, NULL); }
+char yPARSE_stdin       (int *n, int *c)                            { return yparse__main (n, c, -1, NULL, NULL); }
+char yPARSE_load        (int *n, int *c, char *a_recd)              { return yparse__main (n, c, -1, a_recd, NULL); }
+char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return yparse__main (n, c, a_line, NULL, a_label); }
+char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse__main (n, c,  0, a_recd, NULL); }
 
 
 

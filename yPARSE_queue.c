@@ -74,6 +74,8 @@ yparse__enqueue         (char *a_item)
    return 0;
 }
 
+char yPARSE_push  (char *a_item) { return yparse__enqueue (a_item); }
+
 char
 yparse__dequeue         (char *a_item)
 {
@@ -217,6 +219,11 @@ yparse_reusable         (const char a_masked)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
    DEBUG_YPARSE  yLOG_value   ("masked"    , a_masked);
+   --rce;  if (myPARSE.ready != 'y')  {
+      DEBUG_YPARSE   yLOG_note    ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
    --rce;  if (myPARSE.reusing != 'y') {
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
@@ -276,6 +283,11 @@ yPARSE_toss             (void)
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
+   --rce;  if (myPARSE.good != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("record processing was not successful");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(check)--------------------------*/
    rc = yparse__dequeue (NULL);
    if (rc < 0) {
@@ -295,8 +307,15 @@ yPARSE_popstr           (char *a_item)
    char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   /*---(defense)------------------------*/
+   if (a_item != NULL)  strlcpy (a_item, "", LEN_LABEL);
    --rce;  if (myPARSE.ready != 'y')  {
       DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   --rce;  if (myPARSE.good != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("record processing was not successful");
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -332,6 +351,8 @@ yparse_peek             (const int a_ref, char *a_item)
    tQUEUE     *x_curr      = NULL;
    /*---(defense)------------------------*/
    --rce;  if (a_item == NULL)  return rce;
+   /*---(defense)------------------------*/
+   strlcpy (a_item, "", LEN_LABEL);
    /*---(search)-------------------------*/
    x_curr = s_head;
    while (x_curr != NULL) {
@@ -353,7 +374,7 @@ yparse_peek             (const int a_ref, char *a_item)
 static void      o___NUMBERS_________________o (void) {;};
 
 char
-yPARSE_adjval           (const float a_old, const char *a_item, float *a_new)
+yPARSE_adjval           (float a_old, const char *a_item, float *a_new)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -363,8 +384,15 @@ yPARSE_adjval           (const float a_old, const char *a_item, float *a_new)
    char        x_entry     [LEN_LABEL];
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   /*---(defense)------------------------*/
+   if (a_new != NULL)  *a_new = 0.0;
    --rce;  if (myPARSE.ready != 'y')  {
       DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   --rce;  if (myPARSE.good != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("record processing was not successful");
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -437,7 +465,7 @@ yPARSE_adjval           (const float a_old, const char *a_item, float *a_new)
 }
 
 char
-yPARSE_adjfrom          (const float a_old, const char *a_item, float *a_new)
+yPARSE_adjfrom          (float a_old, const char *a_item, float *a_new)
 {
    char        rc          =    0;
    float       a_temp      =  0.0;
@@ -448,7 +476,7 @@ yPARSE_adjfrom          (const float a_old, const char *a_item, float *a_new)
 }
 
 char
-yPARSE_popval           (const float a_old, float *a_new)
+yPARSE_popval           (float a_old, float *a_new)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -458,8 +486,15 @@ yPARSE_popval           (const float a_old, float *a_new)
    char        x_item      [LEN_RECD];
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   /*---(defense)------------------------*/
+   if (a_new != NULL)  *a_new = 0.0;
    --rce;  if (myPARSE.ready != 'y')  {
       DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   --rce;  if (myPARSE.good != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("record processing was not successful");
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -480,7 +515,7 @@ yPARSE_popval           (const float a_old, float *a_new)
 }
 
 char
-yPARSE_popfrom          (const float a_old, float *a_new)
+yPARSE_popfrom          (float a_old, float *a_new)
 {
    char        rc          =    0;
    float       a_temp      =  0.0;
