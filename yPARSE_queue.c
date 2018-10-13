@@ -90,7 +90,6 @@ yparse__dequeue         (char *a_item)
       return rce;
    }
    /*---(copy and clear)-----------------*/
-   DEBUG_YPARSE  yLOG_snote   (s_head->item);
    if (a_item != NULL)  strlcpy (a_item, s_head->item, LEN_RECD);
    if (s_head->item != NULL) {
       DEBUG_YPARSE  yLOG_snote   ("free item");
@@ -123,14 +122,23 @@ yPARSE_purge            (void)
 {
    /*---(locals)-----------+-----+-----+-*/
    tQUEUE     *x_curr      = NULL;
+   /*---(header)-------------------------*/
    /*---(clear)--------------------------*/
    x_curr = s_head;
    while (x_curr != NULL) {
+      DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
       yparse__dequeue (NULL);
       x_curr = s_head;
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    }
    s_first = 0;
    s_count = 0;
+   strlcpy (myPARSE.verb, "", LEN_RECD);
+   /*> strlcpy (myPARSE.orig, "", LEN_RECD);                                          <*/
+   /*> strlcpy (myPARSE.recd, "", LEN_RECD);                                          <*/
+   /*> myPARSE.len    = 0;                                                            <*/
+   /*> myPARSE.good   = '-';                                                          <*/
+   /*> myPARSE.hidden = '-';                                                          <*/
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -143,18 +151,17 @@ yPARSE_purge            (void)
 static void      o___PUSHING_________________o (void) {;};
 
 char         /*--> parse incomming record ----------------[ ------ [ ------ ]-*/
-yPARSE_recd             (char *a_recd)
+yparse_recd             (char *a_recd)
 {
    /*---(locals)-----------+-----------+-*/
-   char        rce         = -10;                /* return code for errors    */
-   char        rc          =   0;                /* generic return code       */
-   int         x_len       = 0;
+   char        rce         =  -10;               /* return code for errors    */
+   char        rc          =    0;               /* generic return code       */
+   int         x_len       =    0;
    int         c           =    0;
    char       *p           = NULL;
    char       *q           = "(,)";
    char       *r           = NULL;
    int         i           =    0;
-   float       x_temp      =  0.0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
@@ -170,6 +177,7 @@ yPARSE_recd             (char *a_recd)
    x_len = strllen   (q, LEN_RECD);
    for (i = c = 0; i < x_len; ++i)   c += strldcnt (a_recd, q [i], LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
+   myPARSE.nfield = c;
    /*---(get first)----------------------*/
    p     = strtok_r (a_recd, q, &r);
    DEBUG_YPARSE yLOG_point   ("p"         , p);
@@ -197,30 +205,54 @@ yPARSE_recd             (char *a_recd)
 }
 
 char
-yPARSE_reusable         (const int a_line, const char *a_verb)
+yparse_reusable         (const char a_masked)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        t           [LEN_RECD];
    char        x_recd      [LEN_RECD];
    tQUEUE     *x_curr      = NULL;
+   int         c           =    1;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_value   ("masked"    , a_masked);
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
+   --rce;  if (myPARSE.reusing != 'y') {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_char    ("good"      , myPARSE.good);
+   --rce;  if (myPARSE.good    != 'y') {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_char    ("hidden"    , myPARSE.hidden);
+   --rce;  if (myPARSE.hidden  == 'y') {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(start)--------------------------*/
-   if (a_verb != NULL)  sprintf (x_recd, "%-10.10s (", a_verb);
+   sprintf (x_recd, "%s (", myPARSE.verb);
    DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
    /*---(clear)--------------------------*/
    x_curr = s_head;
    while (x_curr != NULL) {
-      strlcat (x_recd, x_curr->item, LEN_RECD);
+      if (a_masked == c)   strlcat (x_recd, "¢¢"        , LEN_RECD);
+      else                 strlcat (x_recd, x_curr->item, LEN_RECD);
       strlcat (x_recd, ","         , LEN_RECD);
       DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
       x_curr = x_curr->next;
+      ++c;
    }
    /*---(fix end)------------------------*/
-   x_recd [strlen (x_recd) - 1] = ')';
+   if (x_recd [strlen (x_recd) - 1] == '(')  strlcat (x_recd, ")", LEN_RECD);
+   else                                      x_recd [strlen (x_recd) - 1] = ')';
    DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
    /*---(save)---------------------------*/
-   yPARSE_addline (a_line, x_recd);
+   yparse_addline (myPARSE.nline, x_recd);
    /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -235,9 +267,15 @@ char
 yPARSE_toss             (void)
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
    char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   --rce;  if (myPARSE.ready != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(check)--------------------------*/
    rc = yparse__dequeue (NULL);
    if (rc < 0) {
@@ -257,6 +295,11 @@ yPARSE_popstr           (char *a_item)
    char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   --rce;  if (myPARSE.ready != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(defense)------------------------*/
    DEBUG_YPARSE  yLOG_spoint  (a_item);
    --rce;  if (a_item == NULL) {
@@ -282,7 +325,7 @@ yparse__popable         (void)
 }
 
 char
-yPARSE_peek             (const int a_ref, char *a_item)
+yparse_peek             (const int a_ref, char *a_item)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -320,6 +363,11 @@ yPARSE_adjval           (const float a_old, const char *a_item, float *a_new)
    char        x_entry     [LEN_LABEL];
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   --rce;  if (myPARSE.ready != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(defense)------------------------*/
    DEBUG_YPARSE  yLOG_sdouble (a_old);
    DEBUG_YPARSE  yLOG_spoint  (a_item);
@@ -410,6 +458,11 @@ yPARSE_popval           (const float a_old, float *a_new)
    char        x_item      [LEN_RECD];
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   --rce;  if (myPARSE.ready != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(check)--------------------------*/
    rc = yparse__dequeue (x_item);
    if (rc < 0) {
@@ -453,22 +506,25 @@ yparse__unit_queue      (char *a_question, int a_num)
    char        rc          =    0;
    char        t           [LEN_RECD];
    /*---(preprare)-----------------------*/
-   strlcpy  (yPARSE__unit_answer, "yPARSE unit      : question not understood", LEN_STR);
+   strlcpy  (yPARSE__unit_answer, "QUEUE unit       : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "stats"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "yPARSE stats   : total %2d, curr %2d", s_count, s_first);
+      sprintf (yPARSE__unit_answer, "QUEUE stats    : total %2d, curr %2d", s_count, s_first);
    }
    else if (strcmp (a_question, "entry"    ) == 0) {
       if (s_count < 1 || a_num < s_first || a_num >= s_count) {
-         sprintf (yPARSE__unit_answer, "yPARSE entry %d : null", a_num);
+         sprintf (yPARSE__unit_answer, "QUEUE entry  %d : null", a_num);
       } else {
-         rc = yPARSE_peek (a_num, t);
+         rc = yparse_peek (a_num, t);
          if (rc < 0) {
-            sprintf (yPARSE__unit_answer, "yPARSE entry %d : trouble finding", a_num);
+            sprintf (yPARSE__unit_answer, "QUEUE entry  %d : trouble finding", a_num);
          } else {
-            sprintf (yPARSE__unit_answer, "yPARSE entry %d : %2d[%s]", a_num, strlen (t), t);
+            sprintf (yPARSE__unit_answer, "QUEUE entry  %d : %2d[%s]", a_num, strlen (t), t);
          }
       }
+   }
+   else if (strcmp (a_question, "verb"     ) == 0) {
+      sprintf (yPARSE__unit_answer, "QUEUE verb     : %2d[%s]", strlen (myPARSE.verb), myPARSE.verb);
    }
    /*---(complete)----------------------------------------*/
    return yPARSE__unit_answer;
