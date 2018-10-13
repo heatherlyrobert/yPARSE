@@ -166,7 +166,9 @@ yparse__existing        (int a_line, char *a_label)
    /*---(update)-------------------------*/
    p = strchr (x_recd, '¢');
    DEBUG_YPARSE   yLOG_point   ("p"         , p);
-   --rce;  if (p != NULL) {
+   --rce;  if (p == NULL) {
+      strlcpy (myPARSE.recd, x_recd , LEN_RECD);
+   } else {
       DEBUG_YPARSE   yLOG_point   ("a_label"   , a_label);
       if (a_label == NULL) {
          DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);

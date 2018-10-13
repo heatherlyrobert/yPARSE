@@ -22,8 +22,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.2b"
-#define   YPARSE_VER_TXT      "create a record reading by-pass to test primatives"
+#define   YPARSE_VER_NUM      "0.2c"
+#define   YPARSE_VER_TXT      "fixed issue with getline and non-masked records"
 
 
 

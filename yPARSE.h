@@ -11,7 +11,6 @@
 /*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
 char        yPARSE_init             (void *a_verber, char a_reusing);
-char        yPARSE_force            (void);
 
 
 
@@ -35,6 +34,7 @@ char        yPARSE_popfrom          (float a_old, float *a_new);
 
 
 /*---(external testing)-----*/
+char        yPARSE_force            (void);
 char        yPARSE_push             (char *a_item);
 
 
