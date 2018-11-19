@@ -1,0 +1,50 @@
+.TH yPARSE 7 2018-Oct "linux" "heatherly custom tools manual"
+.na
+
+.SH NAME
+yPARSE \- decision rationale, objectives, and overview
+
+.SH SUMMARY
+yPARSE is a standardized text record parsing and aggregating library used
+to simplify delimited file input and output through a single common queue
+interface.
+
+.SH SCOPE, REASONING and DECISION
+
+.B situation (S).  
+while nearly all programs read and write data streams, and some use
+configuration files, only the more complex read and write named data files
+(most of mine use ascii text for transparency).
+
+.B complication (C).  
+each application generally reinvents the file reading and writing logic, which
+in turn, adds new challenges, unit testing, and backporting of new ideas.
+
+.B answer (A).  
+i have belatedly created a standard file reading and writing shared library
+which provides a simple, field level, queue style interface to the program.
+
+.B target user (T).  
+crazy-person who writes too much code
+
+.B drawbacks...
+   -- takes time to build a shared interface
+   -- library will be overbuilt for some applications
+   -- only standard on my systems
+
+.B benefits...
+   -- define and test once, use over-and-over
+   -- removes a design burden for each application (stardard)
+   -- easier to extend with new ideas (and then backport)
+
+.SH SEE ALSO
+this documentation is layered to provide easier navigation.
+   yPARSE (3), interfacing applications with yPARSE
+   yPARSE (7), decision rationale, objectives, and overview
+
+.SH AUTHOR
+jelloshrike at gmail dot com
+
+.SH COLOPHON
+this page is part of a documentation package meant to make use of the
+heatherly tools easier and faster.

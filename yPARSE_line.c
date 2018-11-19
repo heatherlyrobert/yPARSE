@@ -266,7 +266,7 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
    /*---(set as good)-----------------*/
    myPARSE.good = 'y';
    /*---(pop verb)--------------------*/
-   rc = yparse_peek   (0, myPARSE.verb);
+   rc = yparse_peek_in   (0, myPARSE.verb);
    rc = myPARSE.verber ();
    if (rc < 0) {
       myPARSE.good = '-';

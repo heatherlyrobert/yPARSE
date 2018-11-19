@@ -22,8 +22,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.2c"
-#define   YPARSE_VER_TXT      "fixed issue with getline and non-masked records"
+#define   YPARSE_VER_NUM      "0.3a"
+#define   YPARSE_VER_TXT      "separated queue interface and unit tested successfully"
 
 
 
@@ -58,14 +58,70 @@ extern   tACCESSOR  myPARSE;
 
 
 
+typedef     struct      cSECTION    tSECTION;
+struct cSECTION {
+   /*---(master)------------*/
+   cchar       abbr;                     
+   cchar       label       [LEN_LABEL];
+   cchar       specs       [LEN_LABEL];
+   /*---(handlers)----------*/
+   char        (*writer)   (void);
+   char        (*reader)   (void);
+   /*---(runtime)-----------*/
+   int         try;
+   int         bad;
+   /*---(descriptive)-------*/
+   cchar       column      [LEN_RECD];
+   cchar       desc        [LEN_DESC ];
+   /*---(done)--------------*/
+};
+
+
+
+typedef     struct      cNODE       tNODE;
+struct      cNODE {
+   int         ref;
+   char       *item;
+   tNODE      *next;
+   tNODE      *prev;
+};
+
+
+
+typedef     struct      cQUEUE      tQUEUE;
+struct      cQUEUE {
+   /*---(master)------------*/
+   char        label       [LEN_LABEL];
+   char        verb        [LEN_LABEL];
+   char        good;
+   char        hidden;
+   /*---(counts)------------*/
+   int         nline;
+   int         cline;
+   /*---(node list)---------*/
+   tNODE      *head;
+   tNODE      *tail;
+   int         first;
+   int         count;
+   /*---(done)--------------*/
+};
+
+
+char        yparse_init             (tQUEUE *a_queue, char *a_label);
+char        yparse_purge            (tQUEUE *a_queue);
+char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
+char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);
+char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
+
 char        yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label);
 char        yparse_reusable         (const char a_masked);
-char        yparse_peek             (const int a_ref, char *a_item);
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-char        yparse__enqueue         (char *a_item);
-char        yparse__dequeue         (char *a_item);
 char        yparse_recd             (char *a_recd);
+
+char        yparse_enqueue_in       (char *a_item);
+char        yparse_init_in          (void);
+char        yparse_peek_in          (const int a_ref, char *a_item);
 
 char        yparse__popable         (void);
 
@@ -75,7 +131,8 @@ char        yparse_getline          (const int a_line, char *a_recd);
 
 
 
-char*       yparse__unit_queue      (char *a_question, int a_num);
+char*       yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num);
+char*       yparse__unit_in         (char *a_question, int a_num);
 char*       yparse__unit_line       (char *a_question, int a_num);
 char        yparse__unit_quiet      (void);
 char        yparse__unit_loud       (void);

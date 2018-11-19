@@ -1,0 +1,101 @@
+.TH yPARSE 3 2015-jun "linux" "heatherly custom tools manual"
+
+.SH NAME
+yPARSE \- standard file parsing and aggregating library
+.SH SYNOPSIS
+.nf
+.B #include  <yPARSE.h>
+.sp
+---(shared)------------------------------------
+.BI "char*   yPARSE_version   (void);"
+.BI "char    yPARSE_init      (void *a_verber, char a_reusing);"
+.sp
+---(input)-------------------------------------
+.BI "char    yPARSE_purge_in    (void);"
+---(normal)------------------------------------
+.BI "char    yPARSE_poptoss     (void);"
+.BI "char    yPARSE_popstr      (char   *" "a_str" ");"
+.BI "char    yPARSE_popchar     (char   *" "a_new" ");"
+.BI "char    yPARSE_popint      (int    *" "a_new" ");"
+.BI "char    yPARSE_popfloat    (float  *" "a_new" ");"
+.BI "char    yPARSE_popdouble   (double *" "a_new" ");"
+---(advanced)----------------------------------
+.BI "char    yPARSE_popval      (double  " "a_old" ", double *" "a_new" ");"
+.BI "char    yPARSE_popfrom     (double  " "a_old" ", double *" "a_new" ");"
+.BI "char    yPARSE_adjval      (double  " "a_old" ", char *" "a_entry" ", double *" "a_new" ");"
+.BI "char    yPARSE_adjfrom     (double  " "a_old" ", char *" "a_entry" ", double *" "a_new" ");"
+---(records)-----------------------------------
+.BI "char    yPARSE_stdin       (int *" "a_tot" ", int *" "a_cnt" ");"
+.BI "char    yPARSE_load        (int *" "a_tot" ", int *" "a_cnt" ", char *" "a_recd" ");"
+.BI "char    yPARSE_hidden      (int *" "a_tot" ", int *" "a_cnt" ", char *" "a_recd" ");"
+.BI "char    yPARSE_reload      (int *" "a_tot" ", int *" "a_cnt" ", int " "a_line" ", char *" "a_label" ");"
+.sp
+---(files)-------------------------------------
+.BI "char    yPARSE_open        (char " "a_dir" ", char *" "a_name" ");"
+.BI "char    yPARSE_read        (int *" "a_tot" ", int *" "a_cnt" ");"
+.BI "char    yPARSE_flush       (void);"
+.BI "char    yPARSE_close       (void);"
+.sp
+---(output)------------------------------------
+.BI "char    yPARSE_pushverb    (char   *" "a_verb" ");"
+.BI "char    yPARSE_pushempty   (void);"
+.BI "char    yPARSE_pushstr     (char   *" "a_str" ");"
+.BI "char    yPARSE_pushval     (double  " "a_val" ");"
+.BI "char    yPARSE_pushchar    (char    " "a_val" ");"
+.BI "char    yPARSE_pushint     (int     " "a_val" ");"
+.BI "char    yPARSE_pushfloat   (float   " "a_val" ");"
+.BI "char    yPARSE_pushdouble  (double  " "a_val" ");"
+.sp
+.B link with -L/usr/local/libs -lyPARSE or -lyPARSE_debug
+
+.SH SHARED FUNCTIONS
+
+.B yPARSE_version.  
+returns a string containing the latest yPARSE version number and version
+comment.  this is very useful in debugging/logging.
+
+.B yPARSE_init.  
+initializes the yPARSE environment for use.  accepts two arguments...
+   -- a_verber  : client function to process verb immediately
+   -- a_reusing : togle line reuse flag (arachne scripts)
+
+
+.SH INPUT FUNCTIONS
+
+.B yPARSE_purge_in ();
+   -- clear all entries from in queue
+   -- initialize qlobal counts
+
+.B yPARSE_toss ();
+   -- remove current field from queue
+   -- return nothing
+
+.B yPARSE_popstr (char *a_str);
+   -- remove current field from queue
+   -- return using string pointer
+
+.B yPARSE_popval  (double a_old, double *a_new);
+   -- remove current field from queue
+   -- translate base into a double and place in new
+   -- if relative reference, add old value to new
+   -- return using double pointer
+
+.B yPARSE_popfrom (double a_old, double *a_new);
+   -- same as yPARSE_popval, but treat all values as relative to old
+
+.B yPARSE_adjval  (double a_old, char *a_entry, double *a_new);
+   -- no impact on queue
+   -- translate a_entry into a double and place in new
+   -- if relative reference, add old value to new
+   -- return using double pointer
+
+.B yPARSE_adjfrom (double a_old, char *a_entry, double *a_new);
+   -- same as yPARSE_adjval, but treat all values as relative to old
+
+.B yPARSE_popchar, _popint, _popfloat, and _popdouble ();
+   -- all use yPARSE_popval with no old value
+   -- all cast into an appropriate return pointer
+
+
+
+
