@@ -161,13 +161,17 @@ yparse_purge            (tQUEUE *a_queue)
       DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    }
    /*---(master data)--------------------*/
-   a_queue->good     = '-';
-   a_queue->hidden   = '-';
-   /*---(clear node variables)-----------*/
+   a_queue->iverb    =   -1;
+   a_queue->good     =  '-';
+   a_queue->hidden   =  '-';
+   /*---(record)-------------------------*/
+   strlcpy (a_queue->recd , ""     , LEN_RECD);
+   a_queue->len      =    0;
+   /*---(fields)-------------------------*/
    a_queue->head     = NULL;
    a_queue->tail     = NULL;
-   a_queue->first    = 0;
-   a_queue->count    = 0;
+   a_queue->first    =    0;
+   a_queue->count    =    0;
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -179,17 +183,20 @@ yparse_init             (tQUEUE *a_queue, char *a_label)
    if (a_label != NULL)  strlcpy (a_queue->label, a_label, LEN_LABEL);
    else                  strlcpy (a_queue->label, "???"  , LEN_LABEL);
    /*---(master data)--------------------*/
-   strlcpy (a_queue->verb , ""     , LEN_LABEL);
-   a_queue->good     = '-';
-   a_queue->hidden   = '-';
-   /*---(counts)-------------------------*/
-   a_queue->nline    =   0;
-   a_queue->cline    =   0;
-   /*---(clear node variables)-----------*/
+   a_queue->iverb    =   -1;
+   a_queue->good     =  '-';
+   a_queue->hidden   =  '-';
+   /*---(lines)--------------------------*/
+   a_queue->nline    =    0;
+   a_queue->cline    =    0;
+   /*---(record)-------------------------*/
+   strlcpy (a_queue->recd , ""     , LEN_RECD);
+   a_queue->len      =    0;
+   /*---(fields)-------------------------*/
    a_queue->head     = NULL;
    a_queue->tail     = NULL;
-   a_queue->first    = 0;
-   a_queue->count    = 0;
+   a_queue->first    =    0;
+   a_queue->count    =    0;
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -219,11 +226,17 @@ yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num)
       strlcpy  (yPARSE__unit_answer, "QUEUE unit       : queue not specified", LEN_STR);
    }
    /*---(answer)------------------------------------------*/
-   if      (strcmp (a_question, "line"     ) == 0) {
+   if      (strcmp (a_question, "verb"     ) == 0) {
+      sprintf (yPARSE__unit_answer, "%-3.3s verb       : %2d[%s]", a_queue->label, a_queue->iverb, yPARSE_verb (a_queue->iverb));
+   }
+   else if (strcmp (a_question, "line"     ) == 0) {
       sprintf (yPARSE__unit_answer, "%-3.3s line       : total %2d, curr %2d", a_queue->label, a_queue->nline, a_queue->cline);
    }
    else if (strcmp (a_question, "field"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s field      : total %2d, curr %2d", a_queue->label, a_queue->count, a_queue->first);
+      sprintf (yPARSE__unit_answer, "%-3.3s field      : total %2d, curr %2d, good %c", a_queue->label, a_queue->count, a_queue->first, a_queue->good);
+   }
+   else if (strcmp (a_question, "record"   ) == 0) {
+      sprintf (yPARSE__unit_answer, "%-3.3s record     : %2d[%s]", a_queue->label, a_queue->len, a_queue->recd);
    }
    else if (strcmp (a_question, "entry"    ) == 0) {
       if (a_queue->count < 1 || a_num < a_queue->first || a_num >= a_queue->count) {

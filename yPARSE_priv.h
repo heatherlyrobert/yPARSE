@@ -22,8 +22,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3a"
-#define   YPARSE_VER_TXT      "separated queue interface and unit tested successfully"
+#define   YPARSE_VER_NUM      "0.3b"
+#define   YPARSE_VER_TXT      "out interface pushes, agggregrates, and unit tests"
 
 
 
@@ -91,14 +91,17 @@ struct      cNODE {
 typedef     struct      cQUEUE      tQUEUE;
 struct      cQUEUE {
    /*---(master)------------*/
-   char        label       [LEN_LABEL];
-   char        verb        [LEN_LABEL];
+   char        label       [LEN_LABEL];   /* queue descriptive label          */
+   int         iverb;                     /* verb index                       */
    char        good;
    char        hidden;
-   /*---(counts)------------*/
+   /*---(lines)-------------*/
    int         nline;
    int         cline;
-   /*---(node list)---------*/
+   /*---(record)------------*/
+   char        recd        [LEN_RECD];
+   int         len;
+   /*---(fields)------------*/
    tNODE      *head;
    tNODE      *tail;
    int         first;
@@ -106,6 +109,9 @@ struct      cQUEUE {
    /*---(done)--------------*/
 };
 
+char        yparse_verb_find        (tQUEUE *a_queue, char *a_verb);
+char        yparse_verb_init        (void);
+char*       yparse__unit_verb       (char *a_question, char *a_verb);
 
 char        yparse_init             (tQUEUE *a_queue, char *a_label);
 char        yparse_purge            (tQUEUE *a_queue);
@@ -125,14 +131,21 @@ char        yparse_peek_in          (const int a_ref, char *a_item);
 
 char        yparse__popable         (void);
 
+char        yparse_init_out         (void);
+
+
 /*---(saving)---------------*/
 char        yparse_addline          (const int a_line, const char *a_recd);
 char        yparse_getline          (const int a_line, char *a_recd);
 
+char        yparse_col_count        (tQUEUE *a_queue);
+char        yparse_col_type         (tQUEUE *a_queue);
 
+char        yparse_aggregate        (void);
 
 char*       yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num);
 char*       yparse__unit_in         (char *a_question, int a_num);
+char*       yparse__unit_out        (char *a_question, int a_num);
 char*       yparse__unit_line       (char *a_question, int a_num);
 char        yparse__unit_quiet      (void);
 char        yparse__unit_loud       (void);

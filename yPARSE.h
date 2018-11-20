@@ -52,9 +52,17 @@ char        yPARSE_popdouble        (double *a_new);
 /*---(yPARSE_out.c)---------*/
 char        yPARSE_outfile          (int *n, int *c);
 char        yPARSE_stdout           (int *n, int *c);
-char        yPARSE_pushint          (char a_type, int    a_val);
-char        yPARSE_pushreal         (char a_type, float  a_val);
-char        yPARSE_pushstr          (char a_type, char  *a_str);
+char        yPARSE_pushverb         (char  *a_verb);
+char        yPARSE_pushempty        (void);
+char        yPARSE_pushval          (double  a_val);
+char        yPARSE_pushstr          (char   *a_str);
+char        yPARSE_pushchar         (char    a_val);
+char        yPARSE_pushint          (int     a_val);
+char        yPARSE_pushfloat        (float   a_val);
+char        yPARSE_pushdouble       (double  a_val);
+
+char*       yPARSE_verb             (int a_num);
+char        yPARSE_handler          (char a_mode, char *a_verb, char *a_specs, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc);
 
 
 
