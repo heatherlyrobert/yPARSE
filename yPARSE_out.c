@@ -358,7 +358,54 @@ yparse_aggregate        (void)
    return 0;
 }
 
+char
+yPARSE_write            (int *n, int *c)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        t           [LEN_RECD];
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   /*---(defense)------------------------*/
+   rc = yparse_out_defense ();
+   if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
+      return rc;
+   }
+   /*---(aggregate)----------------------*/
+   rc = yparse_aggregate ();
+   if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
+      return rc;
+   }
+   /*---(defense)------------------------*/
+   --rce;  if (s_qout.file == NULL)  {
+      DEBUG_YPARSE   yLOG_snote   ("file/stdout not open");
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(write)--------------------------*/
+   strlcpy  (t, s_qout.recd, LEN_RECD);
+   strldchg (t, G_CHAR_FIELD, G_KEY_FIELD, LEN_RECD);
+   fprintf  (s_qout.file, "%s\n", t);
+   fflush   (s_qout.file);
+   s_qout.good = 'W';
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   return 0;
+}
 
+
+
+/*====================------------------------------------====================*/
+/*===----                           file control                       ----===*/
+/*====================------------------------------------====================*/
+static void      o___FILES___________________o (void) {;};
+
+char yPARSE_stdout     (void)          { return yparse_open  (&s_qout, "stdout"); }
+char yPARSE_open_out   (char *a_name)  { return yparse_open  (&s_qout, a_name); }
+char yPARSE_close_out  (void)          { return yparse_close (&s_qout);         }
 
 
 

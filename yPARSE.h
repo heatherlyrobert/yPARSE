@@ -16,10 +16,19 @@ char        yPARSE_init             (void *a_verber, char a_reusing);
 
 
 /*---(yPARSE_line.c)--------*/
-char        yPARSE_open             (void);
-char        yPARSE_close            (void);
-char        yPARSE_infile           (int *n, int *c);
-char        yPARSE_stdin            (int *n, int *c);
+
+char        yPARSE_stdin            (void);
+char        yPARSE_open_in          (char *a_name);
+char        yPARSE_close_in         (void);
+
+char        yPARSE_stdout           (void);
+char        yPARSE_open_out         (char *a_name);
+char        yPARSE_close_out        (void);
+
+
+char        yPARSE_write            (int *n, int *c);
+char        yPARSE_dump             (int *n, int *c);
+char        yPARSE_read             (int *n, int *c);
 char        yPARSE_load             (int *n, int *c, char *a_recd);
 char        yPARSE_reload           (int *n, int *c, int a_line, char *a_label);
 char        yPARSE_hidden           (int *n, int *c, char *a_recd);
@@ -50,8 +59,6 @@ char        yPARSE_popdouble        (double *a_new);
 
 
 /*---(yPARSE_out.c)---------*/
-char        yPARSE_outfile          (int *n, int *c);
-char        yPARSE_stdout           (int *n, int *c);
 char        yPARSE_pushverb         (char  *a_verb);
 char        yPARSE_pushempty        (void);
 char        yPARSE_pushval          (double  a_val);

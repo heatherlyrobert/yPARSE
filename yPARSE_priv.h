@@ -9,6 +9,8 @@
 #include    <stdio.h>               /* CLIBC   standard input/output          */
 #include    <stdlib.h>              /* CLIBC   standard general purpose       */
 #include    <string.h>              /* CLIBC   standard string handling       */
+#include    <sys/stat.h>          /* clibc  standard file handling            */
+#include    <unistd.h>            /* clibc  linux/unix standard environment   */
 
 
 
@@ -22,8 +24,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3b"
-#define   YPARSE_VER_TXT      "out interface pushes, agggregrates, and unit tests"
+#define   YPARSE_VER_NUM      "0.3c"
+#define   YPARSE_VER_TXT      "unit testing is solid, combo in/out through file successful"
 
 
 
@@ -95,7 +97,9 @@ struct      cQUEUE {
    int         iverb;                     /* verb index                       */
    char        good;
    char        hidden;
-   /*---(lines)-------------*/
+   /*---(file)--------------*/
+   char       *loc;
+   FILE       *file;
    int         nline;
    int         cline;
    /*---(record)------------*/
@@ -108,6 +112,13 @@ struct      cQUEUE {
    int         count;
    /*---(done)--------------*/
 };
+
+
+char        yparse_open             (tQUEUE *a_queue, char *a_name);
+char        yparse_close            (tQUEUE *a_queue);
+char        yparse_good_in          (void);
+char        yparse_queue_tail       (tQUEUE *a_queue);
+
 
 char        yparse_verb_find        (tQUEUE *a_queue, char *a_verb);
 char        yparse_verb_init        (void);
