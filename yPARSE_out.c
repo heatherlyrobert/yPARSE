@@ -9,14 +9,25 @@ static      tQUEUE      s_qout;
 
 
 /*
+ * char
+ *     c   = char            ( 1 char)    1.0
+ *
+ * int
  *     s   = short           ( 3 char)    3.0
- *     i   = int             ( 5 char)    5.0
- *     l   = long int        (10 char)   10.0
+ *     i   = moderate int    ( 5 char)    5.0
+ *     l   = longer          (10 char)   10.0
+ *
+ * float
  *     k   = kine            ( 6 char)    6.1_
  *     f   = float           ( 6 char)    8.2
+ *
+ * double
  *     d   = double          (10 char)   10.3
+ *     e   = exponent        (10 char)   any
+ *     t   = technical       (20 char)   any
  *     r   = real            (12 char)   any
-
+ *
+ * string
  *     C   = char            (  1 char)
  *     S   = short           (  5 char)
  *     T   = terse           ( 10 char)
@@ -90,7 +101,7 @@ yparse__push_string     (char *a_str)
    }
    x_len = strlen (a_str);
    /*---(prepare)------------------------*/
-   x_type = yparse_col_type   (&s_qout);
+   x_type = yparse_col_by_count (&s_qout);
    /*---(format)-------------------------*/
    --rce;  switch (x_type) {
    case  'c' :
@@ -165,7 +176,7 @@ yparse__push_numeric    (double a_val)
       return rc;
    }
    /*---(prepare)------------------------*/
-   x_type = yparse_col_type   (&s_qout);
+   x_type = yparse_col_by_count (&s_qout);
    /*---(format)-------------------------*/
    --rce;  switch (x_type) {
    case  'c' :
@@ -393,6 +404,95 @@ yPARSE_write            (int *n, int *c)
    s_qout.good = 'W';
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   return 0;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                   variadic interface                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___VARIADIC________________o (void) {;};
+
+char
+yPARSE_fullwrite        (char *a_verb, ...)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   int         n           =    0;
+   int         i           =    0;
+   char        x_type      =  '-';
+   va_list     x_vlist;
+   char        x_char      =    0;
+   int         x_int       =    0;
+   double      x_double    =  0.0;
+   char       *x_str       = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(verb)---------------------------*/
+   rc = yPARSE_pushverb (a_verb);
+   if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
+      return rc;
+   }
+   /*---(column count)-------------------*/
+   n = yparse_col_count (&s_qout);
+   DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
+   /*---(cycle columns)------------------*/
+   va_start (x_vlist, a_verb);
+   DEBUG_YPARSE   yLOG_note    ("va_start successful");
+   --rce;  for (i = 1; i < n; ++i) {
+      x_type = yparse_col_by_count  (&s_qout);
+      DEBUG_YPARSE   yLOG_char    ("x_type"    , x_type);
+      switch (x_type) {
+      case 'c' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "char");
+         x_char    = va_arg (x_vlist, int);
+         DEBUG_YPARSE   yLOG_value   ("x_char"    , x_char);
+         rc = yPARSE_pushchar   (x_char);
+         break;
+      case 's' : case 'i' : case 'l' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "int");
+         x_int     = va_arg (x_vlist, int);
+         DEBUG_YPARSE   yLOG_value   ("x_int"     , x_int);
+         rc = yPARSE_pushint    (x_int);
+         break;
+      case 'k' : case 'f' :
+      case 'd' : case 'r' : case 't' : case 'e' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "double");
+         x_double  = va_arg (x_vlist, double);
+         DEBUG_YPARSE   yLOG_double  ("x_double"  , x_double);
+         rc = yPARSE_pushdouble (x_double);
+         break;
+      case 'C' : case 'S' : case 'T' : case 'A' :
+      case 'L' : case 'D' : case 'U' : case 'F' : case 'O' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "string");
+         x_str     = va_arg (x_vlist, char*);
+         DEBUG_YPARSE   yLOG_info    ("x_str"     , x_str);
+         rc = yPARSE_pushstr    (x_str);
+         break;
+      default  :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "unknown type");
+         va_end (x_vlist);
+         return rce;
+         break;
+      }
+      DEBUG_YPARSE   yLOG_value   ("push"      , rc);
+      if (rc < 0)  {
+         va_end (x_vlist);
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
+         return rc;
+      }
+   }
+   va_end (x_vlist);
+   /*---(write)--------------------------*/
+   rc = yPARSE_write (NULL, NULL);
+   if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
+      return rc;
+   }
+   /*---(complete)-----------------------*/
    return 0;
 }
 

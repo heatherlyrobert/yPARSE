@@ -306,9 +306,9 @@ char
 yPARSE_popchar          (char *a_new)
 {
    char        rc        =     0;
-   double      a         =   0.0;
-   rc = yPARSE_popval (0.0, &a);
-   if (a_new != NULL)  *a_new = (char) a;
+   char        t         [LEN_RECD];
+   rc = yPARSE_popstr (t);
+   if (a_new != NULL)  *a_new = (char) t [0];
    return rc;
 }
 
@@ -748,6 +748,115 @@ yparse_addline          (const int a_line, const char *a_recd)
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
    return 0;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                   variadic interface                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___VARIADIC________________o (void) {;};
+
+char
+yPARSE_fullread         (char *a_verb, ...)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =  -10;
+   char        n           =    0;
+   char        i           =    0;
+   char        x_type      =  '-';
+   va_list     x_vlist;
+   char       *x_char      = NULL;
+   int        *x_int       = NULL;
+   float      *x_float     = NULL;
+   double     *x_double    = NULL;
+   char       *x_str       = NULL;
+   char        t           [LEN_LABEL];
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   rc = yPARSE_read (NULL, NULL);
+   if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
+      return rc;
+   }
+   /*---(verify verb)--------------------*/
+   /*---(column count)-------------------*/
+   n = yparse_col_count (&s_qin);
+   DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
+   /*---(cycle columns)------------------*/
+   va_start (x_vlist, a_verb);
+   DEBUG_YPARSE   yLOG_note    ("va_start successful");
+   --rce;  for (i = 1; i < n; ++i) {
+      s_qin.first = i;
+      x_type = yparse_col_by_first (&s_qin);
+      DEBUG_YPARSE   yLOG_char    ("x_type"    , x_type);
+      DEBUG_YPARSE   yLOG_value   ("first"     , s_qin.first);
+      yparse_peek_in (i, &t);
+      DEBUG_YPARSE   yLOG_info    ("peek"      , t);
+      switch (x_type) {
+      case 'c' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "char*");
+         x_char    = (char *) va_arg (x_vlist, int*);
+         DEBUG_YPARSE   yLOG_point   ("x_char"    , x_char);
+         DEBUG_YPARSE   yLOG_value   ("*x_char"   , *x_char);
+         rc = yPARSE_popchar   (x_char);
+         DEBUG_YPARSE   yLOG_point   ("x_char"    , x_char);
+         DEBUG_YPARSE   yLOG_value   ("*x_char"   , *x_char);
+         break;
+      case 's' : case 'i' : case 'l' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "int*");
+         x_int     = va_arg (x_vlist, int*);
+         DEBUG_YPARSE   yLOG_point   ("x_int"      , x_int);
+         DEBUG_YPARSE   yLOG_value   ("*x_int"     , *x_int);
+         rc = yPARSE_popint    (x_int);
+         DEBUG_YPARSE   yLOG_point   ("x_int"      , x_int);
+         DEBUG_YPARSE   yLOG_value   ("*x_int"     , *x_int);
+         break;
+      case 'k' : case 'f' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "float*");
+         x_float   = (float *) va_arg (x_vlist, double*);
+         DEBUG_YPARSE   yLOG_point   ("x_float"   , x_float);
+         DEBUG_YPARSE   yLOG_double  ("*x_float"  , *x_float);
+         rc = yPARSE_popfloat  (x_float);
+         DEBUG_YPARSE   yLOG_point   ("x_float"   , x_float);
+         DEBUG_YPARSE   yLOG_double  ("*x_float"  , *x_float);
+         break;
+      case 'd' : case 'r' : case 't' : case 'e' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "double*");
+         x_double  = va_arg (x_vlist, double*);
+         DEBUG_YPARSE   yLOG_double  ("*x_double" , *x_double);
+         rc = yPARSE_popdouble (x_double);
+         break;
+      case 'C' : case 'S' : case 'T' : case 'A' :
+      case 'L' : case 'D' : case 'U' : case 'F' : case 'O' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "string");
+         x_str     = (char *) va_arg (x_vlist, int*);
+         DEBUG_YPARSE   yLOG_point   ("x_str"     , x_str);
+         DEBUG_YPARSE   yLOG_info    ("x_str"    , x_str);
+         rc = yPARSE_popstr    (x_str);
+         DEBUG_YPARSE   yLOG_point   ("x_str"     , x_str);
+         DEBUG_YPARSE   yLOG_info    ("x_str"    , x_str);
+         break;
+      default  :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "unknown type");
+         va_end (x_vlist);
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+         break;
+      }
+      DEBUG_YPARSE   yLOG_value   ("pop"       , rc);
+      if (rc < 0)  {
+         va_end (x_vlist);
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
+         return rc;
+      }
+   }
+   va_end (x_vlist);
+   s_qin.good = 'R';
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 1;
 }
 
 

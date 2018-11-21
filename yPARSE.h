@@ -71,6 +71,8 @@ char        yPARSE_pushdouble       (double  a_val);
 char*       yPARSE_verb             (int a_num);
 char        yPARSE_handler          (char a_mode, char *a_verb, char *a_specs, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc);
 
+char        yPARSE_fullwrite        (char *a_verb, ...);
+char        yPARSE_fullread         (char *a_verb, ...);
 
 
 /*---(external testing)-----*/

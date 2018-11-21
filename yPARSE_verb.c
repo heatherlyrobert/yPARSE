@@ -101,13 +101,25 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
 }
 
 char
-yparse_col_type         (tQUEUE *a_queue)
+yparse_col_by_count     (tQUEUE *a_queue)
 {
    if (a_queue        == NULL)  return -1;
    if (a_queue->iverb <  0   )  return -2;
    if (a_queue->count <  0   )  return -3;
    if (a_queue->count >= 12  )  return -4;
+   DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);
    return s_verbs [a_queue->iverb].specs [a_queue->count - 1];
+}
+
+char
+yparse_col_by_first     (tQUEUE *a_queue)
+{
+   if (a_queue        == NULL)  return -1;
+   if (a_queue->iverb <  0   )  return -2;
+   if (a_queue->first <  0   )  return -3;
+   if (a_queue->first >= 12  )  return -4;
+   DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);
+   return s_verbs [a_queue->iverb].specs [a_queue->first - 1];
 }
 
 char
@@ -117,6 +129,7 @@ yparse_col_count        (tQUEUE *a_queue)
    int         n           =    1;   /* start with one for verb  */
    if (a_queue        == NULL)  return -1;
    if (a_queue->iverb <  0   )  return -2;
+   DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);
    for (i = 0; i < 12; ++i) {
       if (s_verbs [a_queue->iverb].specs [i] == '-')   break;
       ++n;

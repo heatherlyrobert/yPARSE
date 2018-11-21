@@ -9,8 +9,9 @@
 #include    <stdio.h>               /* CLIBC   standard input/output          */
 #include    <stdlib.h>              /* CLIBC   standard general purpose       */
 #include    <string.h>              /* CLIBC   standard string handling       */
-#include    <sys/stat.h>          /* clibc  standard file handling            */
-#include    <unistd.h>            /* clibc  linux/unix standard environment   */
+#include    <sys/stat.h>            /* CLIBC   standard file handling         */
+#include    <unistd.h>              /* CLIBC   linux/unix standard env        */
+#include    <stdarg.h>              /* CLIBC   variable argument handling     */
 
 
 
@@ -24,8 +25,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3c"
-#define   YPARSE_VER_TXT      "unit testing is solid, combo in/out through file successful"
+#define   YPARSE_VER_NUM      "0.3d"
+#define   YPARSE_VER_TXT      "basic variadic interface for both read and write unit tested"
 
 
 
@@ -150,7 +151,8 @@ char        yparse_addline          (const int a_line, const char *a_recd);
 char        yparse_getline          (const int a_line, char *a_recd);
 
 char        yparse_col_count        (tQUEUE *a_queue);
-char        yparse_col_type         (tQUEUE *a_queue);
+char        yparse_col_by_count     (tQUEUE *a_queue);
+char        yparse_col_by_first     (tQUEUE *a_queue);
 
 char        yparse_aggregate        (void);
 
