@@ -35,13 +35,16 @@ yPARSE_version          (void)
 char
 yPARSE_init             (void *a_verber, char a_reusing)
 {
+   /*> if (myPARSE.ready == 'y')  return 0;                                           <*/
    myPARSE.verber  = a_verber;
    myPARSE.nline   = 0;
    myPARSE.ready   = 'y';
    myPARSE.reusing = a_reusing;
-   yparse_verb_init ();
-   yparse_init_in   ();
-   yparse_init_out  ();
+   yparse_init_types ();
+   yparse_verb_init  ();
+   yparse_init_in    ();
+   yparse_init_out   ();
+   yparse_initline   ();
    return 0;
 }
 

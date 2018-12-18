@@ -25,8 +25,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3d"
-#define   YPARSE_VER_TXT      "basic variadic interface for both read and write unit tested"
+#define   YPARSE_VER_NUM      "0.3e"
+#define   YPARSE_VER_TXT      "updated reading and writing as gyges was migrated to yPARSE"
 
 
 
@@ -39,7 +39,6 @@
 
 
 extern char yPARSE__unit_answer [ LEN_STR  ];
-
 
 typedef  struct cACCESSOR  tACCESSOR;
 struct cACCESSOR {
@@ -115,6 +114,10 @@ struct      cQUEUE {
 };
 
 
+
+char        yparse_init_types       (void);
+
+
 char        yparse_open             (tQUEUE *a_queue, char *a_name);
 char        yparse_close            (tQUEUE *a_queue);
 char        yparse_good_in          (void);
@@ -123,6 +126,7 @@ char        yparse_queue_tail       (tQUEUE *a_queue);
 
 char        yparse_verb_find        (tQUEUE *a_queue, char *a_verb);
 char        yparse_verb_init        (void);
+char        yparse__verb_divider    (int a_iverb);
 char*       yparse__unit_verb       (char *a_question, char *a_verb);
 
 char        yparse_init             (tQUEUE *a_queue, char *a_label);
@@ -145,8 +149,10 @@ char        yparse__popable         (void);
 
 char        yparse_init_out         (void);
 
+char        yparse_out_line         (char *a_line);
 
 /*---(saving)---------------*/
+char        yparse_initline         (void);
 char        yparse_addline          (const int a_line, const char *a_recd);
 char        yparse_getline          (const int a_line, char *a_recd);
 
@@ -154,6 +160,7 @@ char        yparse_col_count        (tQUEUE *a_queue);
 char        yparse_col_by_count     (tQUEUE *a_queue);
 char        yparse_col_by_first     (tQUEUE *a_queue);
 
+int         yparse_field_len        (char a_type);
 char        yparse_aggregate        (void);
 
 char*       yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num);

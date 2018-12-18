@@ -13,6 +13,9 @@ char       *yPARSE_version          (void);
 char        yPARSE_init             (void *a_verber, char a_reusing);
 
 
+char        yPARSE_verb_begin        (char *a_verb);
+char        yPARSE_verb_break        (int   a_count);
+char        yPARSE_verb_end          (int   a_count);
 
 
 /*---(yPARSE_line.c)--------*/
@@ -22,8 +25,9 @@ char        yPARSE_open_in          (char *a_name);
 char        yPARSE_close_in         (void);
 
 char        yPARSE_stdout           (void);
-char        yPARSE_open_out         (char *a_name);
+char        yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc);
 char        yPARSE_close_out        (void);
+char        yPARSE_section          (char *a_title);
 
 
 char        yPARSE_write            (int *n, int *c);
@@ -69,10 +73,12 @@ char        yPARSE_pushfloat        (float   a_val);
 char        yPARSE_pushdouble       (double  a_val);
 
 char*       yPARSE_verb             (int a_num);
-char        yPARSE_handler          (char a_mode, char *a_verb, char *a_specs, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc);
+char        yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc);
 
 char        yPARSE_fullwrite        (char *a_verb, ...);
 char        yPARSE_fullread         (char *a_verb, ...);
+char        yPARSE_outclear         (void);
+char*       yPARSE_outrecd          (void);
 
 
 /*---(external testing)-----*/

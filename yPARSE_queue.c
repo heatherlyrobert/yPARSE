@@ -19,13 +19,9 @@ yparse_enqueue          (tQUEUE *a_queue, char *a_item)
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    tNODE      *x_new       = NULL;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   DEBUG_YPARSE  yLOG_spoint  (a_item);
    /*---(defense)------------------------*/
    --rce;  if (a_item   == NULL) {
       DEBUG_YPARSE  yLOG_snote   ("nothing to save");
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YPARSE  yLOG_snote   (a_item);
@@ -34,7 +30,6 @@ yparse_enqueue          (tQUEUE *a_queue, char *a_item)
    DEBUG_YPARSE  yLOG_spoint  (x_new);
    --rce;  if (x_new == NULL) {
       DEBUG_YPARSE  yLOG_snote   ("malloc failed");
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    /*---(saving)-------------------------*/
@@ -59,7 +54,6 @@ yparse_enqueue          (tQUEUE *a_queue, char *a_item)
    DEBUG_YPARSE  yLOG_sint    (a_queue->first);
    DEBUG_YPARSE  yLOG_sint    (a_queue->count);
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
 }
 
@@ -298,6 +292,13 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
          a_queue->file  = stdout;
          a_queue->loc   = strdup (a_name);
          DEBUG_YPARSE  yLOG_snote   ("ready");
+         DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+         return 0;
+      }
+      if (strcmp ("unit"   , a_name) == 0) {
+         a_queue->file  = NULL;
+         a_queue->loc   = strdup (a_name);
+         DEBUG_YPARSE  yLOG_snote   ("unit testing");
          DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
          return 0;
       }
