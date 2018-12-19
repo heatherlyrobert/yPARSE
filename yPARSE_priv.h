@@ -25,8 +25,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3e"
-#define   YPARSE_VER_TXT      "updated reading and writing as gyges was migrated to yPARSE"
+#define   YPARSE_VER_NUM      "0.3f"
+#define   YPARSE_VER_TXT      "first full file output (not reading) from gyges, no unit testing"
 
 
 

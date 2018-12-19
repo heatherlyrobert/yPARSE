@@ -13,9 +13,11 @@ char       *yPARSE_version          (void);
 char        yPARSE_init             (void *a_verber, char a_reusing);
 
 
-char        yPARSE_verb_begin        (char *a_verb);
-char        yPARSE_verb_break        (int   a_count);
-char        yPARSE_verb_end          (int   a_count);
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        yPARSE_verb_begin       (char *a_verb);
+char        yPARSE_verb_break       (int   a_count);
+char        yPARSE_verb_end         (int   a_count);
+char        yPARSE_write_all        (void);
 
 
 /*---(yPARSE_line.c)--------*/

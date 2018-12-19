@@ -14,6 +14,8 @@ struct {
    /*---(handlers)----------*/
    char        (*reader)   (void);          /* function to read one record    */
    char        (*writer)   (void);          /* function to write all of type  */
+   float       seq;                         /* writing sequence               */
+   char        done;                        /* written (y/n)                  */
    /*---(descriptive)-------*/
    char        flags       [LEN_LABEL];     /* flags for use by program       */
    char        labels      [LEN_RECD];      /* field labels for headers       */
@@ -145,6 +147,7 @@ yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, 
    /*---(copy values)--------------------*/
    if (a_mode   != 0   )  s_verbs [n].mode    = a_mode;
    if (a_verb   != NULL)  strlcpy (s_verbs [n].verb  , a_verb  , LEN_LABEL);
+   if (a_seq    >  0.0 )  s_verbs [n].seq     = a_seq;
    if (a_specs  != NULL)  strlcpy (s_verbs [n].specs , a_specs , LEN_LABEL);
    if (a_reader != NULL)  s_verbs [n].reader  = a_reader;
    if (a_writer != NULL)  s_verbs [n].writer  = a_writer;
@@ -338,6 +341,46 @@ yPARSE_verb_end          (int   a_count)
    else               yparse_out_line (t);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   return 0;
+}
+
+char
+yPARSE_write_all        (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        i           =    0;
+   float       x_lowest    =  0.0;
+   int         x_next      =   -1;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_value   ("s_nverb"   , s_nverb);
+   /*---(prepare)------------------------*/
+   for (i = 0; i < s_nverb; ++i)  s_verbs [i].done = '-';
+   /*---(call writers)-------------------*/
+   while (1) {
+      /*---(find next)-------------------*/
+      x_lowest = 999999.0;
+      x_next   = -1;
+      for (i = 0; i < s_nverb; ++i) {
+         if (s_verbs [i].done == 'y'    )   continue;
+         if (s_verbs [i].seq >=  x_lowest)  continue;
+         x_lowest = s_verbs [i].seq;
+         x_next   = i;
+      }
+      if (x_lowest > 999.0)  break;
+      if (x_next   < 0    )  break;
+      s_verbs [x_next].done = 'y';
+      /*---(filter)----------------------*/
+      DEBUG_INPT  yLOG_info    ("verb"      , s_verbs [i].verb);
+      DEBUG_INPT  yLOG_point   ("reader"    , s_verbs [i].writer);
+      if (s_verbs [x_next].writer == NULL)  continue;
+      /*---(handle)----------------------*/
+      rc = s_verbs [x_next].writer ();
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 

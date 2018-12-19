@@ -28,7 +28,7 @@ static tTYPES  s_types [MAX_TYPES] = {
    { 'e', "exponent"           , 'n',   20, "exponent        (e)"              },
 
    { 'C', "char"               , 's',    1, "single char     (-1.1s)"          },
-   { 'S', "short"              , 's',    3, "short string    (-3.3s)"          },
+   { 'S', "short"              , 's',    5, "short string    (-5.5s)"          },
    { 'T', "terse"              , 's',   10, "terse string    (-10.10s)"        },
    { 'L', "label"              , 's',   12, "label string    (-12.12s)"        },
    { 'N', "name"               , 's',   20, "name string     (-20.20s)"        },
@@ -195,7 +195,7 @@ yparse__push_string     (char *a_str)
       break;
    case  'S' :
       DEBUG_YPARSE   yLOG_note    ("short string");
-      sprintf (t, "%-3.3s"    , a_str);
+      sprintf (t, "%-5.5s"    , a_str);
       break;
    case  'T' :
       DEBUG_YPARSE   yLOG_note    ("terse string");
@@ -516,6 +516,13 @@ yPARSE_write            (int *n, int *c)
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                      special output lines                    ----===*/
+/*====================------------------------------------====================*/
+static void      o___SPECIAL_________________o (void) {;};
 
 char
 yparse__spacer          (void)
