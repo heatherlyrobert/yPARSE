@@ -25,8 +25,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3g"
-#define   YPARSE_VER_TXT      "fought with yvikeys cmds unit testing and yparse, successful"
+#define   YPARSE_VER_NUM      "0.3h"
+#define   YPARSE_VER_TXT      "increased safety and defense around open/close"
 
 
 

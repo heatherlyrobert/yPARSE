@@ -217,7 +217,6 @@ yparse_purge            (tQUEUE *a_queue)
 char
 yparse_init             (tQUEUE *a_queue, char *a_label)
 {
-   /*> printf ("yparse init start %s\n", a_queue);                                    <*/
    /*---(name)---------------------------*/
    if (a_label != NULL)  strlcpy (a_queue->label, a_label, LEN_LABEL);
    else                  strlcpy (a_queue->label, "???"  , LEN_LABEL);
@@ -239,7 +238,6 @@ yparse_init             (tQUEUE *a_queue, char *a_label)
    a_queue->first    =    0;
    a_queue->count    =    0;
    /*---(complete)-----------------------*/
-   /*> printf ("yparse init end   %s\n", a_queue);                                    <*/
    return 0;
 }
 
@@ -249,6 +247,35 @@ yparse_init             (tQUEUE *a_queue, char *a_label)
 /*===----                         unit testing                         ----===*/
 /*====================------------------------------------====================*/
 static void      o___FILES___________________o (void) {;};
+
+char
+yparse__openclose       (tQUEUE *a_queue)
+{
+   /*---(locals)-----------+-----------+-*/
+   char        rce         =  -10;
+   int         x_len       =    0;
+   /*---(defense)------------------------*/
+   --rce;  if (myPARSE.ready != 'y')  {
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_spoint  (a_queue);
+   --rce;  if (a_queue == NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("null queue");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   x_len = strllen (a_queue->label, LEN_LABEL);
+   DEBUG_YPARSE  yLOG_sint    (x_len);
+   --rce;  if (x_len <= 0  || x_len >= LEN_LABEL) {
+      DEBUG_YPARSE  yLOG_snote   ("file label empty");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_snote   (a_queue->label);
+   /*---(complete)-----------------*/
+   return 0;
+}
 
 char         /*-> open file for reading and prep -----[ leaf   [ge.723.023.20]*/ /*-[01.0000.013.!]-*/ /*-[--.---.---.--]-*/
 yparse_open             (tQUEUE *a_queue, char *a_name)
@@ -261,24 +288,17 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(defense)------------------------*/
-   --rce;  if (myPARSE.ready != 'y')  {
-      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_spoint  (a_queue);
-   --rce;  if (a_queue == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("null queue");
+   rc = yparse__openclose (a_queue);
+   --rce;  if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YPARSE  yLOG_snote   (a_queue->label);
-   DEBUG_YPARSE  yLOG_spoint  (a_name);
-   --rce;  if (a_name  == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("null name");
+   DEBUG_YPARSE  yLOG_spoint  (a_queue->loc);
+   --rce;  if (a_queue->loc != NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("file loc already filled");
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YPARSE  yLOG_snote   (a_name);
    DEBUG_YPARSE  yLOG_spoint  (a_queue->file);
    --rce;  if (a_queue->file != NULL) {
       DEBUG_YPARSE  yLOG_snote   ("file already open");
@@ -357,47 +377,45 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
 char         /*-> close file for reading and wrap ----[ leaf   [ge.411.011.20]*/ /*-[01.0000.013.!]-*/ /*-[--.---.---.--]-*/
 yparse_close            (tQUEUE *a_queue)
 {
-   /*---(locals)-----------+-----------+-*/
-   char        rce         = -10;
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(defense)------------------------*/
-   /*> printf ("closing start\n");                                                    <*/
-   --rce;  if (myPARSE.ready != 'y')  {
-      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
-      /*> printf ("closing end\n");                                                   <*/
-      return rce;
-   }
-   /*> printf ("... ready\n");                                                        <*/
-   DEBUG_YPARSE  yLOG_spoint  (a_queue);
-   --rce;  if (a_queue == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("null queue");
+   rc = yparse__openclose (a_queue);
+   --rce;  if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
-      /*> printf ("closing end\n");                                                   <*/
       return rce;
    }
-   /*> printf ("... queue real\n");                                                   <*/
-   DEBUG_YPARSE  yLOG_spoint  (a_queue->label);
-   if (a_queue->label != NULL)   DEBUG_YPARSE  yLOG_snote   (a_queue->label);
-   /*> printf ("... label shown\n");                                                  <*/
-   /*---(check for pipes)----------------*/
    DEBUG_YPARSE  yLOG_spoint  (a_queue->loc);
-   if (a_queue->loc != NULL)   DEBUG_YPARSE  yLOG_snote   (a_queue->loc);
-   /*> printf ("... loc shown\n");                                                    <*/
-   if (a_queue->loc != NULL && strcmp ("stdin" , a_queue->loc) == 0) {
+   --rce;  if (a_queue->loc == NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("file loc empty");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_snote   (a_queue->loc);
+   DEBUG_YPARSE  yLOG_spoint  (a_queue->file);
+   --rce;  if (a_queue->file == NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("file already closed");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(check for pipes)----------------*/
+   if (strcmp ("stdin" , a_queue->loc) == 0) {
       DEBUG_YPARSE  yLOG_snote   ("stdin");
-      a_queue->file == NULL;
-      if (a_queue->loc != NULL)  free (a_queue->loc);
+      a_queue->file = NULL;
+      free (a_queue->loc);
       a_queue->loc  = NULL;
-      /*> printf ("closing end\n");                                                   <*/
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
       return 0;
    }
-   if (a_queue->loc != NULL && strcmp ("stdout", a_queue->loc) == 0) {
+   if (strcmp ("stdout", a_queue->loc) == 0) {
       DEBUG_YPARSE  yLOG_snote   ("stdout");
-      a_queue->file == NULL;
-      if (a_queue->loc != NULL)  free (a_queue->loc);
+      a_queue->file = NULL;
+      free (a_queue->loc);
       a_queue->loc  = NULL;
-      /*> printf ("closing end\n");                                                   <*/
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
       return 0;
    }
    /*---(close file)---------------------*/
@@ -408,13 +426,12 @@ yparse_close            (tQUEUE *a_queue)
       DEBUG_YPARSE  yLOG_snote   ("close file");
       fclose  (a_queue->file);
    }
-   a_queue->file == NULL;
+   a_queue->file = NULL;
    /*---(prepare)------------------*/
    DEBUG_YPARSE  yLOG_snote   ("globals");
-   if (a_queue->loc != NULL)  free (a_queue->loc);
+   free (a_queue->loc);
    a_queue->loc  = NULL;
    /*---(complete)-----------------*/
-   /*> printf ("closing end\n");                                                      <*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
 }
