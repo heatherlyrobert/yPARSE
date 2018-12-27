@@ -25,8 +25,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3f"
-#define   YPARSE_VER_TXT      "first full file output (not reading) from gyges, no unit testing"
+#define   YPARSE_VER_NUM      "0.3g"
+#define   YPARSE_VER_TXT      "fought with yvikeys cmds unit testing and yparse, successful"
 
 
 
@@ -134,6 +134,7 @@ char        yparse_purge            (tQUEUE *a_queue);
 char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
 char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);
 char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
+char        yparse_peek_verb        (int *a_index, char *a_verb);
 
 char        yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label);
 char        yparse_reusable         (const char a_masked);

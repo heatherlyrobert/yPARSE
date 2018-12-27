@@ -11,6 +11,7 @@
 /*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
 char        yPARSE_init             (void *a_verber, char a_reusing);
+char        yPARSE_wrap             (void);
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/

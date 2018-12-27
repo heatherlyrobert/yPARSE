@@ -387,6 +387,110 @@ yPARSE_write_all        (void)
 
 
 /*====================------------------------------------====================*/
+/*===----                         input reading                        ----===*/
+/*====================------------------------------------====================*/
+static void      o___VERB_READING____________o (void) {;};
+
+char
+yPARSE_read_all         (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   int         n           =   -1;
+   char        c           =    0;
+   float       x_lowest    =  0.0;
+   int         x_next      =   -1;
+   char        x_verb      [LEN_LABEL];
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   while (1) {
+      rc = yPARSE_read (NULL, NULL);
+      if (rc < 0)  {
+         DEBUG_YPARSE   yLOG_note    ("done reading records");
+         break;
+      }
+      yparse_peek_verb (&n, x_verb);
+      DEBUG_YPARSE  yLOG_value   ("index"     , n);
+      if (n < 0)  {
+         DEBUG_YPARSE   yLOG_note    ("verb not recognized");
+         continue;
+      }
+      DEBUG_YPARSE  yLOG_info    ("verb"      , x_verb);
+      DEBUG_YPARSE  yLOG_point   ("reader"    , s_verbs [n].reader);
+      if (s_verbs [n].reader == NULL) {
+         DEBUG_YPARSE   yLOG_note    ("reader not assigned");
+         continue;
+      }
+      rc = s_verbs [n].reader ();
+      if (rc < 0)  {
+         DEBUG_YPARSE   yLOG_note    ("handler not successful");
+         continue;
+      }
+      ++c;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return c;
+}
+
+/*> char         /+-> file reading driver ----------------[ leaf   [ge.C71.072.GA]+/ /+-[02.0000.102.!]-+/ /+-[--.---.---.--]-+/                                                            <* 
+ *> INPT_edit          (void)                                                                                                                                                               <* 
+ *> {                                                                                                                                                                                       <* 
+ *>    /+---(locals)-----------+-----------+-+/                                                                                                                                             <* 
+ *>    char        rce         =  -10;                                                                                                                                                      <* 
+ *>    int         rc          =    0;                                                                                                                                                      <* 
+ *>    int         i           =    0;                                                                                                                                                      <* 
+ *>    int         n           =   -1;                                                                                                                                                      <* 
+ *>    int         x_celltry   = 0;                                                                                                                                                         <* 
+ *>    int         x_cellbad   = 0;                                                                                                                                                         <* 
+ *>    /+---(header)-------------------------+/                                                                                                                                             <* 
+ *>    DEBUG_INPT  yLOG_enter   (__FUNCTION__);                                                                                                                                             <* 
+ *>    /+---(defense)------------------------+/                                                                                                                                             <* 
+ *>    --rce;  if (!STATUS_operational (FMOD_FILE)) {                                                                                                                                       <* 
+ *>       DEBUG_INPT   yLOG_note    ("can not execute until operational");                                                                                                                  <* 
+ *>       DEBUG_INPT   yLOG_exitr   (__FUNCTION__, rce);                                                                                                                                    <* 
+ *>       return rce;                                                                                                                                                                       <* 
+ *>    }                                                                                                                                                                                    <* 
+ *>    /+---(open file)----------------------+/                                                                                                                                             <* 
+ *>    rc = yvikeys__file_open ("r");                                                                                                                                                       <* 
+ *>    --rce;  if (rc < 0) {                                                                                                                                                                <* 
+ *>       DEBUG_INPT  yLOG_exit    (__FUNCTION__);                                                                                                                                          <* 
+ *>       return rce;                                                                                                                                                                       <* 
+ *>    }                                                                                                                                                                                    <* 
+ *>    /+---(read lines)---------------------+/                                                                                                                                             <* 
+ *>    DEBUG_INPT  yLOG_note    ("read lines");                                                                                                                                             <* 
+ *>    while (s_file != NULL) {                                                                                                                                                             <* 
+ *>       /+---(read and clean)--------------+/                                                                                                                                             <* 
+ *>       rc = INPT__read ();                                                                                                                                                               <* 
+ *>       if (rc < 0)  break;                                                                                                                                                               <* 
+ *>       rc = INPT__parse ();                                                                                                                                                              <* 
+ *>       if (rc < 0)  break;                                                                                                                                                               <* 
+ *>       /+---(find type)-------------------+/                                                                                                                                             <* 
+ *>       DEBUG_INPT  yLOG_info    ("f_type"    , myVIKEYS.f_type);                                                                                                                         <* 
+ *>       n = yvikeys__file_by_label (myVIKEYS.f_type);                                                                                                                                     <* 
+ *>       DEBUG_INPT  yLOG_value   ("n"         , n);                                                                                                                                       <* 
+ *>       if (n < 0)  continue;                                                                                                                                                             <* 
+ *>       /+---(handle)----------------------+/                                                                                                                                             <* 
+ *>       ++s_sections [n].try;                                                                                                                                                             <* 
+ *>       rc = -1;                                                                                                                                                                          <* 
+ *>       DEBUG_INPT  yLOG_point   ("reader"    , s_sections [n].reader);                                                                                                                   <* 
+ *>       if (s_sections [n].reader != NULL) {                                                                                                                                              <* 
+ *>          rc = s_sections [n].reader (myVIKEYS.f_vers, s_fields [2], s_fields [3], s_fields [4], s_fields [5], s_fields [6], s_fields [7], s_fields [8], s_fields [9], s_fields [10]);   <* 
+ *>       }                                                                                                                                                                                 <* 
+ *>       if (rc < 0)  ++s_sections [n].bad;                                                                                                                                                <* 
+ *>       /+---(done)------------------------+/                                                                                                                                             <* 
+ *>    }                                                                                                                                                                                    <* 
+ *>    /+---(close file)---------------------+/                                                                                                                                             <* 
+ *>    yvikeys__file_close ();                                                                                                                                                              <* 
+ *>    /+---(complete)-----------------------+/                                                                                                                                             <* 
+ *>    DEBUG_INPT yLOG_exit    (__FUNCTION__);                                                                                                                                              <* 
+ *>    return 0;                                                                                                                                                                            <* 
+ *> }                                                                                                                                                                                       <*/
+
+
+
+/*====================------------------------------------====================*/
 /*===----                         unit testing                         ----===*/
 /*====================------------------------------------====================*/
 static void      o___UNITTEST________________o (void) {;};

@@ -36,47 +36,13 @@ static tTYPES  s_types [MAX_TYPES] = {
    { 'D', "desc"               , 's',   60, "desc string     (-60.60s)"        },
    { 'U', "unit"               , 's',   70, "unit string     (-70.70s)"        },
    { 'H', "hundred"            , 's',  100, "hundred string  (-100.100s)"      },
-   { 'O', "open"               , 's',  999, "open string     (s)"              },
+   { 'O', "open"               , 's',   60, "open string     (s)"              },
 
    {  0 , "end-of-types"       , '-',    0, ""                                 },
 };
 static int   s_ntype       =    0;
 static char  s_strings     [LEN_LABEL]  = "";
 static char  s_numbers     [LEN_LABEL]  = "";
-
-/*
- * char
- *     c   = char            ( 1 char)    1.0
- *
- * int
- *     s   = short           ( 3 char)    3.0
- *     i   = moderate int    ( 5 char)    5.0
- *     l   = longer          (10 char)   10.0
- *
- * float
- *     k   = kine            ( 6 char)    6.1_
- *     f   = float           ( 6 char)    8.2
- *
- * double
- *     d   = double          (10 char)   10.3
- *     e   = exponent        (10 char)   any
- *     t   = technical       (20 char)   any
- *     r   = real            (12 char)   any
- *
- * string
- *     C   = char            (  1 char)
- *     S   = short           (  5 char)
- *     T   = terse           ( 10 char)
- *     L   = label/address   ( 12 char)
- *     N   = name            ( 20 char)
- *     F   = forty           ( 40 char)
- *     D   = description     ( 60 char)
- *     U   = unit test       ( 70 char)
- *     H   = hundred         (100 char)
- *     O   = open            (no trunc)
- *
- *
- */
 
 
 
@@ -342,18 +308,21 @@ yPARSE_pushverb         (char *a_verb)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(prepare)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("purge");
    rc = yPARSE_purge_out   ();
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
    }
    /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("defense");
    rc = yparse_out_defense ();
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
    }
    /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("check");
    DEBUG_YPARSE  yLOG_spoint  (a_verb);
    --rce;  if (a_verb == NULL || a_verb [0] == '\0') {
       s_qout.good = 'n';
@@ -361,6 +330,8 @@ yPARSE_pushverb         (char *a_verb)
       return rce;
    }
    /*---(find it)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   (a_verb);
+   DEBUG_YPARSE  yLOG_snote   ("find");
    n = yparse_verb_find (&s_qout, a_verb);
    if (n < 0) {
       s_qout.good = 'n';
@@ -369,6 +340,7 @@ yPARSE_pushverb         (char *a_verb)
    }
    sprintf (t, "%-12.12s"  , a_verb);
    /*---(enqueue)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("enqueue");
    rc = yparse_enqueue (&s_qout, t);
    if (rc < 0) {
       s_qout.good = 'n';
@@ -540,7 +512,7 @@ yparse__spacer          (void)
    DEBUG_YPARSE  yLOG_snote   ("open");
    /*---(print)--------------------------*/
    DEBUG_YPARSE  yLOG_snote   ("print");
-   fprintf  (s_qout.file, "\n\n");
+   fprintf  (s_qout.file, "\n\n\n");
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
