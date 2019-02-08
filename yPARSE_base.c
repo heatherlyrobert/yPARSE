@@ -33,10 +33,10 @@ yPARSE_version          (void)
 }
 
 char
-yPARSE_init             (void *a_verber, char a_reusing)
+yPARSE_init             (char a_verbs, void *a_verber, char a_reusing)
 {
+   myPARSE.verbs   = a_verbs;
    myPARSE.verber  = a_verber;
-   myPARSE.nline   = 0;
    myPARSE.ready   = 'y';
    myPARSE.reusing = a_reusing;
    yparse_init_types ();
@@ -44,6 +44,18 @@ yPARSE_init             (void *a_verber, char a_reusing)
    yparse_init_in    ();
    yparse_init_out   ();
    yparse_initline   ();
+   strlcpy (myPARSE.delimiters, "(,)", LEN_LABEL);
+   return 0;
+}
+
+char
+yPARSE_delimiters       (char *a_list)
+{
+   if (a_list == NULL) {
+      strlcpy (myPARSE.delimiters, "(,)", LEN_LABEL);
+   } else  {
+      strlcpy (myPARSE.delimiters, a_list , LEN_LABEL);
+   }
    return 0;
 }
 
@@ -53,7 +65,6 @@ yPARSE_wrap             (void)
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
    myPARSE.verber  = NULL;
-   myPARSE.nline   = 0;
    myPARSE.ready   = '-';
    myPARSE.reusing = NULL;
    return 0;
@@ -81,7 +92,7 @@ char         /*-> set up programgents/debugging ------[ light  [uz.320.011.05]*/
 yparse__unit_quiet      (void)
 {
    myPARSE.logger = yLOG_begin ("yPARSE", yLOG_SYSTEM, yLOG_QUIET);
-   yPARSE_init (yparse__unit_verber, 'y');
+   yPARSE_init ('y', yparse__unit_verber, 'y');
    return 0;
 }
 
@@ -90,7 +101,7 @@ yparse__unit_loud       (void)
 {
    myPARSE.logger = yLOG_begin ("yPARSE", yLOG_SYSTEM, yLOG_NOISE);
    yURG_name ("yparse", 'y');
-   yPARSE_init (yparse__unit_verber, 'y');
+   yPARSE_init ('y', yparse__unit_verber, 'y');
    return 0;
 }
 

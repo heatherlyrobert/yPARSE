@@ -1,4 +1,22 @@
 /*============================[[    beg-code    ]]============================*/
+/*===[[ HEADER ]]=============================================================*/
+/*
+ *   focus         : ((tbd))
+ *   niche         : ((tbd))
+ *   heritage      : terminus (god and protector of boundaries and markers)
+ *   purpose       : provide file location, change, and search services
+ *
+ *   base_system   : gnu/linux   (powerful, ubiquitous, technical, and hackable)
+ *   lang_name     : ansi-c      (wicked, limitless, universal, and everlasting)
+ *   dependencies  : none
+ *   size          : small       (approximately 2,000 slocL)
+ * 
+ *   author        : rsheatherly
+ *   created       : 2014-10
+ *   priorities    : direct, simple, brief, vigorous, and lucid (h.w. fowler)
+ *   end goal      : loosely coupled, strict interface, maintainable, traceable
+ */
+
 #ifndef   YPARSE_HGUARD
 #define   YPARSE_HGUARD       loaded
 
@@ -10,7 +28,7 @@
 
 /*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
-char        yPARSE_init             (void *a_verber, char a_reusing);
+char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);
 char        yPARSE_wrap             (void);
 
 
@@ -39,6 +57,8 @@ char        yPARSE_read             (int *n, int *c);
 char        yPARSE_load             (int *n, int *c, char *a_recd);
 char        yPARSE_reload           (int *n, int *c, int a_line, char *a_label);
 char        yPARSE_hidden           (int *n, int *c, char *a_recd);
+char        yPARSE_read_all         (void);
+int         yPARSE_recdno           (void);
 
 
 
@@ -47,17 +67,14 @@ char        yPARSE_purge_in         (void);
 char        yPARSE_purge_out        (void);
 
 /*---(yPARSE_in.c)----------*/
-
+char        yPARSE_ready            (int *a_count);
+char        yPARSE_delimiters       (char *a_list);
 char        yPARSE_toss             (void);
-
 char        yPARSE_popstr           (char *a_item);
-
 char        yPARSE_adjval           (double a_old, const char *a_entry, double *a_new);
 char        yPARSE_adjfrom          (double a_old, const char *a_entry, double *a_new);
-
 char        yPARSE_popval           (double a_old, double *a_new);
 char        yPARSE_popfrom          (double a_old, double *a_new);
-
 char        yPARSE_popchar          (char   *a_new);
 char        yPARSE_popint           (int    *a_new);
 char        yPARSE_popfloat         (float  *a_new);

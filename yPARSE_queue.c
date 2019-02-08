@@ -227,6 +227,7 @@ yparse_init             (tQUEUE *a_queue, char *a_label)
    /*---(file)---------------------------*/
    a_queue->loc      = NULL;
    a_queue->file     = NULL;
+   a_queue->tline    =    0;
    a_queue->nline    =    0;
    a_queue->cline    =    0;
    /*---(record)-------------------------*/
@@ -343,6 +344,7 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
    }
    /*---(verify file)--------------------*/
    --rce;  if (a_queue->label [0] == 'I') {
+      DEBUG_YPARSE   yLOG_snote   (a_name);
       rc = stat (a_name, &s);
       DEBUG_YPARSE   yLOG_sint    (rc);
       --rce;  if (rc < 0) {

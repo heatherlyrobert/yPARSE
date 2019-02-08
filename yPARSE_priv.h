@@ -25,8 +25,8 @@
 
 /*===[[ VERSION ]]========================================*/
 /* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3h"
-#define   YPARSE_VER_TXT      "increased safety and defense around open/close"
+#define   YPARSE_VER_NUM      "0.3i"
+#define   YPARSE_VER_TXT      "small changes for recdno and line reporting"
 
 
 
@@ -43,11 +43,11 @@ extern char yPARSE__unit_answer [ LEN_STR  ];
 typedef  struct cACCESSOR  tACCESSOR;
 struct cACCESSOR {
    char        logger;                          /* yURG debugging handle      */
+   char        verbs;
    char        ready;                           /* flag init/config ready     */
    char        reusing;                         /* must lines be saved        */
+   char        delimiters  [LEN_LABEL];
    char        (*verber) (void);                /* verb lookup function       */
-   int         nline;
-   int         cline;
    char        orig        [LEN_RECD];
    char        recd        [LEN_RECD];
    char        verb        [LEN_LABEL];
@@ -100,8 +100,9 @@ struct      cQUEUE {
    /*---(file)--------------*/
    char       *loc;
    FILE       *file;
-   int         nline;
-   int         cline;
+   int         tline;                           /* line number in total       */
+   int         nline;                           /* line number of accepted    */
+   int         cline;                           /* current line               */
    /*---(record)------------*/
    char        recd        [LEN_RECD];
    int         len;

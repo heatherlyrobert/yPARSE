@@ -60,6 +60,12 @@ char yparse_init_in          (void) { return yparse_init  (&s_qin, "IN"); }
 char yPARSE_purge_in         (void) { return yparse_purge (&s_qin);       }
 char yparse_good_in          (void) { s_qin.good = 'y'; return 0; }
 
+char
+yPARSE_ready            (int *a_count)
+{
+   if (a_count != NULL)  *a_count = s_qin.count;
+   return s_qin.good;
+}
 
 
 
@@ -364,7 +370,6 @@ yparse_recd             (char *a_recd)
    int         x_len       =    0;
    int         c           =    0;
    char       *p           = NULL;
-   char       *q           = "(,)";
    char       *r           = NULL;
    int         i           =    0;
    /*---(header)-------------------------*/
@@ -378,12 +383,12 @@ yparse_recd             (char *a_recd)
    DEBUG_YPARSE yLOG_info    ("a_recd"    , a_recd);
    x_len = strllen   (a_recd, LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
-   x_len = strllen   (q, LEN_RECD);
-   for (i = c = 0; i < x_len; ++i)   c += strldcnt (a_recd, q [i], LEN_RECD);
+   x_len = strllen   (myPARSE.delimiters, LEN_RECD);
+   for (i = c = 0; i < x_len; ++i)   c += strldcnt (a_recd, myPARSE.delimiters [i], LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
    myPARSE.nfield = c;
    /*---(get first)----------------------*/
-   p     = strtok_r (a_recd, q, &r);
+   p     = strtok_r (a_recd, myPARSE.delimiters, &r);
    DEBUG_YPARSE yLOG_point   ("p"         , p);
    c     = 0;
    /*---(read fields)--------------------*/
@@ -399,7 +404,7 @@ yparse_recd             (char *a_recd)
       DEBUG_YPARSE yLOG_value   ("enqueue"   , rc);
       ++c;
       /*---(get next)--------------------*/
-      p = strtok_r (NULL  , q, &r);
+      p = strtok_r (NULL  , myPARSE.delimiters, &r);
       DEBUG_YPARSE yLOG_point   ("p"         , p);
       /*---(done)------------------------*/
    }
@@ -500,9 +505,10 @@ yparse__infile          (void)
       fgets (s_qin.recd, LEN_RECD, s_qin.file);
       if (feof (s_qin.file))  {
          DEBUG_YPARSE   yLOG_snote   ("end-of-file");
-         DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-         return rce;
+         DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, 1);
+         return 1;
       }
+      ++s_qin.tline;
       /*---(clean)-----------------------*/
       s_qin.len = strlen (s_qin.recd);
       if (s_qin.len > 0)  s_qin.recd [--s_qin.len] = 0;
@@ -515,11 +521,6 @@ yparse__infile          (void)
          DEBUG_YPARSE  yLOG_snote    ("#");
          x_bad = 'y';
          rc    = rce - 1;
-      }
-      else if (s_qin.recd [0] == ' ') {
-         DEBUG_YPARSE  yLOG_snote    ("·");
-         x_bad = 'y';
-         rc    = rce - 2;
       }
       else if (s_qin.len      <   5 ) {
          DEBUG_YPARSE  yLOG_snote    ("¨");
@@ -642,6 +643,13 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
       if (a_line < 0) {
          rc = yparse__infile ();
          DEBUG_YPARSE  yLOG_value   ("read"      , rc);
+         if (rc == 1) {
+            DEBUG_YPARSE  yLOG_note    ("end-of-file");
+            yPARSE_purge_in ();
+            s_qin.good = 'n';
+            DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+            return 0;
+         }
       } else {
          rc = yparse__existing (a_line, a_label);
          DEBUG_YPARSE  yLOG_value   ("existing"  , rc);
@@ -668,21 +676,23 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
    /*---(set as good)-----------------*/
    s_qin.good = 'y';
    /*---(pop verb)--------------------*/
-   rc = yparse_peek_in   (0, myPARSE.verb);
-   rc = yparse_verb_find (&s_qin, myPARSE.verb);
-   if (rc < 0) {
-      yPARSE_purge_in ();
-      s_qin.good = 'n';
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
-      return rce;
-   }
-   if (myPARSE.verber != NULL) {
-      rc = myPARSE.verber ();
+   if (myPARSE.verbs == 'y') {
+      rc = yparse_peek_in   (0, myPARSE.verb);
+      rc = yparse_verb_find (&s_qin, myPARSE.verb);
       if (rc < 0) {
          yPARSE_purge_in ();
          s_qin.good = 'n';
          DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
          return rce;
+      }
+      if (myPARSE.verber != NULL) {
+         rc = myPARSE.verber ();
+         if (rc < 0) {
+            yPARSE_purge_in ();
+            s_qin.good = 'n';
+            DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+            return rce;
+         }
       }
    }
    /*---(pop verb)--------------------*/
@@ -702,6 +712,7 @@ char yPARSE_read        (int *n, int *c)                            { return ypa
 char yPARSE_load        (int *n, int *c, char *a_recd)              { return yparse__main (n, c, -1, a_recd, NULL); }
 char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return yparse__main (n, c, a_line, NULL, a_label); }
 char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse__main (n, c,  0, a_recd, NULL); }
+int  yPARSE_recdno      (void)  { return s_qin.tline; }
 
 
 
