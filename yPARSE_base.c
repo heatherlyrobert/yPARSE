@@ -28,7 +28,7 @@ yPARSE_version          (void)
 #else
    strncpy (t, "[unknown    ]", 15);
 #endif
-   snprintf (yPARSE_ver, 100, "%s   %s : %s", t, YPARSE_VER_NUM, YPARSE_VER_TXT);
+   snprintf (yPARSE_ver, 100, "%s   %s : %s", t, P_VERNUM, P_VERTXT);
    return yPARSE_ver;
 }
 
@@ -91,7 +91,7 @@ yparse__unit_verber     (void)
 char         /*-> set up programgents/debugging ------[ light  [uz.320.011.05]*/ /*-[00.0000.00#.#]-*/ /*-[--.---.---.--]-*/
 yparse__unit_quiet      (void)
 {
-   myPARSE.logger = yLOG_begin ("yPARSE", yLOG_SYSTEM, yLOG_QUIET);
+   myPARSE.logger = yLOGS_begin ("yPARSE", YLOG_SYS, YLOG_QUIET);
    yPARSE_init ('y', yparse__unit_verber, 'y');
    return 0;
 }
@@ -99,7 +99,7 @@ yparse__unit_quiet      (void)
 char         /*-> set up programgents/debugging ------[ light  [uz.320.011.05]*/ /*-[00.0000.00#.!]-*/ /*-[--.---.---.--]-*/
 yparse__unit_loud       (void)
 {
-   myPARSE.logger = yLOG_begin ("yPARSE", yLOG_SYSTEM, yLOG_NOISE);
+   myPARSE.logger = yLOGS_begin ("yPARSE", YLOG_SYS, YLOG_NOISE);
    yURG_name ("yparse", 'y');
    yPARSE_init ('y', yparse__unit_verber, 'y');
    return 0;
@@ -108,6 +108,6 @@ yparse__unit_loud       (void)
 char         /*-> set up program urgents/debugging ---[ light  [uz.210.001.01]*/ /*-[00.0000.00#.!]-*/ /*-[--.---.---.--]-*/
 yparse__unit_end        (void)
 {
-   yLOG_end     ();
+   yLOGS_end     ();
    return 0;
 }

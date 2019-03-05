@@ -1,21 +1,4 @@
 /*============================[[    beg-code    ]]============================*/
-/*===[[ HEADER ]]=============================================================*/
-/*
- *   focus         : ((tbd))
- *   niche         : ((tbd))
- *   heritage      : terminus (god and protector of boundaries and markers)
- *   purpose       : provide file location, change, and search services
- *
- *   base_system   : gnu/linux   (powerful, ubiquitous, technical, and hackable)
- *   lang_name     : ansi-c      (wicked, limitless, universal, and everlasting)
- *   dependencies  : none
- *   size          : small       (approximately 2,000 slocL)
- * 
- *   author        : rsheatherly
- *   created       : 2014-10
- *   priorities    : direct, simple, brief, vigorous, and lucid (h.w. fowler)
- *   end goal      : loosely coupled, strict interface, maintainable, traceable
- */
 
 #ifndef   YPARSE_HGUARD
 #define   YPARSE_HGUARD       loaded

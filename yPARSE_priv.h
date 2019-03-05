@@ -1,7 +1,41 @@
 /*============================[[    beg-code    ]]============================*/
+#ifndef   YPARSE_PGUARD
+#define   YPARSE_PGUARD       loaded
+
 #include    "yPARSE.h"
 
 
+
+/*===[[ BEG_HEADER ]]=========================================================*/
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-*/
+
+/*===[[ ONE_LINERS ]]=========================================================*/
+
+#define     P_FOCUS     "RS (run-time support)"
+#define     P_NICHE     "fp (file parsing)"
+#define     P_PURPOSE   "simple, standard file parsing and aggregating library"
+
+#define     P_NAMESAKE  "jupiter-terminus (boundaries)"
+#define     P_HERITAGE  "roman god of boundaries, division, and boundary markers"
+#define     P_IMAGERY   "head and torso of a man, connected to a boundary stone as a base"
+
+#define     P_SYSTEM    "gnu/linux   (powerful, ubiquitous, technical, and hackable)"
+#define     P_LANGUAGE  "ansi-c      (wicked, limitless, universal, and everlasting)"
+#define     P_CODESIZE  "small       (appoximately 10,000 slocl)"
+
+#define     P_AUTHOR    "heatherlyrobert"
+#define     P_CREATED   "2018-01"
+#define     P_DEPENDS   "none"
+
+#define     P_VERNUM    "0.3j"
+#define     P_VERTXT    "updated to address changes to yLOG"
+
+#define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
+#define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
+#define     P_REMINDER  "there are many better options, but i *own* every byte of this one"
+
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-*/
+/*===[[ END_HEADER ]]=========================================================*/
 
 
 /*===[[ library headers -- standard ]]========================================*/
@@ -22,11 +56,6 @@
 #include    <ySTR.h>                /* CUSTOM heatherly string handling       */
 
 
-
-/*===[[ VERSION ]]========================================*/
-/* rapidly evolving version number to aid with visual change confirmation     */
-#define   YPARSE_VER_NUM      "0.3i"
-#define   YPARSE_VER_TXT      "small changes for recdno and line reporting"
 
 
 
@@ -172,3 +201,8 @@ char*       yparse__unit_line       (char *a_question, int a_num);
 char        yparse__unit_quiet      (void);
 char        yparse__unit_loud       (void);
 char        yparse__unit_end        (void);
+
+
+
+#endif
+/*============================[[    end-code    ]]============================*/
