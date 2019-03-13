@@ -479,6 +479,7 @@ yPARSE_write            (int *n, int *c)
       return 0;
    }
    /*---(write)--------------------------*/
+   strlcpy  (myPARSE.recd, s_qout.recd, LEN_RECD);
    strlcpy  (t, s_qout.recd, LEN_RECD);
    strldchg (t, G_CHAR_FIELD, G_KEY_FIELD, LEN_RECD);
    if (s_qout.file != NULL)   fprintf  (s_qout.file, "%s\n", t);

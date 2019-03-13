@@ -406,8 +406,13 @@ yPARSE_read_all         (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    while (1) {
       rc = yPARSE_read (NULL, NULL);
-      if (rc < 0)  {
-         DEBUG_YPARSE   yLOG_note    ("done reading records");
+      if (rc <= 0)  {
+         DEBUG_YPARSE   yLOG_note    ("end-of-file");
+         break;
+      }
+      /*> printf ("%s\n", myPARSE.recd);                                              <*/
+      if (rc <  0)  {
+         DEBUG_YPARSE   yLOG_note    ("trouble reading records");
          break;
       }
       yparse_peek_verb (&n, x_verb);

@@ -665,6 +665,8 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
       s_qin.len = strlen (s_qin.recd);
    }
    /*---(load the queue)-----------------*/
+   strcpy (myPARSE.recd, s_qin.recd);
+   strldchg (myPARSE.recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
    rc = yparse_recd  (s_qin.recd);
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
    if (rc < 0) {
@@ -892,12 +894,6 @@ yPARSE_fullread         (char *a_verb, ...)
    char        t           [LEN_LABEL];
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   rc = yPARSE_read (NULL, NULL);
-   if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
-      return rc;
-   }
-   /*---(verify verb)--------------------*/
    /*---(column count)-------------------*/
    n = yparse_col_count (&s_qin);
    DEBUG_YPARSE   yLOG_value   ("ncol"      , n);

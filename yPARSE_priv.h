@@ -27,8 +27,8 @@
 #define     P_CREATED   "2018-01"
 #define     P_DEPENDS   "none"
 
-#define     P_VERNUM    "0.3j"
-#define     P_VERTXT    "updated to address changes to yLOG"
+#define     P_VERNUM    "0.3k"
+#define     P_VERTXT    "fixed read_all issue and create a unit test for it"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -143,6 +143,18 @@ struct      cQUEUE {
    /*---(done)--------------*/
 };
 
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+typedef     struct      cMOCK       tMOCK;
+struct cMOCK {
+   char        recd        [LEN_RECD];
+   char        x_ch;
+   int         x_int;
+   char        x_str       [LEN_LABEL];
+   float       x_float;
+   char        x_str2      [LEN_LABEL];
+};
+extern      tMOCK       g_mocks     [10];
+extern      int         g_nmock;
 
 
 char        yparse_init_types       (void);
@@ -198,6 +210,12 @@ char*       yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_nu
 char*       yparse__unit_in         (char *a_question, int a_num);
 char*       yparse__unit_out        (char *a_question, int a_num);
 char*       yparse__unit_line       (char *a_question, int a_num);
+
+char        yparse_mock__clear      (void);
+char        yparse_mock__writer     (void);
+char        yparse_mock__reader     (void);
+char*       yparse_mock__unit       (char *a_question, int a_num);
+
 char        yparse__unit_quiet      (void);
 char        yparse__unit_loud       (void);
 char        yparse__unit_end        (void);
