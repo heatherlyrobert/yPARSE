@@ -33,9 +33,9 @@ yPARSE_version          (void)
 }
 
 char
-yPARSE_init             (char a_verbs, void *a_verber, char a_reusing)
+yPARSE_init             (char a_auto, void *a_verber, char a_reusing)
 {
-   myPARSE.verbs   = a_verbs;
+   myPARSE.verbs   = a_auto;
    myPARSE.verber  = a_verber;
    myPARSE.ready   = 'y';
    myPARSE.reusing = a_reusing;
@@ -64,9 +64,10 @@ yPARSE_wrap             (void)
 {
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
+   myPARSE.verbs   = YPARSE_NOAUTO;
    myPARSE.verber  = NULL;
    myPARSE.ready   = '-';
-   myPARSE.reusing = NULL;
+   myPARSE.reusing = YPARSE_NOREUSE;
    return 0;
 }
 

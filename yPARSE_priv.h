@@ -27,8 +27,8 @@
 #define     P_CREATED   "2018-01"
 #define     P_DEPENDS   "none"
 
-#define     P_VERNUM    "0.3k"
-#define     P_VERTXT    "fixed read_all issue and create a unit test for it"
+#define     P_VERNUM    "0.3l"
+#define     P_VERTXT    "updates to support arachne and yvikeys"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

@@ -5,6 +5,13 @@
 
 
 
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+#define     YPARSE_AUTO             'y'
+#define     YPARSE_NOAUTO           '-'
+#define     YPARSE_REUSE            'y'
+#define     YPARSE_NOREUSE          '-'
+
+
 /*===[[ PUBLIC FUNCTIONS ]]===============================*/
 
 

@@ -7,13 +7,22 @@ yPARSE \- standard file parsing and aggregating library
 .B #include  <yPARSE.h>
 .sp
 ---(shared)------------------------------------
-.BI "char*   yPARSE_version   (void);"
-.BI "char    yPARSE_init      (void *a_verber, char a_reusing);"
+.BI "char*   yPARSE_version     (void);"
+.BI "char    yPARSE_init        (char  " "a_auto " ", void *" "a_verber" ", char  " "a_reusing" ");"
+.BI "char    yPARSE_handler     (char  " "a_mode " ", char *" "a_verb  " ", float*" "a_seq" ","
+.BI "                            char *" "a_specs" ", void *" "a_reader" ", void *" "a_writer" ","
+.BI "                            char *" "a_flags" ", char *" "a_labels" ", char *" "a_desc" ");"
 .sp
----(input)-------------------------------------
+===(( input ))=================================
+---(file)--------------------------------------
+.BI "char    yPARSE_open_in     (char *" "a_name" ");"
+.BI "char    yPARSE_stdin       (void);"
+.BI "char    yPARSE_read_all    (void);"
+.BI "char    yPARSE_close_in    (void);"
 .BI "char    yPARSE_purge_in    (void);"
----(normal)------------------------------------
-.BI "char    yPARSE_poptoss     (void);"
+.BI "char    yPARSE_read        (int *" "a_tot" ", int *" "a_cnt" ");"
+---(parsing)-----------------------------------
+.BI "char    yPARSE_toss        (void);"
 .BI "char    yPARSE_popstr      (char   *" "a_str" ");"
 .BI "char    yPARSE_popchar     (char   *" "a_new" ");"
 .BI "char    yPARSE_popint      (int    *" "a_new" ");"
@@ -32,11 +41,15 @@ yPARSE \- standard file parsing and aggregating library
 .sp
 ---(files)-------------------------------------
 .BI "char    yPARSE_open        (char " "a_dir" ", char *" "a_name" ");"
-.BI "char    yPARSE_read        (int *" "a_tot" ", int *" "a_cnt" ");"
-.BI "char    yPARSE_flush       (void);"
 .BI "char    yPARSE_close       (void);"
 .sp
----(output)------------------------------------
+===(( output ))================================
+---(file)--------------------------------------
+.BI "char    yPARSE_stdout      (void);"
+.BI "char    yPARSE_open_out    (char *" "a_name" ", char *" "a_prog"  ", char *" "a_desc" ");"
+.BI "char    yPARSE_purge_out   (void);"
+.BI "char    yPARSE_close_out   (void);"
+---(aggregating)-------------------------------
 .BI "char    yPARSE_pushverb    (char   *" "a_verb" ");"
 .BI "char    yPARSE_pushempty   (void);"
 .BI "char    yPARSE_pushstr     (char   *" "a_str" ");"
@@ -55,24 +68,101 @@ returns a string containing the latest yPARSE version number and version
 comment.  this is very useful in debugging/logging.
 
 .B yPARSE_init.  
-initializes the yPARSE environment for use.  accepts two arguments...
-   -- a_verber  : client function to process verb immediately
-   -- a_reusing : togle line reuse flag (arachne scripts)
+initializes the yPARSE environment for use and how much the reading and
+writing process can be automated.
 
+.RS 3
+.B a_auto, 
+sets automatic triggering of verb handlers for read and write (YPARSE_AUTO
+or YPARSE_NOAUTO);
+
+.B a_verber, 
+client function to process verb type immediately (pointer to a "char (void)"
+function).
+
+.B a_reusing, 
+saves lines to be adapted for future use (YPARSE_REUSE or YPARSE_NOREUSE).
+.RE
+
+.B yPARSE_handler.  
+configures an individual auto verb handler.  if you set yPARSE_init a_auto
+to YPARSE_AUTO, every verb must have a handler or will be rejected.  if it
+was set to yPARSE_NOAUTO, these records are not necessary.
+
+.RS 3
+.B a_mode, 
+identifies/links to a yVIKEYS mode, as desired.
+
+.B a_verb, 
+string name of the verb (3-10 chars).
+
+.B a_seq, 
+sequence for writing record type to output file.
+
+.B a_specs, 
+string idenfifies type for each field in record.
+
+.B a_reader, 
+function pointer to read this verb type.
+
+.B a_writer, 
+function pointer to write all of this type.
+
+.B a_flags, 
+string identifies special treatment by field.
+
+.B a_labels, 
+string of output labels for each field.
+
+.B a_desc, 
+description of verb for reference.
+.RE
 
 .SH INPUT FUNCTIONS
+once yPARSE_init is called, input files can be read from any source.  the
+sequence of events is very typical -- open, purge, read, handle, close.
 
-.B yPARSE_purge_in ();
-   -- clear all entries from in queue
-   -- initialize qlobal counts
+.SS file handling
 
-.B yPARSE_toss ();
-   -- remove current field from queue
-   -- return nothing
+.B yPARSE_open_in,  
+opens input by a full qualified path/file name.
 
-.B yPARSE_popstr (char *a_str);
-   -- remove current field from queue
-   -- return using string pointer
+.B yPARSE_stdin,
+shorthand for yPARSE_open_in ("stdin").
+
+.B yPARSE_read_all,
+if YPARSE_auto, this function handles all input.
+
+.B yPARSE_read,
+if not YPARSE_AUTO, this reads a single record.
+
+.B yPARSE_purge_in,
+clears input queue and initializes global counts.
+
+.B yPARSE_close_in,  
+closes current input file.
+
+.SS parsing
+
+.B yPARSE_toss,
+removes current field from queue.
+
+.B yPARSE_popstr,
+returns current field as string, advances one.
+
+.B yPARSE_popchar,
+returns current field as character, advances one.
+
+.B yPARSE_popint,
+returns current field as integer, advances one.
+
+.B yPARSE_popfloat,
+returns current field as float, advances one.
+
+.B yPARSE_popdouble,
+returns current field as double, advances one.
+
+.SS advanced
 
 .B yPARSE_popval  (double a_old, double *a_new);
    -- remove current field from queue
@@ -91,10 +181,6 @@ initializes the yPARSE environment for use.  accepts two arguments...
 
 .B yPARSE_adjfrom (double a_old, char *a_entry, double *a_new);
    -- same as yPARSE_adjval, but treat all values as relative to old
-
-.B yPARSE_popchar, _popint, _popfloat, and _popdouble ();
-   -- all use yPARSE_popval with no old value
-   -- all cast into an appropriate return pointer
 
 
 

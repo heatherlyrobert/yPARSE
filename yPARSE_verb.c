@@ -72,28 +72,53 @@ char
 yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
    static char x_last      [LEN_LABEL] = "-";
    static char n           =   -1;
    int         i           =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_senter  (__FUNCTION__);
    /*---(short-cut)----------------------*/
-   if (a_verb == NULL)                return -10;
-   if (a_verb [0] == '\0')            return -11;
+   DEBUG_YPARSE   yLOG_spoint  (a_verb);
+   --rce;  if (a_verb == NULL) {
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_snote   (a_verb);
+   --rce;  if (a_verb [0] == '\0') {
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(short-cut)----------------------*/
+   DEBUG_YPARSE   yLOG_sint    (n);
+   DEBUG_YPARSE   yLOG_snote   (x_last);
    if (n >= 0 && strcmp (a_verb, x_last) == 0) {
       if (a_queue != NULL)  a_queue->iverb = n;
+      DEBUG_YPARSE   yLOG_snote   ("short-cut");
+      DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
       return n;
    }
    /*---(find entry)---------------------*/
+   DEBUG_YPARSE   yLOG_sint    (s_nverb);
+   --rce;  if (s_nverb <= 0) {
+      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    n = -1;
    for (i = 0; i < s_nverb; ++i) {
       if (s_verbs [i].verb [0] != a_verb [0])      continue;
       if (strcmp (s_verbs [i].verb, a_verb) != 0)  continue;
+      DEBUG_YPARSE   yLOG_snote   ("FOUND");
       n = i;
       break;
    }
    /*---(save)---------------------------*/
    strlcpy (x_last, a_verb, LEN_LABEL);
    if (a_queue != NULL)  a_queue->iverb = n;
+   DEBUG_YPARSE   yLOG_sint    (n);
+   DEBUG_YPARSE   yLOG_snote   (x_last);
    /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
    return n;
 }
 
