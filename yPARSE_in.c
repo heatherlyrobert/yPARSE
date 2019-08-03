@@ -50,6 +50,15 @@ yparse_in_defense       (void)
 }
 
 char
+yparse_in_fakeready     (void)
+{
+   myPARSE.ready = 'y';
+   s_qin.good    = 'y';
+   return 0;
+}
+
+
+char
 yparse__popable         (void)
 {
    if (s_qin.head == NULL)  return 0;
@@ -449,7 +458,8 @@ yparse_reusable         (const char a_masked)
       return rce;
    }
    /*---(start)--------------------------*/
-   sprintf (x_recd, "%s (", yPARSE_verb (s_qin.iverb));
+   /*> sprintf (x_recd, "%s (", yPARSE_verb (s_qin.iverb));                           <*/
+   sprintf (x_recd, "%s (", myPARSE.verb);
    DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
    /*---(clear)--------------------------*/
    x_curr = s_qin.head;
@@ -593,6 +603,7 @@ yparse__existing        (int a_line, char *a_label)
       strlcat (s_qin.recd, p + 2  , LEN_RECD);
    }
    s_qin.len = strlen (s_qin.recd);
+   DEBUG_YPARSE   yLOG_info    ("recd"      , s_qin.recd);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -605,6 +616,8 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
    char        rce         =  -10;                /* return code for errors    */
    char        rc          =    0;
    char        x_type      =  '-';
+   char        x_index     =   -1;
+   char        x_mask      =   -1;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE   yLOG_char    ("ready"     , myPARSE.ready);
@@ -682,42 +695,42 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
    s_qin.good = 'y';
    DEBUG_YPARSE  yLOG_char    ("s_qin.good", s_qin.good);
    /*---(pop verb)--------------------*/
+   rc = yparse_peek_in   (0, myPARSE.verb);
+   DEBUG_YPARSE  yLOG_value   ("peek"      , rc);
+   if (rc < 0) {
+      yPARSE_purge_in ();
+      s_qin.good = 'n';
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.verb);
+   DEBUG_YPARSE  yLOG_char    ("verbs"     , myPARSE.verbs);
+   --rce;  if (myPARSE.verbs == YPARSE_AUTO) {
+      x_index = yparse_verb_find (&s_qin, myPARSE.verb);
+      DEBUG_YPARSE  yLOG_value   ("find"      , x_index);
+      if (x_index < 0) {
+         yPARSE_purge_in ();
+         s_qin.good = 'n';
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+         return rce;
+      }
+   }
    DEBUG_YPARSE  yLOG_point   ("verber"    , myPARSE.verber);
-   --rce;  if (myPARSE.verbs == YPARSE_AUTO || myPARSE.verber != NULL) {
-      rc = yparse_peek_in   (0, myPARSE.verb);
-      DEBUG_YPARSE  yLOG_value   ("peek"      , rc);
+   --rce;  if (myPARSE.verber != NULL) {
+      rc = myPARSE.verber ();
+      DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
       if (rc < 0) {
          yPARSE_purge_in ();
          s_qin.good = 'n';
          DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
          return rce;
       }
-      DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.verb);
-      DEBUG_YPARSE  yLOG_char    ("verbs"     , myPARSE.verbs);
-      --rce;  if (myPARSE.verbs == YPARSE_AUTO) {
-         rc = yparse_verb_find (&s_qin, myPARSE.verb);
-         DEBUG_YPARSE  yLOG_value   ("find"      , rc);
-         if (rc < 0) {
-            yPARSE_purge_in ();
-            s_qin.good = 'n';
-            DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
-            return rce;
-         }
-      }
-      if (myPARSE.verber != NULL) {
-         rc = myPARSE.verber ();
-         DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
-         if (rc < 0) {
-            yPARSE_purge_in ();
-            s_qin.good = 'n';
-            DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
-            return rce;
-         }
-      }
    }
    /*---(pop verb)--------------------*/
    --rce;  if (a_line < 0 && s_qin.hidden != 'y') {
-      rc = yparse_reusable (rc);
+      if (x_index < 0)  x_index = yparse_verb_find (&s_qin, myPARSE.verb);
+      x_mask = yparse_verb_mask (x_index);
+      rc = yparse_reusable (x_mask);
       if (rc < 0) {
          DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
          return rce;

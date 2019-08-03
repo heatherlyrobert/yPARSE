@@ -95,7 +95,7 @@ yparse__unit_verber     (void)
    char        t           [LEN_LABEL];
    yPARSE_toss ();
    sprintf (t, " %s ", myPARSE.verb);
-   if (strstr (x_masking, t) != NULL)  return 1;
+   /*> if (strstr (x_masking, t) != NULL)  return 1;                                  <*/
    return 0;
 }
 

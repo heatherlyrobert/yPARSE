@@ -11,6 +11,7 @@ struct {
    char        mode;                        /* one char yvikeys mode id       */
    char        verb        [LEN_LABEL];     /* verb name as used in files     */
    char        specs       [LEN_LABEL];     /* field specifications           */
+   char        mask;                        /* field for reload/change        */
    /*---(handlers)----------*/
    char        (*reader)   (void);          /* function to read one record    */
    char        (*writer)   (void);          /* function to write all of type  */
@@ -58,6 +59,7 @@ yparse_verb_init        (void)
       s_verbs [i].mode    =  '·';
       strlcpy (s_verbs [i].verb   , ""            , LEN_LABEL);
       strlcpy (s_verbs [i].specs  , "------------", LEN_LABEL);
+      s_verbs [i].mask    = -1;
       s_verbs [i].reader  = NULL;
       s_verbs [i].writer  = NULL;
       strlcpy (s_verbs [i].flags  , "------------", LEN_LABEL);
@@ -122,6 +124,8 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
    return n;
 }
 
+char yparse_verb_mask        (int n) { return s_verbs [n].mask; }
+
 char
 yparse_col_by_count     (tQUEUE *a_queue)
 {
@@ -160,20 +164,26 @@ yparse_col_count        (tQUEUE *a_queue)
 }
 
 char
-yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc)
+yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, char a_mask, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc)
 {
    /*---(locals)-----------+-----+-----+-*/
    int         n           =    0;
    /*---(defense)------------------------*/
    if (a_verb == NULL)     return -1;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(check existing)-----------------*/
    n = yparse_verb_find (NULL, a_verb);
+   DEBUG_YPARSE   yLOG_value   ("s_nverb"   , s_nverb);
+   DEBUG_YPARSE   yLOG_value   ("find"      , n);
    if (n < 0)  n = s_nverb;
+   DEBUG_YPARSE   yLOG_value   ("n"         , n);
    /*---(copy values)--------------------*/
    if (a_mode   != 0   )  s_verbs [n].mode    = a_mode;
    if (a_verb   != NULL)  strlcpy (s_verbs [n].verb  , a_verb  , LEN_LABEL);
    if (a_seq    >  0.0 )  s_verbs [n].seq     = a_seq;
    if (a_specs  != NULL)  strlcpy (s_verbs [n].specs , a_specs , LEN_LABEL);
+   s_verbs [n].mask    = a_mask;
    if (a_reader != NULL)  s_verbs [n].reader  = a_reader;
    if (a_writer != NULL)  s_verbs [n].writer  = a_writer;
    if (a_flags  != NULL)  strlcpy (s_verbs [n].flags , a_flags , LEN_LABEL);
@@ -182,6 +192,7 @@ yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, 
    /*---(update)-------------------------*/
    ++s_nverb;
    /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 

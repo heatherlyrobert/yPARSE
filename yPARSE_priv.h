@@ -27,8 +27,8 @@
 #define     P_CREATED   "2018-01"
 #define     P_DEPENDS   "none"
 
-#define     P_VERNUM    "0.3l"
-#define     P_VERTXT    "updates to support arachne and yvikeys"
+#define     P_VERNUM    "0.3m"
+#define     P_VERTXT    "added fakeready to support unit testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -167,6 +167,7 @@ char        yparse_queue_tail       (tQUEUE *a_queue);
 
 
 char        yparse_verb_find        (tQUEUE *a_queue, char *a_verb);
+char        yparse_verb_mask        (int n);
 char        yparse_verb_init        (void);
 char        yparse__verb_divider    (int a_iverb);
 char*       yparse__unit_verb       (char *a_question, char *a_verb);
@@ -184,6 +185,7 @@ char        yparse_reusable         (const char a_masked);
 /*--------- ----------- ----------- ----------- ------------------------------*/
 char        yparse_recd             (char *a_recd);
 
+char        yparse_in_fakeready     (void);
 char        yparse_enqueue_in       (char *a_item);
 char        yparse_init_in          (void);
 char        yparse_peek_in          (const int a_ref, char *a_item);
