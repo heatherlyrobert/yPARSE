@@ -148,6 +148,12 @@ yPARSE_popstr           (char *a_item)
 }
 
 char
+yPARSE_top              (char *a_item)
+{
+   return yparse_topqueue (&s_qin, a_item);
+}
+
+char
 yparse_peek_in          (const int a_ref, char *a_item)
 {
    return yparse_peek   (&s_qin, a_ref, a_item);
@@ -177,6 +183,7 @@ yPARSE_adjval           (double a_old, const char *a_item, double *a_new)
    int         x_len       =    0;
    char        x_rel       =  '-';
    char        x_entry     [LEN_LABEL];
+   char        x_suffix    =  ' ';
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(prepare)------------------------*/
@@ -213,37 +220,95 @@ yPARSE_adjval           (double a_old, const char *a_item, double *a_new)
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
       return rce;
    }
-   /*---(check zero markers)-------------*/
-   if (x_len == 4 && strcmp (x_entry, "-.--") == 0) {
-      DEBUG_YPARSE  yLOG_snote   ("zero marker");
-      *a_new = 0.0;
+   /*---(zero degree markers)------------*/
+   --rce;  if (strncmp (x_entry, "-.--", 4) == 0) {
+      DEBUG_YPARSE  yLOG_snote   ("zero degree");
+      x_suffix = x_entry [4];
+      if (x_suffix == ' ')  x_suffix = x_entry [5];
+      switch (x_suffix) {
+      case '\0' :
+         DEBUG_YPARSE  yLOG_snote   ("implicit relative");
+         *a_new  = a_old;
+         break;
+      case 'r'  :
+         DEBUG_YPARSE  yLOG_snote   ("explicit relative");
+         *a_new  = a_old;
+         break;
+      case 'a'  : case '='  :
+         DEBUG_YPARSE  yLOG_snote   ("center absolute");
+         *a_new  = 0.0;
+         break;
+      case 'g'  :
+         DEBUG_YPARSE  yLOG_snote   ("ground absolute");
+         *a_new  = 0.0;
+         break;  /* absolute ground     */
+      default   :
+         DEBUG_YPARSE  yLOG_snote   ("unknown marker");
+         DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
+         return rce;
+      }
    }
-   if (x_len == 3 && strcmp (x_entry, "-.-") == 0) {
-      DEBUG_YPARSE  yLOG_snote   ("zero marker");
-      *a_new = 0.0;
+   /*---(zero distance markers)----------*/
+   else if (strncmp (x_entry, "-.-", 3) == 0) {
+      DEBUG_YPARSE  yLOG_snote   ("zero distance");
+      x_suffix = x_entry [3];
+      if (x_suffix == ' ')  x_suffix = x_entry [4];
+      switch (x_suffix) {
+      case '\0' :
+         DEBUG_YPARSE  yLOG_snote   ("implicit relative");
+         *a_new  = a_old;
+         break;
+      case 'r'  :
+         DEBUG_YPARSE  yLOG_snote   ("explicit relative");
+         *a_new  = a_old;
+         break;
+      case 'a'  : case '='  :
+         DEBUG_YPARSE  yLOG_snote   ("center absolute");
+         *a_new  = 0.0;
+         break;
+      case 'g'  :
+         DEBUG_YPARSE  yLOG_snote   ("ground absolute");
+         *a_new  = 0.0;
+         break;
+      default   :
+         DEBUG_YPARSE  yLOG_snote   ("unknown marker");
+         DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
+         return rce;
+      }
    }
-   else if (x_len == 1 && x_entry[0] == '-') {
-      DEBUG_YPARSE  yLOG_snote   ("zero marker");
-      *a_new = 0.0;
-   }
-   /*---(check min/one marker)-----------*/
-   else if (x_len == 1 && x_entry[0] == '.') {
-      DEBUG_YPARSE  yLOG_snote   ("min/one marker");
-      *a_new = 1.0;
-   }
-   /*---(check unchanged marker)---------*/
-   else if (x_len == 1 && x_entry[0] == '=') {
-      DEBUG_YPARSE  yLOG_snote   ("unchanged marker");
-      *a_new   = a_old;
+   /*---(total relative)-----------------*/
+   else if (strcmp (x_entry, "-") == 0) {
+      DEBUG_YPARSE  yLOG_snote   ("universal relative");
+      *a_new  = a_old;
    }
    /*---(check normal value)-------------*/
    else {
-      if (x_len > 1 && x_entry[x_len - 1] == 'r') {
-         DEBUG_YPARSE  yLOG_snote   ("relative");
-         x_rel   = 'y';
-         x_entry[--x_len] = 0;
+      DEBUG_YPARSE  yLOG_snote   ("normal entry");
+      if (x_len > 1) {
+         switch (x_entry [x_len - 1]) {
+         case 'r' :
+            DEBUG_YPARSE  yLOG_snote   ("explicit relative");
+            x_entry [--x_len] = 0;
+            x_rel = 'y';
+            break;
+         case 'a' : case '=' :
+            DEBUG_YPARSE  yLOG_snote   ("center absolute");
+            x_entry [--x_len] = 0;
+            x_rel = '-';
+            break;
+         case 'g'  :
+            DEBUG_YPARSE  yLOG_snote   ("ground absolute");
+            x_entry [--x_len] = 0;
+            x_rel = '-';
+            break;
+         default  :
+            DEBUG_YPARSE  yLOG_snote   ("implicit absolute");
+            x_rel = '-';
+            break;
+         }
       } else {
-         DEBUG_YPARSE  yLOG_snote   ("normal");
+         DEBUG_YPARSE  yLOG_snote   ("implicit absolute");
+         x_rel = '-';
       }
       *a_new = atof (x_entry);
       if (x_rel == 'y')   *a_new += a_old;
@@ -526,22 +591,31 @@ yparse__infile          (void)
       if (s_qin.len > 0)  s_qin.recd [--s_qin.len] = 0;
       /*> printf ("yparse__infile  %3d %3d %3d \n", x_tries, s_qin.len, s_qin.recd [0]);   <*/
       /*> printf ("yparse__infile  %3d %3d %3d %s\n", x_tries, s_qin.len, s_qin.recd [0], s_qin.recd);   <*/
-      if (x_tries > 50)  break;
+      if (x_tries > 50)  {
+         DEBUG_YPARSE  yLOG_snote    ("too many tries (>50)");
+         break;
+      }
       DEBUG_YPARSE   yLOG_sint    (s_qin.len);
       /*---(filter)----------------------*/
       if (s_qin.recd [0] == '#') {
-         DEBUG_YPARSE  yLOG_snote    ("#");
+         DEBUG_YPARSE  yLOG_snote    ("# comment");
+         x_bad = 'y';
+         rc    = rce - 1;
+      }
+      else if (s_qin.recd [0] == '\0') {
+         DEBUG_YPARSE  yLOG_snote    ("£ null/empty");
          x_bad = 'y';
          rc    = rce - 1;
       }
       else if (s_qin.len      <   5 ) {
-         DEBUG_YPARSE  yLOG_snote    ("¨");
+         DEBUG_YPARSE  yLOG_snote    ("too short (<5c)");
          x_bad = 'y';
          rc    = rce - 3;
       }
       /*---(break)-----------------------*/
       if (x_stdin == 'y') {
          DEBUG_YPARSE  yLOG_snote    ("stdin, breakout");
+         DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
          return rc;
       } else if (x_bad == '-') {
          DEBUG_YPARSE  yLOG_snote    ("success");

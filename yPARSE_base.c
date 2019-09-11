@@ -167,8 +167,6 @@ yparse__unit_quiet      (void)
 {
    int         x_narg       = 1;
    char       *x_args [20]  = {"yPARSE_unit" };
-   yURG_logger   (x_narg, x_args);
-   yURG_urgs     (x_narg, x_args);
    yPARSE_init ('y', yparse__unit_verber, 'y');
    return 0;
 }

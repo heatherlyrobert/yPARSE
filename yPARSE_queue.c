@@ -105,6 +105,32 @@ yparse_dequeue          (tQUEUE *a_queue, char *a_item)
    return 0;
 }
 
+char         /*-> look at item in front of queue -----[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
+yparse_topqueue         (tQUEUE *a_queue, char *a_item)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   tNODE      *x_save      = NULL;
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_spoint  (a_queue);
+   --rce;  if (a_queue == NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("null queue");
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_spoint  (a_item);
+   if (a_item != NULL)  strlcpy (a_item, "", LEN_RECD);
+   /*---(no entries)---------------------*/
+   DEBUG_YPARSE  yLOG_spoint  (a_queue->head);
+   --rce;  if (a_queue->head == NULL)  {
+      DEBUG_YPARSE  yLOG_snote   ("empty queue");
+      return rce;
+   }
+   /*---(copy)---------------------------*/
+   if (a_item != NULL)  strlcpy (a_item, a_queue->head->item, LEN_RECD);
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
 char         /*-> remove item from front of queue ----[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
 yparse_queue_tail       (tQUEUE *a_queue)
 {

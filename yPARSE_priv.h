@@ -27,8 +27,10 @@
 #define     P_CREATED   "2018-01"
 #define     P_DEPENDS   "none"
 
-#define     P_VERNUM    "0.3m"
-#define     P_VERTXT    "added fakeready to support unit testing"
+#define     P_VERMAJOR  "0.--, preparing for prime-time"
+#define     P_VERMINOR  "0.3-, support yKINE and arachne"
+#define     P_VERNUM    "0.3o"
+#define     P_VERTXT    "altered adjval to accept relative, absolute, and ground suffixes (unit tested)"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -176,6 +178,7 @@ char        yparse_init             (tQUEUE *a_queue, char *a_label);
 char        yparse_purge            (tQUEUE *a_queue);
 char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
 char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);
+char        yparse_topqueue         (tQUEUE *a_queue, char *a_item);
 char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
 char        yparse_peek_verb        (int *a_index, char *a_verb);
 

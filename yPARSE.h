@@ -60,6 +60,7 @@ char        yPARSE_purge_out        (void);
 char        yPARSE_ready            (int *a_count);
 char        yPARSE_delimiters       (char *a_list);
 char        yPARSE_toss             (void);
+char        yPARSE_top              (char *a_item);
 char        yPARSE_popstr           (char *a_item);
 char        yPARSE_adjval           (double a_old, const char *a_entry, double *a_new);
 char        yPARSE_adjfrom          (double a_old, const char *a_entry, double *a_new);
