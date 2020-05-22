@@ -61,6 +61,110 @@ yPARSE \- standard file parsing and aggregating library
 .sp
 .B link with -L/usr/local/libs -lyPARSE or -lyPARSE_debug
 
+.SH GENERAL GUIDELINES
+yPARSE can be used at four levels, each adding additional control, but also
+complexity.
+
+.B simple (see SIMPLE USAGE).
+uses five functions and syntax is similar to ansi-c.  good place to start
+when prototyping.
+
+.B auto-read (see AUTO-READ USAGE).
+automatic reading by direct call-back.  simplifies reading and no read loop.
+
+.B moderate (see MODERATE USAGE).
+automatic reading and automatic writing.  no read or write loop required.
+
+.B full (see FULL-INTERFACE USAGE).
+automatic reading and automatic writing.  access to all complexity.
+
+.SH SIMPLE USAGE
+this works mainly like the standard ansi-c sequence of fopen, fgets, scanf,
+printf, and fclose.  the main advanage is error handling, extensive debugging,
+and automatic formatting.  standard loops are still required for reading
+and writing.
+
+this method is advantageous because it requires almost no planning and works
+similar to ansi-c.  but, it is always, always reactive.
+
+.B yPARSE_simple (<in_file>, <out_file>);
+   -- prepares library for simple input
+   -- checks for file existance and type, opens appropriately
+
+.B yPARSE_read_one (<*lineno>, <verb>);
+   -- reads to find the next useful line, parses into fields
+   -- returns line number and verb as a string
+
+.B yPARSE_scanf (<verb>, <fmt>, ...);
+   -- uses format to identify return variable types
+   -- converts fields into appropiate types and returns in pointers
+
+.B yPARSE_printf (<verb>, <fmt>, ...);
+   -- uses format to determine formatting
+   -- builds up a record and writes to output
+
+.B yPARSE_close ();
+   -- flushes and closes input and output files
+   -- clears out the library
+
+this can be done multiple times in the same program with no issues.
+
+.SH AUTO-READ USAGE
+similar to SIMPLE usage, only the input file is automatically read and a
+call-back function is evoked for each line.  this eliminates the read loop
+and allows a more centralized reading approach.  writing is the same as SIMPLE.
+
+this method is advantageous in that code is centralized in the callback so
+simple programs stay simple.  like SIMPLE, this method is also always reactive.
+
+.B yPARSE_autoread (<in_file>, <out_file>, <callback>);
+   -- adds the callback handler to yPARSE_sopen ()
+
+.B callback (<lineno>, <verb>, <exist>, <handler>);
+   -- accepts the verb and calls appropriate yPARSE_sparse
+
+.B continue to use yPARSE_scanf, yPARSE_printf, yPARSE_close
+
+.SH PLANNED USAGE
+building on the AUTO-READ interface, this adds auto-write which eliminates
+the need for a writing loop as well.  this is useful when the number of verbs
+grows and so the writing function gets complex.
+
+this method is advantageous for programs with non-trivial output files and
+keeps the programmer away from the read and write details (and therefore the
+need for unit testing too).
+
+either the callback or individual readers can be used for reading.  writing
+is all done through the individual writers which write all-at-once.
+
+.B yPARSE_planned (<in_file>, <out_file>, <callback>, <name>, <desc>);
+   -- adds the ability to write full files
+   -- gathers some extra file header information
+
+.B yPARSE_handler_plus (<verb>, <fmt>, <seq>, <read>, <write>, <labels>);
+   -- same as simple handler, adds write sequencing and col headers
+
+.B yPARSE_read_all ();
+   -- after handlers added, this triggers the read loop
+
+.B yPARSE_vscanf (<verb>, ...);
+   -- nearly identical to yPARSE_scanf, but format saved by handler
+
+.B yPARSE_write_all ();
+   -- after handlers added, this triggers the write loop
+
+.B yPARSE_vprintf (<verb>, ...);
+   -- nearly identical to yPARSE_printf, but format saved by handler
+
+.B continue to use yPARSE_close
+
+.SH FULL-INTERFACE USAGE
+uses automatic reading and writing of full files all controlled by yPARSE.
+
+
+
+
+
 .SH SHARED FUNCTIONS
 
 .B yPARSE_version.  

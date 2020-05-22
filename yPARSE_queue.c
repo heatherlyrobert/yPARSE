@@ -276,6 +276,70 @@ yparse_init             (tQUEUE *a_queue, char *a_label)
 static void      o___FILES___________________o (void) {;};
 
 char
+yparse__check           (char *a_name, char a_mode)
+{  /*---(locals)-----------+-----------+-*/
+   char        rce         =  -10;
+   int         rci         =    0;
+   tSTAT       st;
+   /*---(header)-------------------------*/
+   DEBUG_FILE   yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_FILE   yLOG_point   ("a_name"    , a_name);
+   --rce;  if (a_name == NULL) {
+      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_FILE   yLOG_info    ("a_name"    , a_name);
+   /*---(get the file information)-------*/
+   rci = lstat (a_name, &st);
+   DEBUG_FILE   yLOG_value   ("lstat"     , rci);
+   --rce; if (rci < 0) {
+      if (a_mode == 'I') {
+         DEBUG_FILE   yLOG_note    ("file does not exist, can not read");
+         DEBUG_FILE   yLOG_exit    (__FUNCTION__);
+         return rce;
+      }
+      DEBUG_FILE   yLOG_note    ("writing data to a brand new file");
+      DEBUG_FILE   yLOG_exit    (__FUNCTION__);
+      return 0;
+   } else {
+      if (a_mode == 'O') {
+         DEBUG_FILE   yLOG_note    ("file exists, writing over existing file");
+      }
+   }
+   /*---(check regular file)-------------*/
+   if (S_ISREG (st.st_mode)) {
+      DEBUG_FILE   yLOG_note    ("refers to a regular file, perfect");
+   }
+   /*---(check symlink)------------------*/
+   else if (S_ISLNK (st.st_mode)) {
+      DEBUG_FILE   yLOG_note    ("file can not be a symlink to another file");
+      DEBUG_FILE   yLOG_exit    (__FUNCTION__);
+      return rce;
+   }
+   else  {
+      if      (S_ISDIR (st.st_mode)) {
+         DEBUG_FILE   yLOG_note    ("file is a directory, not allowwed");
+      } else if (S_ISCHR (st.st_mode)) {
+         DEBUG_FILE   yLOG_note    ("file is a char dev, not allowwed");
+      } else if (S_ISBLK (st.st_mode)) {
+         DEBUG_FILE   yLOG_note    ("file is a block dev, not allowwed");
+      } else if (S_ISFIFO(st.st_mode)) {
+         DEBUG_FILE   yLOG_note    ("file is a fifo/pipe, not allowwed");
+      } else if (S_ISSOCK(st.st_mode)) {
+         DEBUG_FILE   yLOG_note    ("file is a socket, not allowwed");
+      } else  {
+         DEBUG_FILE   yLOG_note    ("file is not recognized, not allowwed");
+      }
+      DEBUG_FILE   yLOG_exit    (__FUNCTION__);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_FILE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
 yparse__openclose       (tQUEUE *a_queue)
 {
    /*---(locals)-----------+-----------+-*/
@@ -332,6 +396,12 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YPARSE  yLOG_spoint  (a_name);
+   --rce;  if (a_name == NULL) {
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_snote   (a_name);
    /*---(direction)----------------------*/
    --rce;  switch (a_queue->label [0]) {
    case 'I'  :
@@ -369,22 +439,29 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
       break;
    }
    /*---(verify file)--------------------*/
-   --rce;  if (a_queue->label [0] == 'I') {
-      DEBUG_YPARSE   yLOG_snote   (a_name);
-      rc = stat (a_name, &s);
-      DEBUG_YPARSE   yLOG_sint    (rc);
-      --rce;  if (rc < 0) {
-         DEBUG_YPARSE   yLOG_snote   ("file not found");
-         DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-         return rce;
-      }
-      DEBUG_YPARSE yLOG_sint    (s.st_mode);
-      --rce;  if (!S_ISREG (s.st_mode)) {
-         DEBUG_YPARSE   yLOG_snote   ("not a file");
-         DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-         return rce;
-      }
+   rc = yparse__check (a_name, a_queue->label [0]);
+   DEBUG_YPARSE  yLOG_sint    (rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
    }
+   DEBUG_YPARSE  yLOG_snote   ("successful");
+   /*> --rce;  if (a_queue->label [0] == 'I') {                                       <* 
+    *>    DEBUG_YPARSE   yLOG_snote   (a_name);                                       <* 
+    *>    rc = stat (a_name, &s);                                                     <* 
+    *>    DEBUG_YPARSE   yLOG_sint    (rc);                                           <* 
+    *>    --rce;  if (rc < 0) {                                                       <* 
+    *>       DEBUG_YPARSE   yLOG_snote   ("file not found");                          <* 
+    *>       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);                         <* 
+    *>       return rce;                                                              <* 
+    *>    }                                                                           <* 
+    *>    DEBUG_YPARSE yLOG_sint    (s.st_mode);                                      <* 
+    *>    --rce;  if (!S_ISREG (s.st_mode)) {                                         <* 
+    *>       DEBUG_YPARSE   yLOG_snote   ("not a file");                              <* 
+    *>       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);                         <* 
+    *>       return rce;                                                              <* 
+    *>    }                                                                           <* 
+    *> }                                                                              <*/
    /*---(open file)----------------------*/
    a_queue->file = fopen (a_name, x_dir);
    DEBUG_YPARSE  yLOG_spoint  (a_queue->file);
@@ -477,6 +554,56 @@ static void      o___UNITTEST________________o (void) {;};
 
 char yPARSE__unit_answer [ LEN_STR  ];
 
+char         /*--> write the heartbeat ---------------------------------------*/
+yparse_queue__line      (int n, char *a_recd)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   FILE       *f           = NULL;
+   char        x_recd      [LEN_RECD]  = "";
+   int         x_len       =    0;
+   int         c           =    0;
+   /*---(header)-------------------------*/
+   DEBUG_RPTG   yLOG_enter   (__FUNCTION__);
+   /*---(prepre)-------------------------*/
+   if (a_recd != NULL)  strlcpy (a_recd, ""    , LEN_RECD);
+   /*---(open)---------------------------*/
+   DEBUG_RPTG   yLOG_info    ("file"      , s_qout.loc);
+   f = fopen (s_qout.loc, "rt");
+   DEBUG_RPTG   yLOG_point   ("f"         , f);
+   --rce;  if (rc < 0) {
+      DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(write)--------------------------*/
+   --rce;  while (1) {
+      fgets (x_recd, LEN_RECD, f);
+      if (feof (f)) {
+         DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      if (c >= n)  break;
+      ++c;
+   }
+   /*---(close)--------------------------*/
+   rc = fclose (f);
+   DEBUG_RPTG   yLOG_value   ("close"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(fix-up)-------------------------*/
+   x_len = strlen (x_recd);
+   if (x_recd [x_len - 1] == '\n')  x_recd [--x_len] = '\0';
+   strlencode (x_recd, ySTR_NORM, LEN_RECD);
+   /*---(save back)----------------------*/
+   if (a_recd != NULL)  strlcpy (a_recd, x_recd, LEN_RECD);
+   /*---(complete)-----------------------*/
+   DEBUG_RPTG   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
 char*      /*----: unit testing accessor for clean validation interface ------*/
 yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num)
 {
@@ -490,31 +617,35 @@ yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num)
    }
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "verb"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s verb       : %2d[%s]", a_queue->label, a_queue->iverb, yPARSE_verb (a_queue->iverb));
+      sprintf (yPARSE__unit_answer, "%-3.3s verb         : %2d[%s]", a_queue->label, a_queue->iverb, yPARSE_verb (a_queue->iverb));
    }
    else if (strcmp (a_question, "line"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s line       : total %2d, curr %2d", a_queue->label, a_queue->nline, a_queue->cline);
+      sprintf (yPARSE__unit_answer, "%-3.3s line         : total %2d, curr %2d", a_queue->label, a_queue->nline, a_queue->cline);
    }
    else if (strcmp (a_question, "field"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s field      : total %2d, curr %2d, good %c", a_queue->label, a_queue->count, a_queue->first, a_queue->good);
+      sprintf (yPARSE__unit_answer, "%-3.3s field        : total %2d, curr %2d, good %c", a_queue->label, a_queue->count, a_queue->first, a_queue->good);
    }
    else if (strcmp (a_question, "record"   ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s record     : %2d[%s]", a_queue->label, a_queue->len, a_queue->recd);
+      sprintf (yPARSE__unit_answer, "%-3.3s record       : %2d[%s]", a_queue->label, a_queue->len, a_queue->recd);
    }
    else if (strcmp (a_question, "entry"    ) == 0) {
       if (a_queue->count < 1 || a_num < a_queue->first || a_num >= a_queue->count) {
-         sprintf (yPARSE__unit_answer, "%-3.3s entry    %d : null", a_queue->label, a_num);
+         sprintf (yPARSE__unit_answer, "%-3.3s entry   (%2d) : null", a_queue->label, a_num);
       } else {
          rc = yparse_peek (a_queue, a_num, t);
          if (rc < 0) {
-            sprintf (yPARSE__unit_answer, "%-3.3s entry    %d : trouble finding", a_queue->label, a_num);
+            sprintf (yPARSE__unit_answer, "%-3.3s entry   (%2d) : trouble finding", a_queue->label, a_num);
          } else {
-            sprintf (yPARSE__unit_answer, "%-3.3s entry    %d : %2d[%s]", a_queue->label, a_num, strlen (t), t);
+            sprintf (yPARSE__unit_answer, "%-3.3s entry   (%2d) : %2d[%s]", a_queue->label, a_num, strlen (t), t);
          }
       }
    }
    else if (strcmp (a_question, "verb"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s verb       : %2d[%s]", a_queue->label, strlen (myPARSE.verb), myPARSE.verb);
+      sprintf (yPARSE__unit_answer, "%-3.3s verb         : %2d[%s]", a_queue->label, strlen (myPARSE.verb), myPARSE.verb);
+   }
+   else if (strcmp (a_question, "written"  ) == 0) {
+      yparse_queue__line (a_num, t);
+      sprintf (yPARSE__unit_answer, "%-3.3s written (%2d) : %2d[%s]", a_queue->label, a_num, strlen (t), t);
    }
    /*---(complete)----------------------------------------*/
    return yPARSE__unit_answer;

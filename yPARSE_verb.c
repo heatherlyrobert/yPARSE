@@ -4,23 +4,23 @@
 
 
 
-
+#define     MAX_COLS      12
 #define     MAX_VERBS     50
 struct {
    /*---(master)------------*/
-   char        mode;                        /* one char yvikeys mode id       */
-   char        verb        [LEN_LABEL];     /* verb name as used in files     */
-   char        specs       [LEN_LABEL];     /* field specifications           */
+   uchar       mode;                        /* one char yvikeys mode id       */
+   uchar       verb        [LEN_LABEL];     /* verb name as used in files     */
+   uchar       specs       [LEN_LABEL];     /* field specifications           */
    char        mask;                        /* field for reload/change        */
    /*---(handlers)----------*/
-   char        (*reader)   (void);          /* function to read one record    */
-   char        (*writer)   (void);          /* function to write all of type  */
+   char        (*reader)   (int n, char *a_verb);
+   char        (*writer)   (int n, char *a_verb);
    float       seq;                         /* writing sequence               */
    char        done;                        /* written (y/n)                  */
    /*---(descriptive)-------*/
    char        flags       [LEN_LABEL];     /* flags for use by program       */
-   char        labels      [LEN_RECD];      /* field labels for headers       */
-   char        desc        [LEN_DESC ];     /* long verb description          */
+   uchar       labels      [LEN_RECD];      /* field labels for headers       */
+   uchar       desc        [LEN_DESC ];     /* long verb description          */
    /*---(done)--------------*/
 }  static   s_verbs   [MAX_VERBS];
 static int  s_nverb   = 0;
@@ -28,43 +28,27 @@ static int  s_nverb   = 0;
 static char *s_nada = "";
 
 
-/*--------------- master data -------------------- */
-/* -   ----mode----- ---label----- ---specs-------    writer   reader   ---1st----    ---2nd----    ---3rd----    ---4th----    ---5th----    ---6th----    ---7th----    ---8th----    ---9th----     try  bad   ---name------------  */
-/*> { 'i', UMOD_MARK    , "loc_mark"  , "ciii--------",  , NULL  , NULL      "-a"        , "--x"       , "--y"       , "--z"       , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "location marks"     },   <* 
- *> { 'i', UMOD_VISUAL  , "visu_mark" , "ciiiii------",  , NULL  , NULL      "-a"        , "xbeg"      , "ybeg"      , "xend"      , "yend"      , "zall"      , ""          , ""          , ""          ,   0,   0 , "visual marks"       },   <* 
- *> { 'i', SMOD_MACRO   , "macro"     , "ciiO--------",  , NULL  , NULL      "-a"        , "count"     , "rc"        , "command"   , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "saved macros"       },   <* 
- *> { 'i', MODE_SEARCH  , "search"    , "ciiO--------",  , NULL  , NULL      "-a"        , "count"     , "found"     , "search"    , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "search history"     },   <* 
- *> { 'i', MODE_COMMAND , "command"   , "ciiO--------",  , NULL  , NULL      "-a"        , "count"     , "rc"        , "command"   , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "command history"    },   <* 
- *> { 'i', SMOD_SRC_REG , "text_reg"  , "cO----------",  , NULL  , NULL      "-a"        , "data"      , ""          , ""          , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "text registers"     },   <* 
- *> { 'e', FILE_DEPCEL  , "cell_dep"  , "TiaTO-------",  , NULL  , NULL      "lvl/reg"   , "seq"       , "label"     , "t-f-d-a-m" , "contents"  , ""          , ""          , ""          , ""          ,   0,   0 , "dependent cells"    },   <* 
- *> { 'e', FILE_FREECEL , "cell_free" , "TiaTO-------",  , NULL  , NULL      "lvl/reg"   , "seq"       , "label"     , "t-f-d-a-m" , "contents"  , ""          , ""          , ""          , ""          ,   0,   0 , "independent cells"  },   <* 
- *> { 'e', FILE_TABS    , "tab"       , "Naaiiic-----",  , NULL  , NULL      "name"      , "min"       , "max"       , "x_size"    , "y_size"    , "z_size"    , "type"      , ""          , ""          ,   0,   0 , "tab (v-axis)"       },   <* 
- *> { 'e', FILE_COLS    , "width"     , "aii---------",  , NULL  , NULL      "label"     , "size"      , "count"     , ""          , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "columns (x-axis)"   },   <* 
- *> { 'e', FILE_ROWS    , "height"    , "aii---------",  , NULL  , NULL      "label"     , "size"      , "count"     , ""          , ""          , ""          , ""          , ""          , ""          ,   0,   0 , "rows (y-axis)"      },   <* 
- *> {  0 , 0            , ""          , "------------",  , NULL  , NULL      ""          , ""          , ""          , ""          , ""          , ""          , ""          , ""          , ""          ,   0,   0 , ""                   },   <*/
-
-/*> yPARSE_handler (UMOD_MARK    , "loc_mark"  , 7.1, "ciii--------", MARK_reader   , MARK_writer   , "a,xpos,ypos,zpos"          , "map mode location marks"   );   <*/
-/*> yPARSE_handler (UMOD_VISUAL  , "visu_mark" , 7.2, "ciiiii------", VISU_reader   , VISU_writer   , "a,xbeg,ybeg,xend,yend,zpos", "map mode visual selections"),   <*/
-/*> yPARSE_handler (SMOD_MACRO   , "macro"     , 7.3, "ciiO--------", MACRO_reader  , MACRO_writer  , "a,count,rc,keys"           , "keyboard macros"           ),   <*/
-/*> yPARSE_handler (MODE_COMMAND , "command"   , 7.4, "ciiO--------", CMDS_reader   , CMDS_writer   , "a,count,rc,command"        , "command history"           ),   <*/
-/*> yPARSE_handler (MODE_SEARCH  , "search"    , 7.5, "ciiO--------", SRCH_reader   , SRCH_writer   , "a,count,found,search"      , "search history"            ),   <*/
-/*> yPARSE_handler (SMOD_SRC_REG , "text_reg"  , 7.6, "cO----------", SRC_REG_reader, SRC_REG_writer, "a,text"                    , "text editing registers"    ),   <*/
-
+char
+yparse_verb__wipe       (char n)
+{
+   s_verbs [n].mode    =  '·';
+   strlcpy (s_verbs [n].verb   , ""            , LEN_LABEL);
+   strlcpy (s_verbs [n].specs  , "------------", LEN_LABEL);
+   s_verbs [n].mask    = -1;
+   s_verbs [n].reader  = NULL;
+   s_verbs [n].writer  = NULL;
+   strlcpy (s_verbs [n].flags  , "------------", LEN_LABEL);
+   strlcpy (s_verbs [n].labels , ""            , LEN_RECD);
+   strlcpy (s_verbs [n].desc   , ""            , LEN_DESC);
+   return 0;
+}
 
 char
 yparse_verb_init        (void)
 {
    int         i           =    0;
    for (i = 0; i < MAX_VERBS; ++i) {
-      s_verbs [i].mode    =  '·';
-      strlcpy (s_verbs [i].verb   , ""            , LEN_LABEL);
-      strlcpy (s_verbs [i].specs  , "------------", LEN_LABEL);
-      s_verbs [i].mask    = -1;
-      s_verbs [i].reader  = NULL;
-      s_verbs [i].writer  = NULL;
-      strlcpy (s_verbs [i].flags  , "------------", LEN_LABEL);
-      strlcpy (s_verbs [i].labels , ""            , LEN_RECD);
-      strlcpy (s_verbs [i].desc   , ""            , LEN_DESC);
+      yparse_verb__wipe (i);
    }
    s_nverb = 0;
    return 0;
@@ -92,14 +76,14 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
       return rce;
    }
    /*---(short-cut)----------------------*/
-   DEBUG_YPARSE   yLOG_sint    (n);
-   DEBUG_YPARSE   yLOG_snote   (x_last);
-   if (n >= 0 && strcmp (a_verb, x_last) == 0) {
-      if (a_queue != NULL)  a_queue->iverb = n;
-      DEBUG_YPARSE   yLOG_snote   ("short-cut");
-      DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
-      return n;
-   }
+   /*> DEBUG_YPARSE   yLOG_sint    (n);                                               <*/
+   /*> DEBUG_YPARSE   yLOG_snote   (x_last);                                          <*/
+   /*> if (n >= 0 && strcmp (a_verb, x_last) == 0) {                                  <* 
+    *>    if (a_queue != NULL)  a_queue->iverb = n;                                   <* 
+    *>    DEBUG_YPARSE   yLOG_snote   ("short-cut");                                  <* 
+    *>    DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);                                 <* 
+    *>    return n;                                                                   <* 
+    *> }                                                                              <*/
    /*---(find entry)---------------------*/
    DEBUG_YPARSE   yLOG_sint    (s_nverb);
    --rce;  if (s_nverb <= 0) {
@@ -116,7 +100,15 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
    }
    /*---(save)---------------------------*/
    strlcpy (x_last, a_verb, LEN_LABEL);
-   if (a_queue != NULL)  a_queue->iverb = n;
+   if (a_queue != NULL) {
+      a_queue->iverb   = n;
+      if (n >= 0) {
+         if (a_queue == &s_qin)  a_queue->handler = s_verbs [n].reader;
+         else                    a_queue->handler = s_verbs [n].writer;
+      } else {
+         a_queue->handler = NULL;
+      }
+   }
    DEBUG_YPARSE   yLOG_sint    (n);
    DEBUG_YPARSE   yLOG_snote   (x_last);
    /*---(complete)-----------------------*/
@@ -127,62 +119,90 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
 char yparse_verb_mask        (int n) { return s_verbs [n].mask; }
 
 char
-yparse_col_by_count     (tQUEUE *a_queue)
+yparse_specs_next_write  (void)
 {
-   if (a_queue        == NULL)  return -1;
-   if (a_queue->iverb <  0   )  return -2;
-   if (a_queue->count <  0   )  return -3;
-   if (a_queue->count >= 12  )  return -4;
-   DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);
-   return s_verbs [a_queue->iverb].specs [a_queue->count - 1];
+   if (s_qout.iverb <  0       )  return -2;
+   if (s_qout.count <  0       )  return -3;
+   if (s_qout.count >= MAX_COLS)  return -4;
+   return s_verbs [s_qout.iverb].specs [s_qout.count - 1];
 }
 
 char
-yparse_col_by_first     (tQUEUE *a_queue)
+yparse_specs_next_read  (void)
 {
-   if (a_queue        == NULL)  return -1;
-   if (a_queue->iverb <  0   )  return -2;
-   if (a_queue->first <  0   )  return -3;
-   if (a_queue->first >= 12  )  return -4;
-   DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);
-   return s_verbs [a_queue->iverb].specs [a_queue->first - 1];
+   if (s_qin.iverb <  0       )  return -2;
+   if (s_qin.first <  0       )  return -3;
+   if (s_qin.first >= MAX_COLS)  return -4;
+   return s_verbs [s_qin.iverb].specs [s_qin.first - 1];
 }
 
 char
-yparse_col_count        (tQUEUE *a_queue)
+yparse_specs_len        (tQUEUE *a_queue)
 {
    int         i           =    0;
    int         n           =    1;   /* start with one for verb  */
    if (a_queue        == NULL)  return -1;
    if (a_queue->iverb <  0   )  return -2;
-   DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);
-   for (i = 0; i < 12; ++i) {
-      if (s_verbs [a_queue->iverb].specs [i] == '-')   break;
+   /*> DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);    <*/
+   for (i = 0; i < MAX_COLS; ++i) {
+      if (s_verbs [a_queue->iverb].specs [i] == '\0')   break;
+      if (s_verbs [a_queue->iverb].specs [i] == '-')    break;
       ++n;
    }
    return n;
 }
 
 char
-yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, char a_mask, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc)
+yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc)
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   int         i           =    0;
+   int         x_found     =    0;
    int         n           =    0;
+   char        x_specs     [LEN_LABEL] = "";
    /*---(defense)------------------------*/
-   if (a_verb == NULL)     return -1;
+   if (myPARSE.ready != 'y')  return -1;
+   if (a_verb == NULL)        return -2;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(check verb)---------------------*/
+   rc = strlgood (a_verb, ySTR_ALNUM, LEN_USER);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(check existing)-----------------*/
-   n = yparse_verb_find (NULL, a_verb);
+   n = x_found = yparse_verb_find (NULL, a_verb);
    DEBUG_YPARSE   yLOG_value   ("s_nverb"   , s_nverb);
    DEBUG_YPARSE   yLOG_value   ("find"      , n);
    if (n < 0)  n = s_nverb;
    DEBUG_YPARSE   yLOG_value   ("n"         , n);
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("a_specs"   , a_specs);
+   if (a_specs != NULL && strlen (a_specs) >  0) {
+      strlcpy (x_specs, a_specs, LEN_LABEL);
+   }
+   strltrim (x_specs, ySTR_BOTH, LEN_LABEL);
+   strlddel (x_specs, '-', LEN_LABEL);
+   DEBUG_YPARSE   yLOG_info    ("x_specs"   , x_specs);
+   --rce;  for (i = 0; i < strlen (x_specs); ++i) {
+      if (yparse_field_len (x_specs [i]) > 0)  continue;
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_point   ("a_reader"  , a_reader);
+   DEBUG_YPARSE   yLOG_point   ("a_writer"  , a_writer);
+   /*> --rce;  if (a_reader == NULL && a_writer == NULL) {                            <* 
+    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                            <* 
+    *>    return rce;                                                                 <* 
+    *> }                                                                              <*/
    /*---(copy values)--------------------*/
    if (a_mode   != 0   )  s_verbs [n].mode    = a_mode;
-   if (a_verb   != NULL)  strlcpy (s_verbs [n].verb  , a_verb  , LEN_LABEL);
+   strlcpy (s_verbs [n].verb  , a_verb  , LEN_LABEL);
    if (a_seq    >  0.0 )  s_verbs [n].seq     = a_seq;
-   if (a_specs  != NULL)  strlcpy (s_verbs [n].specs , a_specs , LEN_LABEL);
+   strlcpy (s_verbs [n].specs , x_specs , LEN_LABEL);
    s_verbs [n].mask    = a_mask;
    if (a_reader != NULL)  s_verbs [n].reader  = a_reader;
    if (a_writer != NULL)  s_verbs [n].writer  = a_writer;
@@ -190,9 +210,25 @@ yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, 
    if (a_labels != NULL)  strlcpy (s_verbs [n].labels, a_labels, LEN_RECD);
    if (a_desc   != NULL)  strlcpy (s_verbs [n].desc  , a_desc  , LEN_DESC);
    /*---(update)-------------------------*/
-   ++s_nverb;
+   if (x_found < 0)  ++s_nverb;
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
+yparse_handler_remove   (char *a_verb)
+{
+   int         i           =    0;
+   int         n           =   -1;
+   for (i = 0; i < s_nverb; ++i) {
+      if (s_verbs [i].verb [0] != a_verb [0])      continue;
+      if (strcmp (s_verbs [i].verb, a_verb) != 0)  continue;
+      DEBUG_YPARSE   yLOG_snote   ("FOUND");
+      n = i;
+      break;
+   }
+   if (n >= 0)  yparse_verb__wipe (n);
    return 0;
 }
 
@@ -238,7 +274,7 @@ yparse__verb_divider     (int a_iverb)
    /*---(build)------------+-----+-----+-*/
    strlcpy (s, s_verbs [a_iverb].labels, LEN_RECD );
    p     = strtok_r (s, q, &r);
-   for (i = 0; i < 12; ++i) {
+   for (i = 0; i < MAX_COLS; ++i) {
       DEBUG_YPARSE   yLOG_value   ("loop"      , i);
       /*---(filter)----------------------*/
       x_spec = s_verbs [a_iverb].specs [i];
@@ -389,6 +425,7 @@ yPARSE_write_all        (void)
    char        i           =    0;
    float       x_lowest    =  0.0;
    int         x_next      =   -1;
+   int         c           =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE  yLOG_value   ("s_nverb"   , s_nverb);
@@ -409,15 +446,16 @@ yPARSE_write_all        (void)
       if (x_next   < 0    )  break;
       s_verbs [x_next].done = 'y';
       /*---(filter)----------------------*/
-      DEBUG_INPT  yLOG_info    ("verb"      , s_verbs [i].verb);
-      DEBUG_INPT  yLOG_point   ("reader"    , s_verbs [i].writer);
+      DEBUG_INPT  yLOG_info    ("verb"      , s_verbs [x_next].verb);
+      DEBUG_INPT  yLOG_point   ("reader"    , s_verbs [x_next].writer);
       if (s_verbs [x_next].writer == NULL)  continue;
       /*---(handle)----------------------*/
-      rc = s_verbs [x_next].writer ();
+      rc = s_verbs [x_next].writer (s_qout.tline, s_verbs [x_next].verb);
+      if (rc >= 0)  c += rc;
    }
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 0;
+   return c;
 }
 
 
@@ -441,7 +479,7 @@ yPARSE_read_all         (void)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    while (1) {
-      rc = yPARSE_read (NULL, NULL);
+      rc = yPARSE_read_one (NULL, NULL);
       if (rc <= 0)  {
          DEBUG_YPARSE   yLOG_note    ("end-of-file");
          break;
@@ -463,7 +501,7 @@ yPARSE_read_all         (void)
          DEBUG_YPARSE   yLOG_note    ("reader not assigned");
          continue;
       }
-      rc = s_verbs [n].reader ();
+      rc = s_verbs [n].reader (s_qin.tline, x_verb);
       if (rc < 0)  {
          DEBUG_YPARSE   yLOG_note    ("handler not successful");
          continue;
@@ -537,28 +575,34 @@ yPARSE_read_all         (void)
 static void      o___UNITTEST________________o (void) {;};
 
 char*      /*----: unit testing accessor for clean validation interface ------*/
-yparse__unit_verb       (char *a_question, char *a_verb)
+yparse__unit_verb       (char *a_question, char *a_verb, int a_seq)
 {
    /*---(locals)-----------+-----+-----+-*/
    int         n           =    0;
    /*---(preprare)-----------------------*/
    strlcpy  (yPARSE__unit_answer, "VERB unit        : question not understood", LEN_STR);
    /*---(check existing)-----------------*/
-   if (a_verb == NULL || a_verb [0] == '\0') {
-      sprintf (yPARSE__unit_answer, "VERB entry     : verb not given");
-      return yPARSE__unit_answer;
+   if      (strcmp (a_question, "count"    ) == 0) {
+      sprintf (yPARSE__unit_answer, "VERB count       : %d", s_nverb);
    }
-   n = yparse_verb_find (NULL, a_verb);
-   if (n < 0) {
-      sprintf (yPARSE__unit_answer, "VERB entry     : %-12.12s is unknown", a_verb);
-      return yPARSE__unit_answer;
+   else if (strcmp (a_question, "entry"    ) == 0) {
+      n = a_seq;
+      if (n < 0 || n >= MAX_VERBS)       sprintf (yPARSE__unit_answer, "VERB entry  (--) : out of range");
+      else if (s_verbs [n].verb [0] == '\0') sprintf (yPARSE__unit_answer, "VERB entry  (%2d) : verb slot not used", n);
+      else sprintf (yPARSE__unit_answer, "VERB entry  (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs, (s_verbs [n].reader != NULL) ? 'y' : '-', (s_verbs [n].writer != NULL) ? 'y' : '-', s_verbs [n].seq, s_verbs [n].mask, s_verbs [n].labels, s_verbs [n].desc);
    }
    /*---(answer)------------------------------------------*/
-   if      (strcmp (a_question, "entry"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "VERB entry     : %c, %-12.12s, %-12.12s", s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs);
+   else if (strcmp (a_question, "by_name"  ) == 0) {
+      if (a_verb == NULL || a_verb [0] == '\0') {
+         sprintf (yPARSE__unit_answer, "VERB name   (--) : verb not given");
+      } else {
+         n = yparse_verb_find (NULL, a_verb);
+         if (n < 0) sprintf (yPARSE__unit_answer, "VERB name   (--) : %s is unknown", a_verb);
+         else       sprintf (yPARSE__unit_answer, "VERB name   (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs, (s_verbs [n].reader != NULL) ? 'y' : '-', (s_verbs [n].writer != NULL) ? 'y' : '-', s_verbs [n].seq, s_verbs [n].mask, s_verbs [n].labels, s_verbs [n].desc);
+      }
    }
    else if (strcmp (a_question, "divider"  ) == 0) {
-      sprintf (yPARSE__unit_answer, "VERB divider   : %-45s", s_div);
+      sprintf (yPARSE__unit_answer, "VERB divider     : %-45s", s_div);
    }
    /*---(complete)----------------------------------------*/
    return yPARSE__unit_answer;

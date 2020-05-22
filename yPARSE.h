@@ -4,15 +4,42 @@
 #define   YPARSE_HGUARD       loaded
 
 
+#define     YPARSE_FUNCTION         'a'
+#define     YPARSE_FIELD            'f'
+
+#define     YPARSE_NOREAD           '-'
+#define     YPARSE_READALL          'y'
+
+#define     YPARSE_ONETIME          '-'
+#define     YPARSE_REUSING          'y'
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 #define     YPARSE_AUTO             'y'
-#define     YPARSE_NOAUTO           '-'
-#define     YPARSE_REUSE            'y'
-#define     YPARSE_NOREUSE          '-'
+#define     YPARSE_SIMPLE           's'
+#define     YPARSE_MANUAL           '-'
 
 
-/*===[[ PUBLIC FUNCTIONS ]]===============================*/
+typedef long long      llong;
+typedef unsigned char  uchar;
+
+
+/*===[[ SIMPLE ]]=========================================*/
+
+/*---(simple interface)-----*/
+char        yPARSE_simple           (uchar *a_in, uchar *a_out);
+char        yPARSE_close            (void);
+char        yPARSE_scanf            (uchar *a_verb, uchar *a_format, ...);
+char        yPARSE_printf           (uchar *a_verb, uchar *a_format, ...);
+/*---(auto-read)------------*/
+char        yPARSE_autoread         (uchar *a_in, uchar *a_out, void *a_verber);
+/*---(planned)--------------*/
+char        yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber);
+char        yPARSE_header           (uchar *a_full, uchar *a_desc, uchar *a_title, uchar *a_vernum, uchar *a_vertxt, int a_epoch);
+char        yPARSE_vscanf           (uchar *a_verb, ...);
+char        yPARSE_vprintf          (uchar *a_verb, ...);
+/*---(planned)--------------*/
+char        yPARSE_reusing          (uchar *a_in, uchar *a_out, void *a_verber);
+
 
 
 
@@ -20,6 +47,7 @@
 char       *yPARSE_version          (void);
 char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);
 char        yPARSE_wrap             (void);
+
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
@@ -32,6 +60,7 @@ char        yPARSE_write_all        (void);
 /*---(yPARSE_line.c)--------*/
 
 char        yPARSE_stdin            (void);
+char        yPARSE_stdin_peek       (void);
 char        yPARSE_open_in          (char *a_name);
 char        yPARSE_close_in         (void);
 
@@ -43,10 +72,11 @@ char        yPARSE_section          (char *a_title);
 
 char        yPARSE_write            (int *n, int *c);
 char        yPARSE_dump             (int *n, int *c);
-char        yPARSE_read             (int *n, int *c);
+char        yPARSE_read             (int *n, int *c, uchar *a_verb);
 char        yPARSE_load             (int *n, int *c, char *a_recd);
 char        yPARSE_reload           (int *n, int *c, int a_line, char *a_label);
 char        yPARSE_hidden           (int *n, int *c, char *a_recd);
+char        yPARSE_read_one         (int *n, uchar *a_verb);
 char        yPARSE_read_all         (void);
 int         yPARSE_recdno           (void);
 
@@ -58,7 +88,7 @@ char        yPARSE_purge_out        (void);
 
 /*---(yPARSE_in.c)----------*/
 char        yPARSE_ready            (int *a_count);
-char        yPARSE_delimiters       (char *a_list);
+char        yPARSE_delimiters       (uchar a_type);
 char        yPARSE_toss             (void);
 char        yPARSE_top              (char *a_item);
 char        yPARSE_popstr           (char *a_item);
@@ -71,23 +101,25 @@ char        yPARSE_popint           (int    *a_new);
 char        yPARSE_popfloat         (float  *a_new);
 char        yPARSE_popdouble        (double *a_new);
 
+char        yPARSE_qin_info         (char *a_label, char *a_loc, void **a_file, int *t);
+char        yPARSE_qout_info        (char *a_label, char *a_loc, void **a_file, int *t);
 
 
 /*---(yPARSE_out.c)---------*/
 char        yPARSE_pushverb         (char  *a_verb);
 char        yPARSE_pushempty        (void);
 char        yPARSE_pushval          (double  a_val);
-char        yPARSE_pushstr          (char   *a_str);
-char        yPARSE_pushchar         (char    a_val);
-char        yPARSE_pushint          (int     a_val);
-char        yPARSE_pushfloat        (float   a_val);
-char        yPARSE_pushdouble       (double  a_val);
+char        yPARSE_pushstr          (uchar  *a_str);
+char        yPARSE_pushchar         (uchar   a_val);
+char        yPARSE_pushint          (llong   a_val);
+char        yPARSE_pushfloat        (double  a_val);
+char        yPARSE_spacer           (char a_lines);
 
 char*       yPARSE_verb             (int a_num);
-char        yPARSE_handler          (char a_mode, char *a_verb, float a_seq, char *a_specs, char a_mask, void *a_reader, void *a_writer, char *a_flags, char *a_labels, char *a_desc);
+char        yPARSE_handler          (uchar *a_verb, char *a_specs, void *a_reader);
+char        yPARSE_handler_plus     (uchar *a_verb, uchar *a_specs, float a_seq, void *a_reader, void *a_writer, uchar *a_labels);
+char        yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc);
 
-char        yPARSE_fullwrite        (char *a_verb, ...);
-char        yPARSE_fullread         (char *a_verb, ...);
 char        yPARSE_outclear         (void);
 char*       yPARSE_outrecd          (void);
 

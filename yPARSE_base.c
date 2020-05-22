@@ -5,7 +5,7 @@
 
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-tACCESSOR   myPARSE;
+tACCESSOR   myPARSE = { 0, '-', '-', '-', "|§", NULL, "", "", "", '-', 0, 0, '-' };
 static      char        yPARSE_ver  [200] = "";
 
 
@@ -32,6 +32,13 @@ yPARSE_version          (void)
    return yPARSE_ver;
 }
 
+
+
+/*====================------------------------------------====================*/
+/*===----                         program level                        ----===*/
+/*====================------------------------------------====================*/
+static void      o___PROGRAM_________________o (void) {;}
+
 char
 yPARSE_init             (char a_auto, void *a_verber, char a_reusing)
 {
@@ -44,17 +51,21 @@ yPARSE_init             (char a_auto, void *a_verber, char a_reusing)
    yparse_init_in    ();
    yparse_init_out   ();
    yparse_initline   ();
-   strlcpy (myPARSE.delimiters, "(,)", LEN_LABEL);
+   yPARSE_delimiters (YPARSE_FIELD);
    return 0;
 }
 
 char
-yPARSE_delimiters       (char *a_list)
+yPARSE_delimiters       (uchar a_type)
 {
-   if (a_list == NULL) {
-      strlcpy (myPARSE.delimiters, "(,)", LEN_LABEL);
-   } else  {
-      strlcpy (myPARSE.delimiters, a_list , LEN_LABEL);
+   switch (a_type) {
+   case YPARSE_FUNCTION  :
+      strlcpy (myPARSE.delimiters, "§(,)", LEN_LABEL);
+      break;
+   case YPARSE_FIELD     :
+   default :
+      strlcpy (myPARSE.delimiters, "|§" , LEN_LABEL);
+      break;
    }
    return 0;
 }
@@ -64,10 +75,10 @@ yPARSE_wrap             (void)
 {
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
-   myPARSE.verbs   = YPARSE_NOAUTO;
+   myPARSE.verbs   = YPARSE_MANUAL;
    myPARSE.verber  = NULL;
    myPARSE.ready   = '-';
-   myPARSE.reusing = YPARSE_NOREUSE;
+   myPARSE.reusing = YPARSE_ONETIME;
    return 0;
 }
 
@@ -118,11 +129,11 @@ yparse_mock__clear      (void)
 char
 yparse_mock__writer     (void)
 {
-   yPARSE_fullwrite   ("macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
+   yPARSE_vprintf   ("macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
-   yPARSE_fullwrite   ("macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
+   yPARSE_vprintf   ("macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
-   yPARSE_fullwrite   ("macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
+   yPARSE_vprintf   ("macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
    return 0;
 }
@@ -132,7 +143,7 @@ yparse_mock__reader     (void)
 {
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE  yLOG_value   ("g_nmock"   , g_nmock);
-   yPARSE_fullread    ("macro", &(g_mocks[g_nmock].x_ch), &(g_mocks[g_nmock].x_int), &(g_mocks[g_nmock].x_str), &(g_mocks[g_nmock].x_float), &(g_mocks[g_nmock].x_str2));
+   yPARSE_vscanf    ("macro", &(g_mocks[g_nmock].x_ch), &(g_mocks[g_nmock].x_int), &(g_mocks[g_nmock].x_str), &(g_mocks[g_nmock].x_float), &(g_mocks[g_nmock].x_str2));
    DEBUG_YPARSE  yLOG_info    ("recd"      , myPARSE.recd);
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
    DEBUG_YPARSE  yLOG_value   ("g_nmock"   , g_nmock);
@@ -167,7 +178,8 @@ yparse__unit_quiet      (void)
 {
    int         x_narg       = 1;
    char       *x_args [20]  = {"yPARSE_unit" };
-   yPARSE_init ('y', yparse__unit_verber, 'y');
+   yPARSE_init (YPARSE_MANUAL, NULL, YPARSE_ONETIME);  /* defaults */
+   myPARSE.ready = '-';
    return 0;
 }
 
@@ -179,7 +191,8 @@ yparse__unit_loud       (void)
    yURG_logger   (x_narg, x_args);
    yURG_urgs     (x_narg, x_args);
    yURG_name     ("yparse", 'y');
-   yPARSE_init ('y', yparse__unit_verber, 'y');
+   yPARSE_init (YPARSE_MANUAL, NULL, YPARSE_ONETIME);  /* defaults */
+   myPARSE.ready = '-';
    return 0;
 }
 
@@ -189,3 +202,24 @@ yparse__unit_end        (void)
    yLOGS_end     ();
    return 0;
 }
+
+char*      /*----: unit testing accessor for clean validation interface ------*/
+yparse_base__unit       (char *a_question, int a_num)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   char        x_in        [LEN_HUND];
+   char        x_out       [LEN_HUND];
+   /*---(preprare)-----------------------*/
+   strlcpy  (yPARSE__unit_answer, "BASE unit        : question not understood", LEN_STR);
+   /*---(answer)------------------------------------------*/
+   if      (strcmp (a_question, "ready"    ) == 0) {
+      yPARSE_qin_info   (NULL, x_in , NULL, NULL);
+      yPARSE_qout_info  (NULL, x_out, NULL, NULL);
+      sprintf (yPARSE__unit_answer, "BASE ready     : %c  %c  %c   [%-20.20s]  [%-20.20s]", myPARSE.ready, myPARSE.verbs, myPARSE.reusing, x_in, x_out);
+   }
+   /*---(complete)----------------------------------------*/
+   return yPARSE__unit_answer;
+}
+
+
