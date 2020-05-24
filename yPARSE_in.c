@@ -817,8 +817,6 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
          if (rc == 1) {
             DEBUG_YPARSE  yLOG_note    ("end-of-file");
             yparse__main_rollback (a_line);
-            /*> yPARSE_purge_in ();                                                   <* 
-             *> s_qin.good = 'n';                                                     <*/
             DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
             return 0;
          }
@@ -828,8 +826,6 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
       }
       if (rc < 0) {
          yparse__main_rollback (a_line);
-         /*> yPARSE_purge_in ();                                                      <* 
-          *> s_qin.good = 'n';                                                        <*/
          DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
          return rc;
       }
@@ -844,8 +840,6 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
    --rce;  if (rc < 0) {
       yparse__main_rollback (a_line);
-      /*> yPARSE_purge_in ();                                                         <* 
-       *> s_qin.good = 'n';                                                           <*/
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
@@ -858,8 +852,6 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
    DEBUG_YPARSE  yLOG_value   ("peek"      , rc);
    if (rc < 0) {
       yparse__main_rollback (a_line);
-      /*> yPARSE_purge_in ();                                                         <* 
-       *> s_qin.good = 'n';                                                           <*/
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rce;
    }
@@ -870,11 +862,13 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
       x_index = yparse_verb_find (&s_qin, myPARSE.verb);
       DEBUG_YPARSE  yLOG_value   ("find"      , x_index);
       if (x_index < 0) {
-         yparse__main_rollback (a_line);
-         /*> yPARSE_purge_in ();                                                      <* 
-          *> s_qin.good = 'n';                                                        <*/
-         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
-         return rce;
+         if (myPARSE.verber == NULL) {
+            DEBUG_YPARSE  yLOG_note    ("verb unrecognized and verber not active");
+            yparse__main_rollback (a_line);
+            DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+            return rce;
+         }
+         DEBUG_YPARSE  yLOG_note    ("verb unrecognized, verber will need to sort out");
       }
    }
    /*---(contact callback)------------*/
@@ -885,9 +879,7 @@ yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label
       DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
       if (rc < 0) {
          yparse__main_rollback (a_line);
-         /*> yPARSE_purge_in ();                                                      <* 
-          *> s_qin.good = 'n';                                                        <*/
-         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
    }
@@ -917,7 +909,6 @@ char yPARSE_load        (int *n, int *c, char *a_recd)              { return ypa
 char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return yparse__main (n, c, a_line, NULL, a_label, NULL); }
 char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse__main (n, c,  0, a_recd, NULL, NULL); }
 int  yPARSE_recdno      (void)  { return s_qin.tline; }
-
 
 
 /*====================------------------------------------====================*/

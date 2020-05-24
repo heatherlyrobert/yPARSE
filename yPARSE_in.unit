@@ -555,6 +555,7 @@ SCRP          (IN) verify pushing and popping fields                           
      get      ...entry 5                           yparse__unit_in             "entry"        , 5                                                                                    s_equal     IN  entry   ( 5) : null                                                                                
 
    COND       complete testing                                                   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((03.030))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     call simple close                    yPARSE_close                                                                                                                      i_equal     0                                                                                                    
      exec     stop testing                         yparse__unit_end                                                                                                                  i_equal     0                                                                                                    
 
 
@@ -667,6 +668,7 @@ SCRP          (IN) verify parsing and pushing recd                             
      get      ...entry 7                           yparse__unit_in             "entry"        , 7                                                                                    s_equal     IN  entry   ( 7) : null                                                                                
 
    COND       complete testing                                                   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((04.010))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     call simple close                    yPARSE_close                                                                                                                      i_equal     0                                                                                                    
      exec     stop testing                         yparse__unit_end                                                                                                                  i_equal     0                                                                                                    
 
 
@@ -844,6 +846,7 @@ SCRP          (IN) verify reusable processing                                  
      get      ...entry 8                           yparse__unit_line           "entry"        , 8                                                                                    s_equal     LINE entry   8 : null                                                                                
 
    COND       complete testing                                                   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((04.010))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     call simple close                    yPARSE_close                                                                                                                      i_equal     0                                                                                                    
      exec     stop testing                         yparse__unit_end                                                                                                                  i_equal     0                                                                                                    
 
 
@@ -1032,6 +1035,7 @@ SCRP          (IN) verify full record processing                               
      get      ...entry 8                           yparse__unit_line           "entry"        , 7                                                                                    s_equal     LINE entry   7 : null                                                                                
 
    COND       complete testing                                                   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((05.030))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     call simple close                    yPARSE_close                                                                                                                      i_equal     0                                                                                                    
      exec     stop testing                         yparse__unit_end                                                                                                                  i_equal     0                                                                                                    
 
 
@@ -1157,7 +1161,28 @@ SCRP          (IN) verify single line variadic reading                         
      exec     call read                            yPARSE_vscanf               "tiny"      , &a                                                                                      i_equal     1                                                                                                    
      echo     ... check return                     - - - - - - - - - - - - -   a                                                                                                     i_equal     432                                                                                                  
 
+   COND       try some dangerous reads                                           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((01.001))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     call simple close                    yPARSE_close                                                                                                                      i_equal     0                                                                                                    
+     exec     call simple open                     yPARSE_planned              "/tmp/yPARSE_in.txt"  , NULL              , NULL                                                      i_equal     0                                                                                                    
+
+   COND       prepare handlers                                                   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((01.001))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     make the handlers                    yPARSE_handler              "tiny"      , "i"     , NULL                                                                          i_equal     0                                                                                                    
+     exec     make the handlers                    yPARSE_handler              "small"     , "TL"    , NULL                                                                          i_equal     0                                                                                                    
+     exec     make the handlers                    yPARSE_handler              "medium"    , "LifcO" , NULL                                                                          i_equal     0                                                                                                    
+
+   COND       read and parse with two null fields                                - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((01.001))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     read the record                      yPARSE_read_one             NULL, NULL                                                                                            i_equal     6                                                                                                    
+     exec     call read                            yPARSE_vscanf               "medium"    , t, NULL, &b, NULL, s                                                                    i_equal     1                                                                                                    
+     echo     ... check return                     - - - - - - - - - - - - -   t                                                                                                     s_equal     label                                                                                                
+     echo     ... check return                     - - - - - - - - - - - - -   b                                                                                                     r_norm93    3.142                                                                                                
+     echo     ... check return                     - - - - - - - - - - - - -   s                                                                                                     s_equal     arstieanrstieanrstie                                                                                 
+
+   COND       attempt with a null verb                                           - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((01.001))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     read the record                      yPARSE_read_one             NULL, NULL                                                                                            i_equal     2                                                                                                    
+     exec     call read                            yPARSE_vscanf               NULL        , &a                                                                                      i_lesser    0                                                                                                    
+
    COND       complete testing                                                   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((05.030))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     exec     call simple close                    yPARSE_close                                                                                                                      i_equal     0                                                                                                    
      exec     stop testing                         yparse__unit_end                                                                                                                  i_equal     0                                                                                                    
 
 

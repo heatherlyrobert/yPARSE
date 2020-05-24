@@ -129,11 +129,11 @@ yparse_mock__clear      (void)
 char
 yparse_mock__writer     (void)
 {
-   yPARSE_vprintf   ("macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
+   yPARSE_vprintf   (-1, "macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
-   yPARSE_vprintf   ("macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
+   yPARSE_vprintf   (-1, "macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
-   yPARSE_vprintf   ("macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
+   yPARSE_vprintf   (-1, "macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
    strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
    return 0;
 }

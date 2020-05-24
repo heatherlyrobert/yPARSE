@@ -3,6 +3,10 @@
 #include    "yPARSE_priv.h"
 
 
+static int    s_count = 0;
+static int    s_last      =   -1;
+
+
 
 /*====================------------------------------------====================*/
 /*===----                   generalize functions                       ----===*/
@@ -18,6 +22,9 @@ yparse_opener           (uchar a_auto, uchar *a_in, uchar *a_out, void *a_verber
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE   yLOG_complex ("args"      , "%p, %p, %p, %c, %c", a_in, a_out, a_verber, a_read, a_reuse);
+   /*---(globals)------------------------*/
+   s_count = -1;
+   s_last  = -1;
    /*---(initialize)---------------------*/
    if (rc == 0) {
       rc = yPARSE_init (a_auto, a_verber, a_reuse);
@@ -62,6 +69,7 @@ yPARSE_close            (void)
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    yPARSE_close_in  ();
+   if (s_count >= 0)  yparse_fancy_end (s_count + 1);
    yPARSE_close_out ();
    yPARSE_wrap ();
    /*---(complete)-----------------------*/
@@ -220,8 +228,38 @@ yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber)
 }
 
 char
-yPARSE_header           (uchar *a_full, uchar *a_desc, uchar *a_title, uchar *a_vernum, uchar *a_vertxt, int a_epoch)
+yPARSE_header           (uchar *a_full, uchar *a_vernum, uchar *a_vertxt, uchar *a_oneline, uchar *a_content, void (*a_additional) (void))
 {
+   /*---(locals)-----------+-----+-----+-*/
+   char        x_vernum    [LEN_TERSE] = "";
+   char        x_vertxt    [LEN_HUND]  = "";
+   char        t           [LEN_RECD]  = "";
+   char       *p           = NULL;
+   time_t      x_time;
+   struct tm  *x_broke     = NULL;
+   /*---(program)------------------------*/
+   if (a_vernum != NULL)  strlcpy (x_vernum, a_vernum, LEN_TERSE);
+   if (a_vertxt != NULL)  strlcpy (x_vertxt, a_vertxt, LEN_HUND);
+   if (a_full != NULL) {
+      p = strrchr (a_full, '/');
+      if (p != NULL) {
+         sprintf (t, "#!%s", a_full);
+         yparse_fancy__write  (t);
+         yPARSE_spacer (1);
+         yPARSE_printf  ("s_program", "LSO", p + 1 , x_vernum, x_vertxt);
+      } else {
+         yPARSE_printf  ("s_program", "LSO", a_full, x_vernum, x_vertxt);
+      }
+   }
+   if (a_oneline != NULL)  yPARSE_printf  ("s_oneline", "O"  , a_oneline);
+   if (a_content != NULL)  yPARSE_printf  ("s_content", "O"  , a_content);
+   yPARSE_printf ("s_filename", "O"  , s_qout.loc);
+   x_time  = time (NULL);
+   x_broke = localtime (&x_time);
+   strftime (t,  30, "%y.%m.%d.%H.%M.%S.%u.%V", x_broke);
+   yPARSE_printf ("s_written" , "O"  , t);
+   if (a_additional != NULL)   a_additional ();
+   yPARSE_spacer (1);
    return 0;
 }
 
@@ -278,7 +316,7 @@ yPARSE_vscanf           (uchar *a_verb, ...)
 }
 
 char
-yPARSE_vprintf        (uchar *a_verb, ...)
+yPARSE_vprintf        (int c, uchar *a_verb, ...)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -295,6 +333,15 @@ yPARSE_vprintf        (uchar *a_verb, ...)
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
+   /*---(fancy)--------------------------*/
+   if (c >= 0 && s_qout.iverb >= 0) {
+      if (s_last != -1 && s_qout.iverb != s_last)   yparse_fancy_end  (s_count + 1);
+      if (c == 0)  {
+         yparse_fancy_begin (s_qout.iverb);
+         s_count = -1;
+      }
+      yparse_fancy_break (c);
+   }
    /*---(column count)-------------------*/
    n = yparse_specs_len (&s_qout);
    DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
@@ -308,6 +355,11 @@ yPARSE_vprintf        (uchar *a_verb, ...)
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
       return rc;
+   }
+   /*---(save)---------------------------*/
+   if (s_qout.iverb != -1) {
+      s_last  = s_qout.iverb;
+      s_count = c;
    }
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
@@ -475,7 +527,7 @@ yparse__mock_rtiny      (int n, uchar *a_verb)
 }
 
 char
-yparse__mock_wtiny      (int n, uchar *a_verb)
+yparse__mock__wtiny      (char a_fancy, int n, uchar *a_verb)
 {
    int         i           =    0;
    int         c           =    0;
@@ -486,12 +538,16 @@ yparse__mock_wtiny      (int n, uchar *a_verb)
       DEBUG_YPARSE   yLOG_info    ("check"     , s_mocks [i].d_verb);
       if (strcmp (s_mocks [i].d_verb, a_verb) != 0)  continue;
       DEBUG_YPARSE  yLOG_info    ("a_verb"    , a_verb);
-      yPARSE_vprintf (a_verb, s_mocks [i].d_int);
+      if (a_fancy == 'f')  yPARSE_vprintf (c , a_verb, s_mocks [i].d_int);
+      else                 yPARSE_vprintf (-1, a_verb, s_mocks [i].d_int);
       ++c;
    }
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return c;
 }
+
+char yparse__mock_wtiny      (int n, uchar *a_verb) { return yparse__mock__wtiny ('-', n, a_verb); }
+char yparse__mock_ftiny      (int n, uchar *a_verb) { return yparse__mock__wtiny ('f', n, a_verb); }
 
 char
 yparse__mock_rsmall     (int n, uchar *a_verb)
@@ -505,17 +561,21 @@ yparse__mock_rsmall     (int n, uchar *a_verb)
 }
 
 char
-yparse__mock_wsmall     (int n, uchar *a_verb)
+yparse__mock__wsmall     (char a_fancy, int n, uchar *a_verb)
 {
    int         i           =    0;
    int         c           =    0;
    for (i = 0; i < MAX_MOCK; ++i) {
       if (strcmp (s_mocks [i].d_verb, a_verb) != 0)  continue;
-      yPARSE_vprintf (a_verb, s_mocks [i].d_terse, s_mocks [i].d_label);
+      if (a_fancy == 'f')  yPARSE_vprintf (c , a_verb, s_mocks [i].d_terse, s_mocks [i].d_label);
+      else                 yPARSE_vprintf (-1, a_verb, s_mocks [i].d_terse, s_mocks [i].d_label);
       ++c;
    }
    return c;
 }
+
+char yparse__mock_wsmall     (int n, uchar *a_verb) { return yparse__mock__wsmall ('-', n, a_verb); }
+char yparse__mock_fsmall     (int n, uchar *a_verb) { return yparse__mock__wsmall ('f', n, a_verb); }
 
 char
 yparse__mock_rmedium    (int n, uchar *a_verb)
@@ -532,17 +592,21 @@ yparse__mock_rmedium    (int n, uchar *a_verb)
 }
 
 char
-yparse__mock_wmedium    (int n, uchar *a_verb)
+yparse__mock__wmedium    (char a_fancy, int n, uchar *a_verb)
 {
    int         i           =    0;
    int         c           =    0;
    for (i = 0; i < MAX_MOCK; ++i) {
       if (strcmp (s_mocks [i].d_verb, a_verb) != 0)  continue;
-      yPARSE_vprintf (a_verb, s_mocks [i].d_terse, s_mocks [i].d_int, s_mocks [i].d_double, s_mocks [i].d_char, s_mocks [i].d_string);
+      if (a_fancy == 'f')  yPARSE_vprintf (c , a_verb, s_mocks [i].d_terse, s_mocks [i].d_int, s_mocks [i].d_double, s_mocks [i].d_char, s_mocks [i].d_string);
+      else                 yPARSE_vprintf (-1, a_verb, s_mocks [i].d_terse, s_mocks [i].d_int, s_mocks [i].d_double, s_mocks [i].d_char, s_mocks [i].d_string);
       ++c;
    }
    return c;
 }
+
+char yparse__mock_wmedium    (int n, uchar *a_verb) { return yparse__mock__wmedium ('-', n, a_verb); }
+char yparse__mock_fmedium    (int n, uchar *a_verb) { return yparse__mock__wmedium ('f', n, a_verb); }
 
 char
 yparse__mock_rlarge     (int n, uchar *a_verb)
@@ -564,17 +628,27 @@ yparse__mock_rlarge     (int n, uchar *a_verb)
 }
 
 char
-yparse__mock_wlarge     (int n, uchar *a_verb)
+yparse__mock__wlarge     (char a_fancy, int n, uchar *a_verb)
 {
    int         i           =    0;
    int         c           =    0;
    for (i = 0; i < MAX_MOCK; ++i) {
       if (strcmp (s_mocks [i].d_verb, a_verb) != 0)  continue;
-      yPARSE_vprintf (a_verb, s_mocks [i].d_terse, s_mocks [i].d_label, s_mocks [i].d_float, s_mocks [i].d_double, s_mocks [i].d_char, s_mocks [i].d_int, s_mocks [i].d_long, s_mocks [i].d_exp, s_mocks [i].d_desc, s_mocks [i].d_string);
+      if (a_fancy == 'f')  yPARSE_vprintf (c , a_verb, s_mocks [i].d_terse, s_mocks [i].d_label, s_mocks [i].d_float, s_mocks [i].d_double, s_mocks [i].d_char, s_mocks [i].d_int, s_mocks [i].d_long, s_mocks [i].d_exp, s_mocks [i].d_desc, s_mocks [i].d_string);
+      else                 yPARSE_vprintf (-1, a_verb, s_mocks [i].d_terse, s_mocks [i].d_label, s_mocks [i].d_float, s_mocks [i].d_double, s_mocks [i].d_char, s_mocks [i].d_int, s_mocks [i].d_long, s_mocks [i].d_exp, s_mocks [i].d_desc, s_mocks [i].d_string);
       ++c;
    }
    return c;
 }
 
+char yparse__mock_wlarge     (int n, uchar *a_verb) { return yparse__mock__wlarge ('-', n, a_verb); }
+char yparse__mock_flarge     (int n, uchar *a_verb) { return yparse__mock__wlarge ('f', n, a_verb); }
 
+char
+yparse__mock_header     (void)
+{
+   yPARSE_printf  ("s_control", "cSO" , 'y', "0.6w", "testing integration");
+   yPARSE_printf  ("s_format" , "O"  , "mimecat");
+   return 0;
+}
 

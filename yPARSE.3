@@ -134,8 +134,9 @@ this method is advantageous for programs with non-trivial output files and
 keeps the programmer away from the read and write details (and therefore the
 need for unit testing too).
 
-either the callback or individual readers can be used for reading.  writing
-is all done through the individual writers which write all-at-once.
+either the callback or individual readers can be used for reading.  unplanned
+verbs will still report to verber.  writing is all done through the individual
+writers which write all-at-once.
 
 .B yPARSE_planned (<in_file>, <out_file>, <callback>, <name>, <desc>);
    -- adds the ability to write full files
@@ -155,6 +156,9 @@ is all done through the individual writers which write all-at-once.
 
 .B yPARSE_vprintf (<verb>, ...);
    -- nearly identical to yPARSE_printf, but format saved by handler
+
+.B yPARSE_vprintf_fancy (<cnt>, <verb>, ...);
+   -- fancy, does section and column heads, breaks at 5 rows, etc
 
 .B continue to use yPARSE_close
 

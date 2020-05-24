@@ -29,8 +29,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.3-, support yKINE and arachne"
-#define     P_VERNUM    "0.3p"
-#define     P_VERTXT    "gazillions of fixes and full unit test passes"
+#define     P_VERNUM    "0.3q"
+#define     P_VERTXT    "added writing header to output files, and its unit testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -53,6 +53,7 @@
 #include    <termios.h>           /* clibc standard terminal control          */
 #include    <errno.h>
 #include    <error.h>
+#include    <time.h>
 
 
 /*===[[ library headers -- heatherly ]]=======================================*/
@@ -213,7 +214,6 @@ char        yparse__popable         (void);
 
 char        yparse_init_out         (void);
 
-char        yparse_out_line         (char *a_line);
 
 /*---(saving)---------------*/
 char        yparse_initline         (void);
@@ -260,12 +260,27 @@ char        yparse__mock_internal   (void);
 char        yparse__mock_verber     (int n, uchar *a_verb, char a_exist, void *a_handler);
 char        yparse__mock_rtiny      (int n, uchar *a_verb);
 char        yparse__mock_wtiny      (int n, uchar *a_verb);
+char        yparse__mock_ftiny      (int n, uchar *a_verb);
 char        yparse__mock_rsmall     (int n, uchar *a_verb);
 char        yparse__mock_wsmall     (int n, uchar *a_verb);
+char        yparse__mock_fsmall     (int n, uchar *a_verb);
 char        yparse__mock_rmedium    (int n, uchar *a_verb);
 char        yparse__mock_wmedium    (int n, uchar *a_verb);
+char        yparse__mock_fmedium    (int n, uchar *a_verb);
 char        yparse__mock_rlarge     (int n, uchar *a_verb);
 char        yparse__mock_wlarge     (int n, uchar *a_verb);
+char        yparse__mock_flarge     (int n, uchar *a_verb);
+char        yparse__mock_header     (void);
+
+
+
+char        yparse_fancy__write     (uchar *a_line);
+char        yparse_fancy__columns   (uchar *a_specs, uchar *a_labels);
+char        yparse_fancy__begin     (uchar *a_verb, uchar *a_specs, uchar *a_labels, uchar *a_desc);
+char        yparse_fancy_begin      (int n);
+char        yparse_fancy_end        (int c);
+char        yparse_fancy_break      (int c);;
+
 
 
 #endif

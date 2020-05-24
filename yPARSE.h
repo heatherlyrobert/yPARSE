@@ -34,9 +34,9 @@ char        yPARSE_printf           (uchar *a_verb, uchar *a_format, ...);
 char        yPARSE_autoread         (uchar *a_in, uchar *a_out, void *a_verber);
 /*---(planned)--------------*/
 char        yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber);
-char        yPARSE_header           (uchar *a_full, uchar *a_desc, uchar *a_title, uchar *a_vernum, uchar *a_vertxt, int a_epoch);
+char        yPARSE_header           (uchar *a_full, uchar *a_vernum, uchar *a_vertxt, uchar *a_oneline, uchar *a_content, void (*a_additional) (void));
 char        yPARSE_vscanf           (uchar *a_verb, ...);
-char        yPARSE_vprintf          (uchar *a_verb, ...);
+char        yPARSE_vprintf          (int c, uchar *a_verb, ...);
 /*---(planned)--------------*/
 char        yPARSE_reusing          (uchar *a_in, uchar *a_out, void *a_verber);
 
@@ -51,9 +51,6 @@ char        yPARSE_wrap             (void);
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yPARSE_verb_begin       (char *a_verb);
-char        yPARSE_verb_break       (int   a_count);
-char        yPARSE_verb_end         (int   a_count);
 char        yPARSE_write_all        (void);
 
 

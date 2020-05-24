@@ -570,7 +570,8 @@ yparse_queue__line      (int n, char *a_recd)
    if (a_recd != NULL)  strlcpy (a_recd, ""    , LEN_RECD);
    /*---(open)---------------------------*/
    DEBUG_RPTG   yLOG_info    ("file"      , s_qout.loc);
-   f = fopen (s_qout.loc, "rt");
+   if (s_qout.loc != NULL)  f = fopen (s_qout.loc, "rt");
+   else                     f = fopen ("/tmp/yPARSE_out.txt", "rt");
    DEBUG_RPTG   yLOG_point   ("f"         , f);
    --rce;  if (rc < 0) {
       DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
