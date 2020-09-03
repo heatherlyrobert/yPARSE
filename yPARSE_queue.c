@@ -57,6 +57,20 @@ yparse_enqueue          (tQUEUE *a_queue, char *a_item)
    return 0;
 }
 
+char         /*-> add item to end of queue -----------[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
+yparse_enqueue_full     (tQUEUE *a_queue, char *a_item)
+{
+   char        rc          =    0;
+   DEBUG_FILE   yLOG_senter  (__FUNCTION__);
+   rc = yparse_enqueue (a_queue, a_item);
+   if (rc < 0) {
+      DEBUG_FILE   yLOG_sexitr  (__FUNCTION__, rc);
+      return rc;
+   }
+   DEBUG_FILE   yLOG_sexit   (__FUNCTION__);
+   return 0;
+}
+
 char         /*-> remove item from front of queue ----[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
 yparse_dequeue          (tQUEUE *a_queue, char *a_item)
 {
@@ -102,6 +116,20 @@ yparse_dequeue          (tQUEUE *a_queue, char *a_item)
    DEBUG_YPARSE  yLOG_sint    (a_queue->first);
    DEBUG_YPARSE  yLOG_sint    (a_queue->count);
    /*---(complete)-----------------------*/
+   return 0;
+}
+
+char         /*-> add item to end of queue -----------[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
+yparse_dequeue_full     (tQUEUE *a_queue, char *a_item)
+{
+   char        rc          =    0;
+   DEBUG_FILE   yLOG_senter  (__FUNCTION__);
+   rc = yparse_dequeue (a_queue, a_item);
+   if (rc < 0) {
+      DEBUG_FILE   yLOG_sexitr  (__FUNCTION__, rc);
+      return rc;
+   }
+   DEBUG_FILE   yLOG_sexit   (__FUNCTION__);
    return 0;
 }
 
@@ -219,10 +247,8 @@ yparse_purge            (tQUEUE *a_queue)
    /*---(walk-through)-------------------*/
    x_curr = a_queue->head;
    while (x_curr != NULL) {
-      DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-      yparse_dequeue (a_queue, NULL);
+      yparse_dequeue_full (a_queue, NULL);
       x_curr = a_queue->head;
-      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    }
    /*---(master data)--------------------*/
    a_queue->iverb    =   -1;
@@ -285,11 +311,16 @@ yparse__check           (char *a_name, char a_mode)
    DEBUG_FILE   yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
    DEBUG_FILE   yLOG_point   ("a_name"    , a_name);
-   --rce;  if (a_name == NULL) {
+   --rce;  if (a_name == NULL || a_name [0] == '\0') {
       DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_FILE   yLOG_info    ("a_name"    , a_name);
+   DEBUG_FILE   yLOG_char    ("a_mode"    , a_mode);
+   --rce;  if (a_mode == 0 || strchr ("IO", a_mode) == NULL) {
+      DEBUG_FILE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(get the file information)-------*/
    rci = lstat (a_name, &st);
    DEBUG_FILE   yLOG_value   ("lstat"     , rci);
@@ -308,7 +339,7 @@ yparse__check           (char *a_name, char a_mode)
       }
    }
    /*---(check regular file)-------------*/
-   if (S_ISREG (st.st_mode)) {
+   --rce;  if (S_ISREG (st.st_mode)) {
       DEBUG_FILE   yLOG_note    ("refers to a regular file, perfect");
    }
    /*---(check symlink)------------------*/

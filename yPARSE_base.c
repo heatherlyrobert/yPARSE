@@ -58,15 +58,18 @@ yPARSE_init             (char a_auto, void *a_verber, char a_reusing)
 char
 yPARSE_delimiters       (uchar a_type)
 {
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    switch (a_type) {
    case YPARSE_FUNCTION  :
       strlcpy (myPARSE.delimiters, "§(,)", LEN_LABEL);
       break;
    case YPARSE_FIELD     :
    default :
-      strlcpy (myPARSE.delimiters, "|§" , LEN_LABEL);
+      strlcpy (myPARSE.delimiters, "§" , LEN_LABEL);
       break;
    }
+   DEBUG_YPARSE  yLOG_info    ("delimit"   , myPARSE.delimiters);
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -191,6 +194,7 @@ yparse__unit_loud       (void)
    yURG_logger   (x_narg, x_args);
    yURG_urgs     (x_narg, x_args);
    yURG_name     ("yparse", 'y');
+   yURG_name     ("ystr"  , 'y');
    yPARSE_init (YPARSE_MANUAL, NULL, YPARSE_ONETIME);  /* defaults */
    myPARSE.ready = '-';
    return 0;

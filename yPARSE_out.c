@@ -22,6 +22,8 @@ static tTYPES  s_types [MAX_TYPES] = {
    { 'i', "integer"            , 'n',    6, "normal integer  (6d)"             },
    { 'l', "long"               , 'n',   10, "long integer    (10d)"            },
    { 'h', "huge"               , 'n',   16, "long integer    (16ld)"           },
+   { ',', "comma"              , 'n',   10, "comma           (10d)"            },
+   { ';', "hcomma"             , 'n',   19, "long comma      (19ld)"           },
    { 'k', "ykine"              , 'n',    6, "short float     (6.1f)"           },
    { 'f', "float"              , 'n',    8, "normal float    (8.2f)"           },
    { 'd', "double"             , 'n',   10, "double float    (10.3lf)"         },
@@ -274,6 +276,7 @@ yparse__push_numeric    (double a_val)
    char        rc          =    0;
    char        x_type      =  '-';
    char        t           [LEN_RECD];
+   char        s           [LEN_RECD];
    llong       v           =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
@@ -331,6 +334,24 @@ yparse__push_numeric    (double a_val)
       if      (a_val < -999999999999998LL)  strlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 9999999999999998LL)  strlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else                                  sprintf (t, "%16ld"    , (llong) a_val);
+      break;
+   case  ','  :
+      DEBUG_YPARSE   yLOG_snote   ("comma");
+      if      (a_val < -9999999)      strlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
+      else if (a_val > 99999999)      strlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
+      else  {
+         strl4comma (a_val, s, 0, 'c', '-', LEN_LABEL);
+         sprintf (t, "%10.10s", s);
+      }
+      break;
+   case  ';'  :
+      DEBUG_YPARSE   yLOG_snote   ("hcomma");
+      if      (a_val < -99999999999998LL)  strlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
+      else if (a_val > 999999999999998LL)  strlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
+      else {
+         strl4comma (a_val, s, 0, 'c', '-', LEN_LABEL);
+         sprintf (t, "%19.19s", s);
+      }
       break;
    case  'k'  :
       DEBUG_YPARSE   yLOG_snote   ("ykine");
@@ -610,6 +631,7 @@ yparse_out_variadic    (va_list a_vlist, int n)
    double      x_double    =  0.0;
    uchar      *x_str       = NULL;
    int         c           =    0;
+   double      x_val       =  0.0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(walk fields)--------------------*/
@@ -621,12 +643,12 @@ yparse_out_variadic    (va_list a_vlist, int n)
          rc = yPARSE_pushchar   (x_char);
          DEBUG_YPARSE   yLOG_complex ("char"      , "%d, %c, %3d, %c", i, x_type, rc, x_char);
          break;
-      case 's' : case 'i' :
+      case 's' : case 'i' : case ',' :
          x_int     = va_arg (a_vlist, int);
          rc = yPARSE_pushint    (x_int);
          DEBUG_YPARSE   yLOG_complex ("int"       , "%d, %c, %3d, %ld", i, x_type, rc, x_int);
          break;
-      case 'l' : case 'h' :
+      case 'l' : case 'h' : case ';' :
          x_long    = va_arg (a_vlist, llong);
          rc = yPARSE_pushint    (x_long);
          DEBUG_YPARSE   yLOG_complex ("long"      , "%d, %c, %3d, %ld", i, x_type, rc, x_long);

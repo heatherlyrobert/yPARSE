@@ -2,19 +2,207 @@
 .na
 
 .SH NAME
-yPARSE \- decision rationale, objectives, and overview
+.B yPARSE
+\- text file parsing and aggregating library
+
+.SH PATRON
+.B jupiter-terminus
+(boundaries) the roman god of boundaries and division
+
+.SH IMAGERY (see HERITAGE in man section 7 for more)
+head and torso of a man, connected to a boundary stone as a base
 
 .SH SUMMARY
-yPARSE is a standardized text record parsing and aggregating library used
-to simplify delimited file input and output through a single common queue
-interface.
+.BI yPARSE
+standardizes the reading/parsing and writing/aggregating of structured,
+multi-type, ascii-text data streams and files required by most non-trivial
+applications than dont require a full database.
+
+.SH TABLE OF CONTENTS
+.nf
+software niche     what is the subject matter
+.nf
+focus/scope        what are the broad scope boundaries
+.nf
+why                why would you do this
+.nf
+audience           who will be using it
+.nf
+standards          requirements for all my applications
+.nf
+accepted           requirements that i expect to deliver
+.nf
+rejected           requirements for another place, or nowhere
+
+.SH SOFTWARE NICHE
+
+.SS background (b).  
+virtually all applications require access to external, non-system data in
+some way.  what typically varies is the volitility, volume, complexity,
+and inter-relatedness of the data.
+
+.SS concern (c).  
+programmers typically become one trick ponies.  they use one method because they
+have great comfort.
+
+.SS major alternatives (a)
+
+.B 1) database     : awesome for huge, shared data loads, massive overhead
+.nf
+databases are fantastic and allow data abstraction into models.  but, require
+servers, serious software, real-time comms, and pose another maintenance point.
+love them, but save for serious, centralized data
+
+.B 2) binary       : loading/saving very fast, but inflexible, opaque
+.nf
+binary file databases are stunningly fast and perfect for fast response times
+and even massively interconnected data.  but, they are hugely inflexible and
+require dedicated software.  i love them, but use them sparingly.
+
+.B 3) built-in     : great for simple, low change data tables
+data coded directly into the software is fast and simple, but it can only
+be changed by making sofware updates.  very useful is that the data can be
+forced into the shared segment and therefore save space in libraries.
+
+.B 4) unstructured :  single data type, simple inter-connections
+unstructured, ascii data is the most common and very useful for single record
+type data that is connected in simple ways.  this is the lifeblood of unix
+pipes and filters.  i love this, but use ot when its appropriate.
+
+.B 5) structured   : multiple, inter-related data types in single file
+structured ascii-text data streams and files provide a simple, flexible,
+understandable, and verifiable means of saving and transfering complex data.
+but building readers and writers is non-trivial.
+
+.SH FOCUS/SCOPE (F)
+.B structured ascii-data files
+are my very specific focus.  i love and use existing tools for normal data
+streams, databases, and built-in data.  but, i now have many tools that use
+complicated data sets in manageable volumes.
+
+i have chosen to implement a
+.B full eight-bit ascii
+because of the usefulness of my custom character set in a
+.B column delimited
+format for verification, maintenance, and understanding, using
+.B verb-prefixed
+records that allow data to be mixed in complex ways.
+
+.SH WHAT THE HELL (?)
+i now have many application creating variants of this format, each using their
+own logic.  while these applications are stable, they all require redundant
+testing and i am open to significant maintenance to port better ideas.
+
+write-once, test-once, maintain-once, use many times.
+
+.SH TARGET USER (T).  
+me, myself, and i.
+
+.SH STANDARD REQUIREMENTS (#)
+.nf
+-- run on any linux box from raspberry to cray
+.nf
+-- stay focused, small, tight, reliable, and secure
+.nf
+-- forgo sloppy, kitchen-sink languages, like python, java, or perl
+.nf
+-- stay away from dependency on external code libraries, like boost
+.nf
+-- only human-readable, safe, ascii streams (not database)
+.nf
+-- have dedicated, maintained, automated unit testing
+.nf
+-- provide either detailed reporting or logging for debugging
+.nf
+-- use secure communications between systems where required
+.nf
+-- clean, clean code so i can maintain after long absences
+.nf
+-- no international, multi-lang, multi-byte support (freaking ever)
+.nf
+-- one-hundred percent keyboard driven and centric
+.nf
+-- all tables must be self describing with labels and queries
+.nf
+-- all data structures must include dumps, reports, and audits
+
+.SH ACCEPTED REQUIREMENTS (a).  
+.nf
+-- remove most open, read, write, and close logic from programs
+.nf
+-- simple version to keep simple apps simple
+.nf
+-- deep version to accomodate wickedly complex needs
+.nf
+-- allows file header information to convey specific config
+.nf
+-- optional section headers and footers for readabilty
+.nf
+-- verb-prefixed records to easily route parsing
+.nf
+-- column delimited for readability and maintenance
+.nf
+-- set of standard column formats, rather than highly configurable
+.nf
+-- use standard ascii field delimeter /x31 (obviously)
+
+
+.SH REJECTED REQUIREMENTS (r).  
+.nf
+-- visualization (that is a front-end thing)
+.nf
+-- simulation (that is a front-end thing)
+.nf
+-- dynamics (forces and resistance) of any sort
+.nf
+-- statics (loads and pressures) of any sort
+
+
+
+
+
+
+
+.SS consequences (c).  
+.nf
+-- redundant coding effort
+.nf
+-- more layers of unit testing
+.nf
+-- another potential point of failure
+.nf
+-- more maintenance effort
+.nf
+-- potential cross-porting of new ideas
+
+.B definition (d).
+structured ascii-text data streams and files provide a simple, flexible,
+understandable, and verifiable means of saving and transfering comglex data.
+
+.B existing solutions (x).
+
+.B existing solutions (x).
+five methods are typically used for program data, built into the program,
+plain-text files, structured files, databases software, and binary databases.
+
+.B unaided result (u).
+for ninety-nine percent of software
+files and directories often go unmanaged, are misused, and atrophy badly
+over time.  the result is conflicting versions, confusing duplication,
+unfindable files, and storage waste.
+
+.B software challenge (c).
+finding a specific file, particularly if not frequently used, can be a chore.
+any solution must make that much easier as well as provide invaluable aid to
+the cleanup process.
 
 .SH SCOPE, REASONING and DECISION
 
+.Bk
+
 .B situation (S).  
-while nearly all programs read and write data streams, and some use
-configuration files, only the more complex read and write named data files
-(most of mine use ascii text for transparency).
+while nearly every program reads and/or writes plain-text data streams, named
+ascii-text files, and potentially configuration files.
 
 .B complication (C).  
 each application generally reinvents the file reading and writing logic, which

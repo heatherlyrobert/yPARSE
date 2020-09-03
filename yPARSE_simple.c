@@ -325,6 +325,7 @@ yPARSE_vprintf        (int c, uchar *a_verb, ...)
    va_list     x_vlist;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_value   ("c"         , c);
    /*---(verb)---------------------------*/
    DEBUG_YPARSE   yLOG_point   ("a_verb"    , a_verb);
    if (a_verb != NULL) DEBUG_YPARSE  yLOG_info    ("a_verb"    , a_verb);
@@ -334,6 +335,7 @@ yPARSE_vprintf        (int c, uchar *a_verb, ...)
       return rc;
    }
    /*---(fancy)--------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("iverb"     , s_qout.iverb);
    if (c >= 0 && s_qout.iverb >= 0) {
       if (s_last != -1 && s_qout.iverb != s_last)   yparse_fancy_end  (s_count + 1);
       if (c == 0)  {

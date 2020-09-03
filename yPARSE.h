@@ -69,7 +69,7 @@ char        yPARSE_section          (char *a_title);
 
 char        yPARSE_write            (int *n, int *c);
 char        yPARSE_dump             (int *n, int *c);
-char        yPARSE_read             (int *n, int *c, uchar *a_verb);
+char        yPARSE_read             (int *t, int *n, int *c, uchar *a_verb);
 char        yPARSE_load             (int *n, int *c, char *a_recd);
 char        yPARSE_reload           (int *n, int *c, int a_line, char *a_label);
 char        yPARSE_hidden           (int *n, int *c, char *a_recd);
@@ -97,6 +97,7 @@ char        yPARSE_popchar          (char   *a_new);
 char        yPARSE_popint           (int    *a_new);
 char        yPARSE_popfloat         (float  *a_new);
 char        yPARSE_popdouble        (double *a_new);
+char        yPARSE_popexp           (double *a_new);
 
 char        yPARSE_qin_info         (char *a_label, char *a_loc, void **a_file, int *t);
 char        yPARSE_qout_info        (char *a_label, char *a_loc, void **a_file, int *t);
@@ -112,6 +113,12 @@ char        yPARSE_pushint          (llong   a_val);
 char        yPARSE_pushfloat        (double  a_val);
 char        yPARSE_spacer           (char a_lines);
 
+char        yPARSE_sect_begin       (uchar *a_verb);
+char        yPARSE_sect_break       (int c);
+char        yPARSE_sect_end         (int c);
+
+
+char        yPARSE_verb_purge       (void);
 char*       yPARSE_verb             (int a_num);
 char        yPARSE_handler          (uchar *a_verb, char *a_specs, void *a_reader);
 char        yPARSE_handler_plus     (uchar *a_verb, uchar *a_specs, float a_seq, void *a_reader, void *a_writer, uchar *a_labels);

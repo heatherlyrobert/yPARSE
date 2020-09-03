@@ -13,7 +13,7 @@
 
 #define     P_FOCUS     "RS (run-time support)"
 #define     P_NICHE     "fp (file parsing)"
-#define     P_PURPOSE   "simple, standard file parsing and aggregating library"
+#define     P_PURPOSE   "text file parsing and aggregating library"
 
 #define     P_NAMESAKE  "jupiter-terminus (boundaries)"
 #define     P_HERITAGE  "roman god of boundaries, division, and boundary markers"
@@ -29,8 +29,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.3-, support yKINE and arachne"
-#define     P_VERNUM    "0.3q"
-#define     P_VERTXT    "added writing header to output files, and its unit testing"
+#define     P_VERNUM    "0.3r"
+#define     P_VERTXT    "lots of little fixes for yKINE integration"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -96,32 +96,10 @@ struct cACCESSOR {
 };
 extern   tACCESSOR  myPARSE;
 
-
-
-/*> typedef     struct      cSECTION    tSECTION;                                     <* 
- *> struct cSECTION {                                                                 <* 
- *>    /+---(master)------------+/                                                    <* 
- *>    cchar       abbr;                                                              <* 
- *>    cchar       label       [LEN_LABEL];                                           <* 
- *>    cchar       specs       [LEN_LABEL];                                           <* 
- *>    /+---(handlers)----------+/                                                    <* 
- *>    char        (*writer)   (int n, uchar *a_verb);                                <* 
- *>    char        (*reader)   (int n, uchar *a_verb);                                <* 
- *>    /+---(runtime)-----------+/                                                    <* 
- *>    int         try;                                                               <* 
- *>    int         bad;                                                               <* 
- *>    /+---(descriptive)-------+/                                                    <* 
- *>    cchar       column      [LEN_RECD];                                            <* 
- *>    cchar       desc        [LEN_DESC ];                                           <* 
- *>    /+---(done)--------------+/                                                    <* 
- *> };                                                                                <*/
-
-
-
 typedef     struct      cNODE       tNODE;
 struct      cNODE {
    int         ref;
-   char       *item;
+   uchar      *item;
    tNODE      *next;
    tNODE      *prev;
 };
@@ -139,11 +117,11 @@ struct      cQUEUE {
    /*---(file)--------------*/
    char       *loc;
    FILE       *file;
-   int         tline;                           /* line number in total       */
+   int         tline;                           /* line number in source      */
    int         nline;                           /* line number of accepted    */
-   int         cline;                           /* current line               */
+   int         cline;                           /* current line in use        */
    /*---(record)------------*/
-   char        recd        [LEN_RECD];
+   uchar       recd        [LEN_RECD];
    int         len;
    /*---(fields)------------*/
    tNODE      *head;
@@ -179,6 +157,7 @@ char*       yparse_base__unit       (char *a_question, int a_num);
 char        yparse_init_types       (void);
 
 
+char        yparse__check           (char *a_name, char a_mode);
 char        yparse_open             (tQUEUE *a_queue, char *a_name);
 char        yparse_close            (tQUEUE *a_queue);
 char        yparse_good_in          (void);
@@ -194,16 +173,18 @@ char*       yparse__unit_verb       (char *a_question, char *a_verb, int a_seq);
 char        yparse_init             (tQUEUE *a_queue, char *a_label);
 char        yparse_purge            (tQUEUE *a_queue);
 char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
+char        yparse_enqueue_full     (tQUEUE *a_queue, char *a_item);
 char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);
+char        yparse_dequeue_full     (tQUEUE *a_queue, char *a_item);
 char        yparse_topqueue         (tQUEUE *a_queue, char *a_item);
 char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
 char        yparse_peek_verb        (int *a_index, char *a_verb);
 
-char        yparse__main            (int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
+char        yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
 char        yparse_reusable         (char a_masked);
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-char        yparse_recd             (char *a_recd);
+char        yparse_recd             (uchar *a_recd);
 
 char        yparse_in_fakeready     (void);
 char        yparse_enqueue_in       (char *a_item);

@@ -4,21 +4,21 @@
 
 
 
-#define     MAX_COLS      12
+#define     MAX_COLS      29
 #define     MAX_VERBS     50
 struct {
    /*---(master)------------*/
    uchar       mode;                        /* one char yvikeys mode id       */
    uchar       verb        [LEN_LABEL];     /* verb name as used in files     */
-   uchar       specs       [LEN_LABEL];     /* field specifications           */
+   uchar       specs       [LEN_TITLE];     /* field specifications           */
    char        mask;                        /* field for reload/change        */
    /*---(handlers)----------*/
-   char        (*reader)   (int n, char *a_verb);
-   char        (*writer)   (int n, char *a_verb);
+   int         (*reader)   (int n, char *a_verb);
+   int         (*writer)   (int n, char *a_verb);
    float       seq;                         /* writing sequence               */
    char        done;                        /* written (y/n)                  */
    /*---(descriptive)-------*/
-   char        flags       [LEN_LABEL];     /* flags for use by program       */
+   char        flags       [LEN_TITLE];     /* flags for use by program       */
    uchar       labels      [LEN_RECD];      /* field labels for headers       */
    uchar       desc        [LEN_DESC ];     /* long verb description          */
    /*---(done)--------------*/
@@ -41,24 +41,30 @@ yparse_verb__wipe       (char n)
 {
    s_verbs [n].mode    =  '·';
    strlcpy (s_verbs [n].verb   , ""            , LEN_LABEL);
-   strlcpy (s_verbs [n].specs  , "------------", LEN_LABEL);
+   strlcpy (s_verbs [n].specs  , "------------", LEN_TITLE);
    s_verbs [n].mask    = -1;
    s_verbs [n].reader  = NULL;
    s_verbs [n].writer  = NULL;
-   strlcpy (s_verbs [n].flags  , "------------", LEN_LABEL);
+   strlcpy (s_verbs [n].flags  , "------------", LEN_TITLE);
    strlcpy (s_verbs [n].labels , ""            , LEN_RECD);
    strlcpy (s_verbs [n].desc   , ""            , LEN_DESC);
    return 0;
 }
 
 char
-yparse_verb_init        (void)
+yPARSE_verb_purge       (void)
 {
    int         i           =    0;
    for (i = 0; i < MAX_VERBS; ++i) {
       yparse_verb__wipe (i);
    }
    s_nverb = 0;
+}
+
+char
+yparse_verb_init        (void)
+{
+   yPARSE_verb_purge ();
    return 0;
 }
 
@@ -169,7 +175,7 @@ yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs
    int         i           =    0;
    int         x_found     =    0;
    int         n           =    0;
-   char        x_specs     [LEN_LABEL] = "";
+   char        x_specs     [LEN_TITLE] = "";
    /*---(defense)------------------------*/
    if (myPARSE.ready != 'y')  return -1;
    if (a_verb == NULL)        return -2;
@@ -190,10 +196,10 @@ yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs
    /*---(defense)------------------------*/
    DEBUG_YPARSE   yLOG_point   ("a_specs"   , a_specs);
    if (a_specs != NULL && strlen (a_specs) >  0) {
-      strlcpy (x_specs, a_specs, LEN_LABEL);
+      strlcpy (x_specs, a_specs, LEN_TITLE);
    }
-   strltrim (x_specs, ySTR_BOTH, LEN_LABEL);
-   strlddel (x_specs, '-', LEN_LABEL);
+   strltrim (x_specs, ySTR_BOTH, LEN_TITLE);
+   strlddel (x_specs, '-', LEN_TITLE);
    DEBUG_YPARSE   yLOG_info    ("x_specs"   , x_specs);
    --rce;  for (i = 0; i < strlen (x_specs); ++i) {
       if (yparse_field_len (x_specs [i]) > 0)  continue;
@@ -210,11 +216,11 @@ yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs
    if (a_mode   != 0   )  s_verbs [n].mode    = a_mode;
    strlcpy (s_verbs [n].verb  , a_verb  , LEN_LABEL);
    if (a_seq    >  0.0 )  s_verbs [n].seq     = a_seq;
-   strlcpy (s_verbs [n].specs , x_specs , LEN_LABEL);
+   strlcpy (s_verbs [n].specs , x_specs , LEN_TITLE);
    s_verbs [n].mask    = a_mask;
    if (a_reader != NULL)  s_verbs [n].reader  = a_reader;
    if (a_writer != NULL)  s_verbs [n].writer  = a_writer;
-   if (a_flags  != NULL)  strlcpy (s_verbs [n].flags , a_flags , LEN_LABEL);
+   if (a_flags  != NULL)  strlcpy (s_verbs [n].flags , a_flags , LEN_TITLE);
    if (a_labels != NULL)  strlcpy (s_verbs [n].labels, a_labels, LEN_RECD);
    if (a_desc   != NULL)  strlcpy (s_verbs [n].desc  , a_desc  , LEN_DESC);
    /*---(update)-------------------------*/
@@ -535,6 +541,33 @@ yparse_fancy_end        (int c)
 }
 
 
+
+/*====================------------------------------------====================*/
+/*===----                     public simplifiers                       ----===*/
+/*====================------------------------------------====================*/
+static void      o___PUBLIC__________________o (void) {;};
+
+char
+yPARSE_sect_begin       (uchar *a_verb)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   int         n           =   -1;
+   int         i           =    0;
+   for (i = 0; i < s_nverb; ++i) {
+      if (s_verbs [i].verb [0] != a_verb [0])      continue;
+      if (strcmp (s_verbs [i].verb, a_verb) != 0)  continue;
+      n = i;
+      break;
+   }
+   yparse_fancy_begin (n);
+   return 0;
+}
+
+char yPARSE_sect_break       (int c) { return yparse_fancy_break (c); }
+char yPARSE_sect_end         (int c) { return yparse_fancy_end   (c); }
+
+
+
 /*====================------------------------------------====================*/
 /*===----                        major drivers                         ----===*/
 /*====================------------------------------------====================*/
@@ -597,14 +630,14 @@ yPARSE_read_all         (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    while (1) {
       rc = yPARSE_read_one (NULL, NULL);
-      if (rc <= 0)  {
+      if (rc == 0)  {
          DEBUG_YPARSE   yLOG_note    ("end-of-file");
          break;
       }
       /*> printf ("%s\n", myPARSE.recd);                                              <*/
       if (rc <  0)  {
-         DEBUG_YPARSE   yLOG_note    ("trouble reading records");
-         break;
+         DEBUG_YPARSE   yLOG_note    ("trouble reading record");
+         continue;
       }
       yparse_peek_verb (&n, x_verb);
       DEBUG_YPARSE  yLOG_value   ("index"     , n);
