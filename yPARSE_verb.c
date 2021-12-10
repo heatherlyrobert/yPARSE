@@ -2,6 +2,15 @@
 #include    "yPARSE.h"
 #include    "yPARSE_priv.h"
 
+/*
+ *  readers and writers must accept two arguments...
+ *  1) n       reference number (out is a sequence, in is file line number)
+ *  2) a_verb  the string verb name to verify and prepare
+ *  these two provide excellent, targeted debugging information
+ *
+ *
+ *
+ */
 
 
 #define     MAX_COLS      29

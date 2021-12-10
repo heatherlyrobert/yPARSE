@@ -13,24 +13,33 @@
 
 #define     P_FOCUS     "RS (run-time support)"
 #define     P_NICHE     "fp (file parsing)"
+#define     P_SUBJECT   "automated file parsing"
 #define     P_PURPOSE   "text file parsing and aggregating library"
 
 #define     P_NAMESAKE  "jupiter-terminus (boundaries)"
 #define     P_HERITAGE  "roman god of boundaries, division, and boundary markers"
 #define     P_IMAGERY   "head and torso of a man, connected to a boundary stone as a base"
+#define     P_REASON    ""
+
+#define     P_ONELINE   P_NAMESAKE " " P_SUBJECT
+
+#define     P_BASENAME  ""
+#define     P_FULLPATH  ""
+#define     P_SUFFIX    ""
+#define     P_CONTENT   ""
 
 #define     P_SYSTEM    "gnu/linux   (powerful, ubiquitous, technical, and hackable)"
 #define     P_LANGUAGE  "ansi-c      (wicked, limitless, universal, and everlasting)"
 #define     P_CODESIZE  "small       (appoximately 10,000 slocl)"
+#define     P_DEPENDS   "none"
 
 #define     P_AUTHOR    "heatherlyrobert"
 #define     P_CREATED   "2018-01"
-#define     P_DEPENDS   "none"
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.3-, support yKINE and arachne"
-#define     P_VERNUM    "0.3r"
-#define     P_VERTXT    "lots of little fixes for yKINE integration"
+#define     P_VERNUM    "0.3s"
+#define     P_VERTXT    "updated timestamp to latest standard (yEXEC)"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

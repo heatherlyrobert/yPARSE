@@ -695,6 +695,12 @@ yPARSE_stdout           (void)
 }
 
 char
+yPARSE_tmpout           (void)
+{
+   return yparse_open  (&s_qout, "/tmp/yparse.txt");
+}
+
+char
 yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -727,7 +733,7 @@ yPARSE_close_out  (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(footer)-------------------------*/
    yPARSE_spacer  (3);
-   if (s_qout.file != NULL)   fprintf (s_qout.file, "# end-of-file.  done, finito, completare.\n");
+   if (s_qout.file != NULL)   fprintf (s_qout.file, "# end-of-file.  done, finito, completare, whimper [Ï´···\n");
    /*---(close)--------------------------*/
    rc = yparse_close (&s_qout);
    if (rc < 0)  {

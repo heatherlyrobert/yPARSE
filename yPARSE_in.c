@@ -139,6 +139,7 @@ yPARSE_popstr           (char *a_item)
    if (a_item != NULL)  strlcpy (a_item, "", LEN_LABEL);
    /*---(defense)------------------------*/
    rc = yparse_in_defense ();
+   DEBUG_YPARSE  yLOG_sint       (rc);
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
@@ -956,6 +957,7 @@ int  yPARSE_recdno      (void)  { return s_qin.tline; }
 static void      o___FILES___________________o (void) {;};
 
 char yPARSE_stdin      (void)          { return yparse_open  (&s_qin, "stdin"); }
+char yPARSE_tmpin      (void)          { return yparse_open  (&s_qin, "/tmp/yparse.txt"); };
 char yPARSE_open_in    (char *a_name)  { return yparse_open  (&s_qin, a_name);  }
 char yPARSE_close_in   (void)          { return yparse_close (&s_qin);          }
 

@@ -183,7 +183,7 @@ yPARSE_scanf            (uchar *a_verb, uchar *a_format, ...)
    /*---(cycle fields)-------------------*/
    rc = yparse_in_variadic (x_vlist, n);
    DEBUG_YPARSE   yLOG_value   ("variadic"  , rc);
-   --rce;  if (n < 0)  {
+   --rce;  if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -256,7 +256,7 @@ yPARSE_header           (uchar *a_full, uchar *a_vernum, uchar *a_vertxt, uchar 
    yPARSE_printf ("s_filename", "O"  , s_qout.loc);
    x_time  = time (NULL);
    x_broke = localtime (&x_time);
-   strftime (t,  30, "%y.%m.%d.%H.%M.%S.%u.%V", x_broke);
+   strftime (t, LEN_TITLE, "%y.%m.%d.%H.%M.%S.%u.%W.%j", x_broke);
    yPARSE_printf ("s_written" , "O"  , t);
    if (a_additional != NULL)   a_additional ();
    yPARSE_spacer (1);

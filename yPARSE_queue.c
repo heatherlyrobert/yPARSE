@@ -78,6 +78,7 @@ yparse_dequeue          (tQUEUE *a_queue, char *a_item)
    char        rce         =  -10;
    tNODE      *x_save      = NULL;
    /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("dequeue");
    DEBUG_YPARSE  yLOG_spoint  (a_queue);
    --rce;  if (a_queue == NULL) {
       DEBUG_YPARSE  yLOG_snote   ("null queue");

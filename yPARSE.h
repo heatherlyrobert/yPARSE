@@ -57,11 +57,13 @@ char        yPARSE_write_all        (void);
 /*---(yPARSE_line.c)--------*/
 
 char        yPARSE_stdin            (void);
+char        yPARSE_tmpin            (void);
 char        yPARSE_stdin_peek       (void);
 char        yPARSE_open_in          (char *a_name);
 char        yPARSE_close_in         (void);
 
 char        yPARSE_stdout           (void);
+char        yPARSE_tmpout           (void);
 char        yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc);
 char        yPARSE_close_out        (void);
 char        yPARSE_section          (char *a_title);
