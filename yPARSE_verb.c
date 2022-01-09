@@ -631,7 +631,7 @@ yPARSE_read_all         (void)
    char        rce         =  -10;
    char        rc          =    0;
    int         n           =   -1;
-   char        c           =    0;
+   int         c           =    0;
    float       x_lowest    =  0.0;
    int         x_next      =   -1;
    char        x_verb      [LEN_LABEL];
@@ -667,6 +667,10 @@ yPARSE_read_all         (void)
       }
       ++c;
    }
+   /*---(limits)-------------------------*/
+   DEBUG_YPARSE  yLOG_value   ("c"         , c);
+   if (c > 99)  c = 99;
+   DEBUG_YPARSE  yLOG_value   ("c"         , c);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return c;

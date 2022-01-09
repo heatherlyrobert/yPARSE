@@ -1307,6 +1307,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
             case 'H'  : strlcpy (x_str, x_work, LEN_HUND );   break;
             case 'F'  : strlcpy (x_str, x_work, LEN_FULL );   break;
             case 'O'  : strcpy  (x_str, x_work);              break;
+            default   : strlcpy  (x_str, x_work, LEN_SHORT);  break;
             }
          }
          DEBUG_YPARSE   yLOG_complex ("string"    , "%d, %c, %3d, %s, %p, %s", i, x_type, rc, x_work, x_str, x_str);

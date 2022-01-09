@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.3-, support yKINE and arachne"
-#define     P_VERNUM    "0.3s"
-#define     P_VERTXT    "updated timestamp to latest standard (yEXEC)"
+#define     P_VERNUM    "0.3t"
+#define     P_VERTXT    "tiny, scary bug -- used char instead of int for counter in yPARSE_read_all ()"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
