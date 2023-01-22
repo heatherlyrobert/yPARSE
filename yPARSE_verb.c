@@ -185,6 +185,7 @@ yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs
    int         x_found     =    0;
    int         n           =    0;
    char        x_specs     [LEN_TITLE] = "";
+   int         l           =    0;
    /*---(defense)------------------------*/
    if (myPARSE.ready != 'y')  return -1;
    if (a_verb == NULL)        return -2;
@@ -211,7 +212,9 @@ yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs
    strlddel (x_specs, '-', LEN_TITLE);
    DEBUG_YPARSE   yLOG_info    ("x_specs"   , x_specs);
    --rce;  for (i = 0; i < strlen (x_specs); ++i) {
-      if (yparse_field_len (x_specs [i]) > 0)  continue;
+      l = yparse_field_len (x_specs [i]);
+      DEBUG_YPARSE   yLOG_complex ("entry"     , "%2d, %c, %d", i, x_specs [i], l);
+      if (l > 0)  continue;
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }

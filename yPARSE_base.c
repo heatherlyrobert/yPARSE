@@ -42,16 +42,22 @@ static void      o___PROGRAM_________________o (void) {;}
 char
 yPARSE_init             (char a_auto, void *a_verber, char a_reusing)
 {
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_char    ("a_reusing" , a_reusing);
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
    myPARSE.verbs   = a_auto;
    myPARSE.verber  = a_verber;
    myPARSE.ready   = 'y';
    myPARSE.reusing = a_reusing;
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
    yparse_init_types ();
    yparse_verb_init  ();
    yparse_init_in    ();
    yparse_init_out   ();
    yparse_initline   ();
    yPARSE_delimiters (YPARSE_FIELD);
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -76,12 +82,17 @@ yPARSE_delimiters       (uchar a_type)
 char
 yPARSE_wrap             (void)
 {
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
+   yparse_line_purge ();
    myPARSE.verbs   = YPARSE_MANUAL;
    myPARSE.verber  = NULL;
    myPARSE.ready   = '-';
    myPARSE.reusing = YPARSE_ONETIME;
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -179,8 +190,6 @@ yparse_mock__unit       (char *a_question, int a_num)
 char         /*-> set up programgents/debugging ------[ light  [uz.320.011.05]*/ /*-[00.0000.00#.#]-*/ /*-[--.---.---.--]-*/
 yparse__unit_quiet      (void)
 {
-   int         x_narg       = 1;
-   char       *x_args [20]  = {"yPARSE_unit" };
    yPARSE_init (YPARSE_MANUAL, NULL, YPARSE_ONETIME);  /* defaults */
    myPARSE.ready = '-';
    return 0;
@@ -190,11 +199,11 @@ char         /*-> set up programgents/debugging ------[ light  [uz.320.011.05]*/
 yparse__unit_loud       (void)
 {
    int         x_narg       = 1;
-   char       *x_args [20]  = {"yPARSE_unit" };
+   char       *x_args [ 1]  = {"yPARSE_unit" };
    yURG_logger   (x_narg, x_args);
    yURG_urgs     (x_narg, x_args);
-   yURG_name     ("yparse", 'y');
-   yURG_name     ("ystr"  , 'y');
+   yURG_by_name  ("yparse", 'y');
+   yURG_by_name  ("ystr"  , 'y');
    yPARSE_init (YPARSE_MANUAL, NULL, YPARSE_ONETIME);  /* defaults */
    myPARSE.ready = '-';
    return 0;

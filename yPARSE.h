@@ -39,6 +39,7 @@ char        yPARSE_vscanf           (uchar *a_verb, ...);
 char        yPARSE_vprintf          (int c, uchar *a_verb, ...);
 /*---(planned)--------------*/
 char        yPARSE_reusing          (uchar *a_in, uchar *a_out, void *a_verber);
+char        yPARSE_set_reuse        (void);
 
 
 
@@ -78,6 +79,7 @@ char        yPARSE_hidden           (int *n, int *c, char *a_recd);
 char        yPARSE_read_one         (int *n, uchar *a_verb);
 char        yPARSE_read_all         (void);
 int         yPARSE_recdno           (void);
+char        yparse_peek_verb        (int *a_index, char *a_verb);
 
 
 

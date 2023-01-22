@@ -332,6 +332,9 @@ yPARSE_adjval           (double a_old, const char *a_item, double *a_new)
          x_rel = '-';
       }
       *a_new = atof (x_entry);
+      DEBUG_YPARSE  yLOG_sint    (*a_new);
+      DEBUG_YPARSE  yLOG_sdouble (a_old);
+      DEBUG_YPARSE  yLOG_schar   (x_rel);
       if (x_rel == 'y')   *a_new += a_old;
    }
    /*---(output)-------------------------*/
@@ -552,6 +555,14 @@ yparse_recd             (uchar *a_recd)
 }
 
 char
+yPARSE_set_reuse        (void)
+{
+   myPARSE.reusing = 'y';
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
+   return 0;
+}
+
+char
 yparse_reusable         (char a_masked)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -614,7 +625,8 @@ yparse_reusable         (char a_masked)
    else                                      x_recd [strlen (x_recd) - 1] = ')';
    DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
    /*---(save)---------------------------*/
-   yparse_addline (s_qin.nline, x_recd);
+   /*> yparse_addline (s_qin.nline, x_recd);                                          <*/
+   yparse_addline (s_qin.tline, x_recd);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -1170,12 +1182,14 @@ yparse_in_variadic      (va_list a_vlist, int n)
    int         i           =    0;
    uchar       x_type      =  '-';
    uchar      *x_char      = NULL;
+   int        *x_short     = NULL;
    int        *x_int       = NULL;
    llong      *x_long      = NULL;
    float      *x_float     = NULL;
    double     *x_double    = NULL;
    uchar      *x_str       = NULL;
    uchar       x_work      [LEN_RECD] = "";
+   int         a           =    0;
    int         c           =    0;
    uchar       t           [LEN_RECD] = "";
    double      x_val       =  0.0;
@@ -1199,10 +1213,20 @@ yparse_in_variadic      (va_list a_vlist, int n)
             break;
          }
          rc = yPARSE_popchar   (x_char);
-         if (*x_char == (uchar) '¬')  *x_char = -66;
-         DEBUG_YPARSE   yLOG_complex ("char"      , "%d, %c, %3d, %p, %d, %c", i, x_type, rc, x_char, *x_char, *x_char);
+         DEBUG_YPARSE   yLOG_complex ("char"      , "%d, %c, %3d, %p, %d", i, x_type, rc, x_char, *x_char);
          break;
-      case 's' : case 'i' :
+      case 's' :
+         x_short   = (short *) va_arg (a_vlist, int*);
+         if (x_short == NULL) {
+            DEBUG_YPARSE   yLOG_note    ("short type, return null");
+            yPARSE_toss ();
+            break;
+         }
+         rc = yPARSE_popint    (&a);
+         *x_short = a;
+         DEBUG_YPARSE   yLOG_complex ("short"     , "%d, %c, %3d, %p, %d", i, x_type, rc, x_int, *x_int);
+         break;
+      case 'i' :
          x_int     = va_arg (a_vlist, int*);
          if (x_int == NULL) {
             DEBUG_YPARSE   yLOG_note    ("int type, return null");
@@ -1280,7 +1304,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
          break;
       case 'C' : case 'S' : case 'T' : case 'U' : case 'L' :
       case '3' : case '4' : case 'D' : case '5' : case '6' :
-      case '7' : case '8' : case 'H' : case 'F' : case 'O' :
+      case '7' : case '8' : case 'H' : case 'F' : case 'R' : case 'O' :
          DEBUG_YPARSE  yLOG_note    ("string");
          x_str     = (char *) va_arg (a_vlist, int*);
          if (x_str == NULL) {
@@ -1293,7 +1317,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
          DEBUG_YPARSE  yLOG_info    ("x_work"    , x_work);
          if (x_str != NULL) {
             switch (x_type) {
-            case 'C'  : strlcpy (x_str, x_work, 1        );   break;
+            case 'C'  : *x_str = x_work [0];                  break;
             case 'S'  : strlcpy (x_str, x_work, LEN_SHORT);   break;
             case 'T'  : strlcpy (x_str, x_work, LEN_TERSE);   break;
             case 'U'  : strlcpy (x_str, x_work, LEN_USER );   break;
@@ -1306,6 +1330,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
             case '8'  : strlcpy (x_str, x_work, 80       );   break;
             case 'H'  : strlcpy (x_str, x_work, LEN_HUND );   break;
             case 'F'  : strlcpy (x_str, x_work, LEN_FULL );   break;
+            case 'R'  : strlcpy (x_str, x_work, LEN_RECD );   break;
             case 'O'  : strcpy  (x_str, x_work);              break;
             default   : strlcpy  (x_str, x_work, LEN_SHORT);  break;
             }
@@ -1357,7 +1382,7 @@ yparse__unit_line       (char *a_question, int a_num)
       sprintf (yPARSE__unit_answer, "LINE stats     : nline %2d, cline %2d, total %2d", s_qin.nline, s_qin.cline, s_count);
    }
    else if (strcmp (a_question, "entry"    ) == 0) {
-      if (s_count < 1 || a_num > s_qin.nline) {
+      if (s_count < 1 || a_num >  s_qin.nline) {
          sprintf (yPARSE__unit_answer, "LINE entry  %2d : null", a_num);
       } else {
          rc = yparse_getline (a_num, t);

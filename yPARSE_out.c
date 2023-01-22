@@ -17,6 +17,7 @@ struct cTYPES {
    cchar       desc        [LEN_DESC];      /* long description               */
 };
 static tTYPES  s_types [MAX_TYPES] = {
+   { '-', "nothing"            , 'n',    1, "single char     (c)"              },
    { 'c', "char"               , 'n',    1, "single char     (c)"              },
    { 's', "short"              , 'n',    3, "short integer   (3d)"             },
    { 'i', "integer"            , 'n',    6, "normal integer  (6d)"             },
@@ -45,6 +46,7 @@ static tTYPES  s_types [MAX_TYPES] = {
    { '8', "eighty"             , 's',   80, "eighty string   (-80.80s)"        },
    { 'H', "hundred"            , 's',  100, "hundred string  (-100.100s)"      },
    { 'F', "full"               , 's',  200, "two-hundred     (-200.200s)"      },
+   { 'R', "recd"               , 's', 2000, "two-thousand    (-2000.2000s)"    },
    { 'O', "open"               , 's',   60, "open string     (s)"              },
 
    {  0 , "end-of-types"       , '-',    0, ""                                 },
@@ -115,10 +117,17 @@ int
 yparse_field_len        (char a_type)
 {
    int         i           =    0;
+   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_schar   (a_type);
    for (i = 0; i < s_ntype; ++i) {
+      DEBUG_YPARSE  yLOG_schar   (s_types [i].abbr);
       if (s_types [i].abbr != a_type)  continue;
+      DEBUG_YPARSE  yLOG_snote   ("FOUND");
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
       return s_types [i].size;
    }
+   DEBUG_YPARSE  yLOG_snote   ("nada");
+   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
 }
 
@@ -175,7 +184,7 @@ yparse__push_string     (uchar *a_str)
    }
    x_len = strlen (a_str);
    strlcpy  (s, a_str, LEN_RECD);
-   strlmark (s, ySTR_PRINT, LEN_RECD);
+   strlmark (s, ySTR_HEATHERLY, LEN_RECD);
    /*---(prepare)------------------------*/
    x_type = yparse_specs_next_write ();
    DEBUG_YPARSE   yLOG_schar   (x_type);
@@ -239,6 +248,10 @@ yparse__push_string     (uchar *a_str)
    case  'F' :
       DEBUG_YPARSE   yLOG_snote   ("full string");
       sprintf (t, "%-200.200s", s);
+      break;
+   case  'R' :
+      DEBUG_YPARSE   yLOG_snote   ("record string");
+      sprintf (t, "%-2000.2000s", s);
       break;
    case  'O' :
       DEBUG_YPARSE   yLOG_snote   ("open string");
