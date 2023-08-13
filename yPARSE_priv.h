@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.3-, support yKINE and arachne"
-#define     P_VERNUM    "0.3u"
-#define     P_VERTXT    "unit test 99p successful"
+#define     P_VERNUM    "0.3v"
+#define     P_VERTXT    "stupid mistake for handling read/write application fixed"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

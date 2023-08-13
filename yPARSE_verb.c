@@ -18,7 +18,7 @@
 struct {
    /*---(master)------------*/
    uchar       mode;                        /* one char yvikeys mode id       */
-   uchar       verb        [LEN_LABEL];     /* verb name as used in files     */
+   char        verb        [LEN_LABEL];     /* verb name as used in files     */
    uchar       specs       [LEN_TITLE];     /* field specifications           */
    char        mask;                        /* field for reload/change        */
    /*---(handlers)----------*/
@@ -64,10 +64,14 @@ char
 yPARSE_verb_purge       (void)
 {
    int         i           =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    for (i = 0; i < MAX_VERBS; ++i) {
       yparse_verb__wipe (i);
    }
    s_nverb = 0;
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
 }
 
 char
@@ -176,7 +180,7 @@ yparse_specs_len        (tQUEUE *a_queue)
 }
 
 char
-yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc)
+yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -191,11 +195,17 @@ yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs
    if (a_verb == NULL)        return -2;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(note)---------------------------*/
+   if (a_desc != NULL) {
+      DEBUG_YPARSE   yLOG_info    ("a_desc"    , a_desc);
+   }
    /*---(check verb)---------------------*/
-   rc = strlgood (a_verb, ySTR_ALNUM, LEN_USER);
-   --rce;  if (rc < 0) {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
+   if (myPARSE.verbs  != YPARSE_MANUAL) {
+      rc = strlgood (a_verb, ySTR_ALNUM, LEN_USER);
+      --rce;  if (rc < 0) {
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
    }
    /*---(check existing)-----------------*/
    n = x_found = yparse_verb_find (NULL, a_verb);

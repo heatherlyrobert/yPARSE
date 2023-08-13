@@ -47,6 +47,7 @@ char        yPARSE_set_reuse        (void);
 /*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
 char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);
+char        yPARSE_getready         (char a_auto, void *a_verber, char a_reusing, char a_delim);
 char        yPARSE_wrap             (void);
 
 
@@ -126,7 +127,7 @@ char        yPARSE_verb_purge       (void);
 char*       yPARSE_verb             (int a_num);
 char        yPARSE_handler          (uchar *a_verb, char *a_specs, void *a_reader);
 char        yPARSE_handler_plus     (uchar *a_verb, uchar *a_specs, float a_seq, void *a_reader, void *a_writer, uchar *a_labels);
-char        yPARSE_handler_max      (char a_mode, uchar *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc);
+char        yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc);
 
 char        yPARSE_outclear         (void);
 char*       yPARSE_outrecd          (void);

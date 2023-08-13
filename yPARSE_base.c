@@ -62,6 +62,22 @@ yPARSE_init             (char a_auto, void *a_verber, char a_reusing)
 }
 
 char
+yPARSE_getready         (char a_auto, void *a_verber, char a_reusing, char a_delim)
+{
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_char    ("a_reusing" , a_reusing);
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
+   myPARSE.verbs   = a_auto;
+   myPARSE.verber  = a_verber;
+   myPARSE.ready   = 'y';
+   myPARSE.reusing = a_reusing;
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);
+   if (a_delim != '\0')   yPARSE_delimiters (a_delim);
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
 yPARSE_delimiters       (uchar a_type)
 {
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);

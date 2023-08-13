@@ -26,14 +26,8 @@ yparse_opener           (uchar a_auto, uchar *a_in, uchar *a_out, void *a_verber
    s_count = -1;
    s_last  = -1;
    /*---(initialize)---------------------*/
-   if (rc == 0) {
-      rc = yPARSE_init (a_auto, a_verber, a_reuse);
-      DEBUG_YPARSE   yLOG_value   ("init"      , rc);
-   }
-   if (rc == 0) {
-      rc = yPARSE_delimiters (YPARSE_FIELD);
-      DEBUG_YPARSE   yLOG_value   ("delimiters", rc);
-   }
+   rc = yPARSE_getready (a_auto, a_verber, a_reuse, 0);
+   DEBUG_YPARSE   yLOG_value   ("getready"  , rc);
    /*---(open)---------------------------*/
    --rce;  if (a_in != NULL && a_out != NULL) {
       if (strcmp (a_in, a_out) == 0) {

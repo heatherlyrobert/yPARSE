@@ -834,6 +834,11 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    }
    /*---(prepare)------------------------*/
    yPARSE_purge_in ();
+   /*---(temporary verbs)----------------*/
+   if (myPARSE.verbs  == YPARSE_MANUAL) {
+      DEBUG_YPARSE  yLOG_note    ("single use verb/handlers, purge before each");
+      yPARSE_verb_purge ();
+   }
    /*---(defense)------------------------*/
    /*> --rce;  if (a_line < 0) {                                                      <* 
     *>    if (s_qin.label == NULL || strcmp (s_qin  s_qin.file == NULL) {             <* 
@@ -1224,7 +1229,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
          }
          rc = yPARSE_popint    (&a);
          *x_short = a;
-         DEBUG_YPARSE   yLOG_complex ("short"     , "%d, %c, %3d, %p, %d", i, x_type, rc, x_int, *x_int);
+         DEBUG_YPARSE   yLOG_complex ("short"     , "%d, %c, %3d, %p, %d", i, x_type, rc, x_short, *x_short);
          break;
       case 'i' :
          x_int     = va_arg (a_vlist, int*);
