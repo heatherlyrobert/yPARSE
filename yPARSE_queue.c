@@ -85,7 +85,7 @@ yparse_dequeue          (tQUEUE *a_queue, char *a_item)
       return rce;
    }
    DEBUG_YPARSE  yLOG_spoint  (a_item);
-   if (a_item != NULL)  strlcpy (a_item, "", LEN_RECD);
+   if (a_item != NULL)  ystrlcpy (a_item, "", LEN_RECD);
    /*---(no entries)---------------------*/
    DEBUG_YPARSE  yLOG_spoint  (a_queue->head);
    --rce;  if (a_queue->head == NULL)  {
@@ -93,7 +93,7 @@ yparse_dequeue          (tQUEUE *a_queue, char *a_item)
       return rce;
    }
    /*---(copy and clear)-----------------*/
-   if (a_item != NULL)  strlcpy (a_item, a_queue->head->item, LEN_RECD);
+   if (a_item != NULL)  ystrlcpy (a_item, a_queue->head->item, LEN_RECD);
    if (a_queue->head->item != NULL) {
       DEBUG_YPARSE  yLOG_snote   ("free item");
       free (a_queue->head->item);
@@ -147,7 +147,7 @@ yparse_topqueue         (tQUEUE *a_queue, char *a_item)
       return rce;
    }
    DEBUG_YPARSE  yLOG_spoint  (a_item);
-   if (a_item != NULL)  strlcpy (a_item, "", LEN_RECD);
+   if (a_item != NULL)  ystrlcpy (a_item, "", LEN_RECD);
    /*---(no entries)---------------------*/
    DEBUG_YPARSE  yLOG_spoint  (a_queue->head);
    --rce;  if (a_queue->head == NULL)  {
@@ -155,7 +155,7 @@ yparse_topqueue         (tQUEUE *a_queue, char *a_item)
       return rce;
    }
    /*---(copy)---------------------------*/
-   if (a_item != NULL)  strlcpy (a_item, a_queue->head->item, LEN_RECD);
+   if (a_item != NULL)  ystrlcpy (a_item, a_queue->head->item, LEN_RECD);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -219,12 +219,12 @@ yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item)
    /*---(defense)------------------------*/
    --rce;  if (a_item == NULL)  return rce;
    /*---(defense)------------------------*/
-   strlcpy (a_item, "", LEN_LABEL);
+   ystrlcpy (a_item, "", LEN_LABEL);
    /*---(search)-------------------------*/
    x_curr = a_queue->head;
    while (x_curr != NULL) {
       if (x_curr->ref == a_ref) {
-         strlcpy (a_item, x_curr->item, LEN_RECD);
+         ystrlcpy (a_item, x_curr->item, LEN_RECD);
          return 0;
       }
       x_curr = x_curr->next;
@@ -256,7 +256,7 @@ yparse_purge            (tQUEUE *a_queue)
    a_queue->good     =  '-';
    a_queue->hidden   =  '-';
    /*---(record)-------------------------*/
-   strlcpy (a_queue->recd , ""     , LEN_RECD);
+   ystrlcpy (a_queue->recd , ""     , LEN_RECD);
    a_queue->len      =    0;
    /*---(fields)-------------------------*/
    a_queue->head     = NULL;
@@ -271,8 +271,8 @@ char
 yparse_init             (tQUEUE *a_queue, char *a_label)
 {
    /*---(name)---------------------------*/
-   if (a_label != NULL)  strlcpy (a_queue->label, a_label, LEN_LABEL);
-   else                  strlcpy (a_queue->label, "???"  , LEN_LABEL);
+   if (a_label != NULL)  ystrlcpy (a_queue->label, a_label, LEN_LABEL);
+   else                  ystrlcpy (a_queue->label, "???"  , LEN_LABEL);
    /*---(master data)--------------------*/
    a_queue->iverb    =   -1;
    a_queue->good     =  '-';
@@ -284,7 +284,7 @@ yparse_init             (tQUEUE *a_queue, char *a_label)
    a_queue->nline    =    0;
    a_queue->cline    =    0;
    /*---(record)-------------------------*/
-   strlcpy (a_queue->recd , ""     , LEN_RECD);
+   ystrlcpy (a_queue->recd , ""     , LEN_RECD);
    a_queue->len      =    0;
    /*---(fields)-------------------------*/
    a_queue->head     = NULL;
@@ -388,7 +388,7 @@ yparse__openclose       (tQUEUE *a_queue)
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   x_len = strllen (a_queue->label, LEN_LABEL);
+   x_len = ystrllen (a_queue->label, LEN_LABEL);
    DEBUG_YPARSE  yLOG_sint    (x_len);
    --rce;  if (x_len <= 0  || x_len >= LEN_LABEL) {
       DEBUG_YPARSE  yLOG_snote   ("file label empty");
@@ -438,7 +438,7 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
    --rce;  switch (a_queue->label [0]) {
    case 'I'  :
       DEBUG_YPARSE  yLOG_snote   ("reading");
-      strlcpy (x_dir, "rt", LEN_LABEL);
+      ystrlcpy (x_dir, "rt", LEN_LABEL);
       if (strcmp ("stdin"  , a_name) == 0) {
          a_queue->file  = stdin;
          a_queue->loc   = strdup (a_name);
@@ -449,7 +449,7 @@ yparse_open             (tQUEUE *a_queue, char *a_name)
       break;
    case 'O'  :
       DEBUG_YPARSE  yLOG_snote   ("writing");
-      strlcpy (x_dir, "wt", LEN_LABEL);
+      ystrlcpy (x_dir, "wt", LEN_LABEL);
       if (strcmp ("stdout" , a_name) == 0) {
          a_queue->file  = stdout;
          a_queue->loc   = strdup (a_name);
@@ -599,7 +599,7 @@ yparse_queue__line      (int n, char *a_recd)
    /*---(header)-------------------------*/
    DEBUG_RPTG   yLOG_enter   (__FUNCTION__);
    /*---(prepre)-------------------------*/
-   if (a_recd != NULL)  strlcpy (a_recd, ""    , LEN_RECD);
+   if (a_recd != NULL)  ystrlcpy (a_recd, ""    , LEN_RECD);
    /*---(open)---------------------------*/
    DEBUG_RPTG   yLOG_info    ("file"      , s_qout.loc);
    if (s_qout.loc != NULL)  f = fopen (s_qout.loc, "rt");
@@ -629,9 +629,9 @@ yparse_queue__line      (int n, char *a_recd)
    /*---(fix-up)-------------------------*/
    x_len = strlen (x_recd);
    if (x_recd [x_len - 1] == '\n')  x_recd [--x_len] = '\0';
-   strlencode (x_recd, ySTR_NORM, LEN_RECD);
+   ystrlencode (x_recd, ySTR_NORM, LEN_RECD);
    /*---(save back)----------------------*/
-   if (a_recd != NULL)  strlcpy (a_recd, x_recd, LEN_RECD);
+   if (a_recd != NULL)  ystrlcpy (a_recd, x_recd, LEN_RECD);
    /*---(complete)-----------------------*/
    DEBUG_RPTG   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -644,9 +644,9 @@ yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num)
    char        rc          =    0;
    char        t           [LEN_RECD];
    /*---(preprare)-----------------------*/
-   strlcpy  (yPARSE__unit_answer, "QUEUE unit       : question not understood", LEN_STR);
+   ystrlcpy  (yPARSE__unit_answer, "QUEUE unit       : question not understood", LEN_STR);
    if (a_queue == NULL) {
-      strlcpy  (yPARSE__unit_answer, "QUEUE unit       : queue not specified", LEN_STR);
+      ystrlcpy  (yPARSE__unit_answer, "QUEUE unit       : queue not specified", LEN_STR);
    }
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "verb"     ) == 0) {

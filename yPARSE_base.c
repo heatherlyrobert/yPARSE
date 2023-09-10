@@ -83,11 +83,11 @@ yPARSE_delimiters       (uchar a_type)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    switch (a_type) {
    case YPARSE_FUNCTION  :
-      strlcpy (myPARSE.delimiters, "§(,)", LEN_LABEL);
+      ystrlcpy (myPARSE.delimiters, "§(,)", LEN_LABEL);
       break;
    case YPARSE_FIELD     :
    default :
-      strlcpy (myPARSE.delimiters, "§" , LEN_LABEL);
+      ystrlcpy (myPARSE.delimiters, "§" , LEN_LABEL);
       break;
    }
    DEBUG_YPARSE  yLOG_info    ("delimit"   , myPARSE.delimiters);
@@ -188,7 +188,7 @@ yparse_mock__unit       (char *a_question, int a_num)
    char        rc          =    0;
    char        t           [LEN_RECD];
    /*---(preprare)-----------------------*/
-   strlcpy  (yPARSE__unit_answer, "MOCK unit        : question not understood", LEN_STR);
+   ystrlcpy  (yPARSE__unit_answer, "MOCK unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "count"    ) == 0) {
       sprintf (yPARSE__unit_answer, "MOCK count     : %2d", g_nmock);
@@ -240,7 +240,7 @@ yparse_base__unit       (char *a_question, int a_num)
    char        x_in        [LEN_HUND];
    char        x_out       [LEN_HUND];
    /*---(preprare)-----------------------*/
-   strlcpy  (yPARSE__unit_answer, "BASE unit        : question not understood", LEN_STR);
+   ystrlcpy  (yPARSE__unit_answer, "BASE unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "ready"    ) == 0) {
       yPARSE_qin_info   (NULL, x_in , NULL, NULL);

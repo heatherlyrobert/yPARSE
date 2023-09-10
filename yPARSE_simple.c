@@ -232,8 +232,8 @@ yPARSE_header           (uchar *a_full, uchar *a_vernum, uchar *a_vertxt, uchar 
    time_t      x_time;
    struct tm  *x_broke     = NULL;
    /*---(program)------------------------*/
-   if (a_vernum != NULL)  strlcpy (x_vernum, a_vernum, LEN_TERSE);
-   if (a_vertxt != NULL)  strlcpy (x_vertxt, a_vertxt, LEN_HUND);
+   if (a_vernum != NULL)  ystrlcpy (x_vernum, a_vernum, LEN_TERSE);
+   if (a_vertxt != NULL)  ystrlcpy (x_vertxt, a_vertxt, LEN_HUND);
    if (a_full != NULL) {
       p = strrchr (a_full, '/');
       if (p != NULL) {
@@ -427,17 +427,17 @@ yparse__mock_clear      (void)
 {
    int         i           =    0;
    for (i = 0; i < MAX_MOCK; ++i) {
-      strlcpy (s_mocks [i].d_verb      , "", LEN_LABEL);
-      strlcpy (s_mocks [i].d_label     , "", LEN_LABEL);
-      strlcpy (s_mocks [i].d_terse     , "", LEN_LABEL);
+      ystrlcpy (s_mocks [i].d_verb      , "", LEN_LABEL);
+      ystrlcpy (s_mocks [i].d_label     , "", LEN_LABEL);
+      ystrlcpy (s_mocks [i].d_terse     , "", LEN_LABEL);
       s_mocks [i].d_int       = 0;
       s_mocks [i].d_long      = 0;
       s_mocks [i].d_float     = 0.0;
       s_mocks [i].d_double    = 0.0;
       s_mocks [i].d_char      = 0;
       s_mocks [i].d_exp       = 0.0;
-      strlcpy (s_mocks [i].d_desc      , "", LEN_DESC);
-      strlcpy (s_mocks [i].d_string    , "", LEN_RECD);
+      ystrlcpy (s_mocks [i].d_desc      , "", LEN_DESC);
+      ystrlcpy (s_mocks [i].d_string    , "", LEN_RECD);
    }
    s_nmock = 0;
    return 0;
@@ -481,7 +481,7 @@ char
 yparse__mock_verber     (int n, uchar *a_verb, char a_exist, void *a_handler)
 {
    char rc = 0;
-   strlcpy (s_verb, a_verb, LEN_USER);
+   ystrlcpy (s_verb, a_verb, LEN_USER);
    if      (strcmp (a_verb, "tiny"    ) == 0) {
       rc = yPARSE_scanf  (a_verb, "i"         , s_int);
       yPARSE_printf ("tiny"     , "i"         , *s_int);
@@ -515,7 +515,7 @@ yparse__mock_rtiny      (int n, uchar *a_verb)
    DEBUG_YPARSE   yLOG_point   ("a_verb"    , a_verb);
    if (a_verb != NULL) DEBUG_YPARSE  yLOG_info    ("a_verb"    , a_verb);
    yPARSE_vscanf (a_verb, s_int);
-   strlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
+   ystrlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
    s_mocks [s_nmock].d_int     = *s_int;
    ++s_nmock;
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
@@ -549,9 +549,9 @@ char
 yparse__mock_rsmall     (int n, uchar *a_verb)
 {
    yPARSE_vscanf (a_verb, s_terse, s_label);
-   strlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
-   strlcpy (s_mocks [s_nmock].d_terse     , s_terse   , LEN_TERSE);
-   strlcpy (s_mocks [s_nmock].d_label     , s_label   , LEN_LABEL);
+   ystrlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
+   ystrlcpy (s_mocks [s_nmock].d_terse     , s_terse   , LEN_TERSE);
+   ystrlcpy (s_mocks [s_nmock].d_label     , s_label   , LEN_LABEL);
    ++s_nmock;
    return 0;
 }
@@ -577,12 +577,12 @@ char
 yparse__mock_rmedium    (int n, uchar *a_verb)
 {
    yPARSE_vscanf (a_verb, s_terse, s_int, s_double, s_char, s_string);
-   strlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
-   strlcpy (s_mocks [s_nmock].d_terse     , s_terse   , LEN_TERSE);
+   ystrlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
+   ystrlcpy (s_mocks [s_nmock].d_terse     , s_terse   , LEN_TERSE);
    s_mocks [s_nmock].d_int     = *s_int;
    s_mocks [s_nmock].d_double  = *s_double;
    s_mocks [s_nmock].d_char    = *s_char;
-   strlcpy (s_mocks [s_nmock].d_string    , s_string  , LEN_RECD);
+   ystrlcpy (s_mocks [s_nmock].d_string    , s_string  , LEN_RECD);
    ++s_nmock;
    return 0;
 }
@@ -608,17 +608,17 @@ char
 yparse__mock_rlarge     (int n, uchar *a_verb)
 {
    yPARSE_vscanf (a_verb, s_terse, s_int, s_double, s_char, s_string);
-   strlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
-   strlcpy (s_mocks [s_nmock].d_terse     , s_terse   , LEN_TERSE);
-   strlcpy (s_mocks [s_nmock].d_label     , s_label   , LEN_LABEL);
+   ystrlcpy (s_mocks [s_nmock].d_verb      , a_verb    , LEN_LABEL);
+   ystrlcpy (s_mocks [s_nmock].d_terse     , s_terse   , LEN_TERSE);
+   ystrlcpy (s_mocks [s_nmock].d_label     , s_label   , LEN_LABEL);
    s_mocks [s_nmock].d_float   = *s_float;
    s_mocks [s_nmock].d_double  = *s_double;
    s_mocks [s_nmock].d_char    = *s_char;
    s_mocks [s_nmock].d_int     = *s_int;
    s_mocks [s_nmock].d_long    = *s_long;
    s_mocks [s_nmock].d_exp     = *s_exp;
-   strlcpy (s_mocks [s_nmock].d_desc      , s_desc    , LEN_DESC);
-   strlcpy (s_mocks [s_nmock].d_string    , s_string  , LEN_RECD);
+   ystrlcpy (s_mocks [s_nmock].d_desc      , s_desc    , LEN_DESC);
+   ystrlcpy (s_mocks [s_nmock].d_string    , s_string  , LEN_RECD);
    ++s_nmock;
    return 0;
 }

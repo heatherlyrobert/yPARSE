@@ -79,10 +79,10 @@ yPARSE_ready            (int *a_count)
 char
 yPARSE_qin_info          (char *a_label, char *a_loc, void **a_file, int *t)
 {
-   if (a_label != NULL)  strlcpy (a_label, s_qin.label   , LEN_LABEL);
+   if (a_label != NULL)  ystrlcpy (a_label, s_qin.label   , LEN_LABEL);
    if (a_loc   != NULL) {
-      if (s_qin.loc != NULL)  strlcpy (a_loc  , s_qin.loc      , LEN_HUND);
-      else                    strlcpy (a_loc  , "-"            , LEN_HUND);
+      if (s_qin.loc != NULL)  ystrlcpy (a_loc  , s_qin.loc      , LEN_HUND);
+      else                    ystrlcpy (a_loc  , "-"            , LEN_HUND);
    }
    if (a_file  != NULL)  *a_file =  s_qin.file;
    if (t       != NULL)  *t      =  s_qin.tline;
@@ -136,7 +136,7 @@ yPARSE_popstr           (char *a_item)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(prepare)------------------------*/
-   if (a_item != NULL)  strlcpy (a_item, "", LEN_LABEL);
+   if (a_item != NULL)  ystrlcpy (a_item, "", LEN_LABEL);
    /*---(defense)------------------------*/
    rc = yparse_in_defense ();
    DEBUG_YPARSE  yLOG_sint       (rc);
@@ -179,7 +179,7 @@ char
 yparse_peek_verb        (int *a_index, char *a_verb)
 {
    if (a_index != NULL)  *a_index = s_qin.iverb;
-   if (a_verb  != NULL)  strlcpy (a_verb, yPARSE_verb (s_qin.iverb), LEN_LABEL);
+   if (a_verb  != NULL)  ystrlcpy (a_verb, yPARSE_verb (s_qin.iverb), LEN_LABEL);
    return 0;
 }
 
@@ -225,7 +225,7 @@ yPARSE_adjval           (double a_old, const char *a_item, double *a_new)
    }
    /*---(prepare)------------------------*/
    *a_new = 0.0;
-   strlcpy (x_entry, a_item, LEN_LABEL);
+   ystrlcpy (x_entry, a_item, LEN_LABEL);
    x_len  = strlen (x_entry);
    DEBUG_YPARSE  yLOG_snote   (x_entry);
    DEBUG_YPARSE  yLOG_sint    (x_len);
@@ -484,7 +484,7 @@ yPARSE_popexp           (double *a_new)
    DEBUG_YPARSE yLOG_info    ("t"         , t);
    if (a_new != NULL) 
       if (t [0] == (uchar) '¬')  a = -666.0;
-      else                       strl2real (t, &a, LEN_RECD);
+      else                       ystrl2real (t, &a, LEN_RECD);
    DEBUG_YPARSE yLOG_double  ("a"         , a);
    if (a_new != NULL)  *a_new = a;
    return rc;
@@ -517,11 +517,11 @@ yparse_recd             (uchar *a_recd)
       return rce;
    }
    DEBUG_YPARSE yLOG_info    ("a_recd"    , a_recd);
-   x_len = strllen   (a_recd, LEN_RECD);
+   x_len = ystrllen   (a_recd, LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
    DEBUG_YPARSE yLOG_info    ("delimit"   , myPARSE.delimiters);
-   x_len = strllen   (myPARSE.delimiters, LEN_RECD);
-   for (i = c = 0; i < x_len; ++i)   c += strldcnt (a_recd, myPARSE.delimiters [i], LEN_RECD);
+   x_len = ystrllen   (myPARSE.delimiters, LEN_RECD);
+   for (i = c = 0; i < x_len; ++i)   c += ystrldcnt (a_recd, myPARSE.delimiters [i], LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
    myPARSE.nfield = c;
    /*---(get first)----------------------*/
@@ -531,9 +531,9 @@ yparse_recd             (uchar *a_recd)
    /*---(read fields)--------------------*/
    while (p != NULL) {
       /*---(clean it up)-----------------*/
-      strltrim (p, ySTR_BOTH, LEN_RECD);
-      x_len = strllen (p, LEN_RECD);
-      strlunstore (p, x_len);
+      ystrltrim (p, ySTR_BOTH, LEN_RECD);
+      x_len = ystrllen (p, LEN_RECD);
+      ystrlunstore (p, x_len);
       DEBUG_YPARSE yLOG_info    ("field"     , p);
       DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
       /*---(enqueue it)------------------*/
@@ -613,15 +613,15 @@ yparse_reusable         (char a_masked)
    /*---(clear)--------------------------*/
    x_curr = s_qin.head;
    while (x_curr != NULL) {
-      if (a_masked == c)   strlcat (x_recd, "¢¢"        , LEN_RECD);
-      else                 strlcat (x_recd, x_curr->item, LEN_RECD);
-      strlcat (x_recd, ","         , LEN_RECD);
+      if (a_masked == c)   ystrlcat (x_recd, "¢¢"        , LEN_RECD);
+      else                 ystrlcat (x_recd, x_curr->item, LEN_RECD);
+      ystrlcat (x_recd, ","         , LEN_RECD);
       DEBUG_YPARSE  yLOG_complex ("reusable"  , "%2d, %20.20s, %s", c, x_curr->item, x_recd);
       x_curr = x_curr->next;
       ++c;
    }
    /*---(fix end)------------------------*/
-   if (x_recd [strlen (x_recd) - 1] == '(')  strlcat (x_recd, ")", LEN_RECD);
+   if (x_recd [strlen (x_recd) - 1] == '(')  ystrlcat (x_recd, ")", LEN_RECD);
    else                                      x_recd [strlen (x_recd) - 1] = ')';
    DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
    /*---(save)---------------------------*/
@@ -770,7 +770,7 @@ yparse__existing        (int a_line, char *a_label)
    p = strchr (x_recd, '¢');
    DEBUG_YPARSE   yLOG_point   ("p"         , p);
    --rce;  if (p == NULL) {
-      strlcpy (s_qin.recd, x_recd , LEN_RECD);
+      ystrlcpy (s_qin.recd, x_recd , LEN_RECD);
    } else {
       DEBUG_YPARSE   yLOG_point   ("a_label"   , a_label);
       if (a_label == NULL) {
@@ -783,12 +783,12 @@ yparse__existing        (int a_line, char *a_label)
       DEBUG_YPARSE   yLOG_point   ("x_recd"    , x_recd);
       x_len = strlen (x_recd);
       DEBUG_YPARSE   yLOG_value   ("x_len"     , x_len);
-      strlcpy (s_qin.recd, x_recd , LEN_RECD);
-      strlcat (s_qin.recd, a_label, LEN_RECD);
+      ystrlcpy (s_qin.recd, x_recd , LEN_RECD);
+      ystrlcat (s_qin.recd, a_label, LEN_RECD);
       DEBUG_YPARSE   yLOG_point   ("p + 2"     , p + 2);
       x_len = strlen (p + 2);
       DEBUG_YPARSE   yLOG_value   ("x_len"     , x_len);
-      strlcat (s_qin.recd, p + 2  , LEN_RECD);
+      ystrlcat (s_qin.recd, p + 2  , LEN_RECD);
    }
    s_qin.len = strlen (s_qin.recd);
    DEBUG_YPARSE   yLOG_info    ("recd"      , s_qin.recd);
@@ -886,13 +886,13 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
          return rc;
       }
    } else {
-      strlcpy (s_qin.recd, a_recd, LEN_RECD);
+      ystrlcpy (s_qin.recd, a_recd, LEN_RECD);
       s_qin.len = strlen (s_qin.recd);
    }
    if (t != NULL)  *t = s_qin.tline;
    /*---(load the queue)-----------------*/
    strcpy (myPARSE.recd, s_qin.recd);
-   strldchg (myPARSE.recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
+   ystrldchg (myPARSE.recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
    rc = yparse_recd  (s_qin.recd);
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
    --rce;  if (rc < 0) {
@@ -954,7 +954,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    }
    /*---(result)-------------------------*/
    DEBUG_YPARSE   yLOG_value   ("count"     , s_qin.count);
-   if (a_verb != NULL)  strlcpy (a_verb, myPARSE.verb, LEN_LABEL);
+   if (a_verb != NULL)  ystrlcpy (a_verb, myPARSE.verb, LEN_LABEL);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return s_qin.count;
@@ -1103,13 +1103,13 @@ yparse_getline          (const int a_line, char *a_recd)
    }
    /*---(prepare)------------------------*/
    DEBUG_YPARSE   yLOG_snote   ("prepare");
-   strlcpy (a_recd, "", LEN_RECD);
+   ystrlcpy (a_recd, "", LEN_RECD);
    x_curr = s_tail;
    /*---(find)---------------------------*/
    while (x_curr != NULL) {
       if (a_line == x_curr->line) {
          ++(x_curr->uses);
-         strlcpy (a_recd, x_curr->recd, LEN_RECD);
+         ystrlcpy (a_recd, x_curr->recd, LEN_RECD);
          DEBUG_YPARSE   yLOG_snote   ("found");
          DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
          return 0;
@@ -1250,7 +1250,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
          }
          rc = yPARSE_popstr    (x_work);
          if (x_work [0] == (uchar) '¬')  x_val = -666.0;
-         else  strl2comma (x_work, &x_val, LEN_LABEL);
+         else  ystrl2comma (x_work, &x_val, LEN_LABEL);
          *x_int = (int) x_val;
          DEBUG_YPARSE   yLOG_complex ("comma"     , "%d, %c, %3d, %s, %lf, %p, %d", i, x_type, rc, x_work, x_val, x_int, *x_int);
          break;
@@ -1273,7 +1273,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
          }
          rc = yPARSE_popstr    (x_work);
          if (x_work [0] == (uchar) '¬')  x_val = -666.0;
-         else  strl2comma (x_work, &x_val, LEN_LABEL);
+         else  ystrl2comma (x_work, &x_val, LEN_LABEL);
          *x_long = (llong) x_val;
          DEBUG_YPARSE   yLOG_complex ("hcomma"    , "%d, %c, %3d, %s, %lf, %p, %ld", i, x_type, rc, x_work, x_val, x_long, *x_long);
          break;
@@ -1323,21 +1323,21 @@ yparse_in_variadic      (va_list a_vlist, int n)
          if (x_str != NULL) {
             switch (x_type) {
             case 'C'  : *x_str = x_work [0];                  break;
-            case 'S'  : strlcpy (x_str, x_work, LEN_SHORT);   break;
-            case 'T'  : strlcpy (x_str, x_work, LEN_TERSE);   break;
-            case 'U'  : strlcpy (x_str, x_work, LEN_USER );   break;
-            case 'L'  : strlcpy (x_str, x_work, LEN_LABEL);   break;
-            case '3'  : strlcpy (x_str, x_work, 30       );   break;
-            case '4'  : strlcpy (x_str, x_work, 40       );   break;
-            case 'D'  : strlcpy (x_str, x_work, LEN_DESC );   break;
-            case '6'  : strlcpy (x_str, x_work, 60       );   break;
-            case '7'  : strlcpy (x_str, x_work, 70       );   break;
-            case '8'  : strlcpy (x_str, x_work, 80       );   break;
-            case 'H'  : strlcpy (x_str, x_work, LEN_HUND );   break;
-            case 'F'  : strlcpy (x_str, x_work, LEN_FULL );   break;
-            case 'R'  : strlcpy (x_str, x_work, LEN_RECD );   break;
+            case 'S'  : ystrlcpy (x_str, x_work, LEN_SHORT);   break;
+            case 'T'  : ystrlcpy (x_str, x_work, LEN_TERSE);   break;
+            case 'U'  : ystrlcpy (x_str, x_work, LEN_USER );   break;
+            case 'L'  : ystrlcpy (x_str, x_work, LEN_LABEL);   break;
+            case '3'  : ystrlcpy (x_str, x_work, 30       );   break;
+            case '4'  : ystrlcpy (x_str, x_work, 40       );   break;
+            case 'D'  : ystrlcpy (x_str, x_work, LEN_DESC );   break;
+            case '6'  : ystrlcpy (x_str, x_work, 60       );   break;
+            case '7'  : ystrlcpy (x_str, x_work, 70       );   break;
+            case '8'  : ystrlcpy (x_str, x_work, 80       );   break;
+            case 'H'  : ystrlcpy (x_str, x_work, LEN_HUND );   break;
+            case 'F'  : ystrlcpy (x_str, x_work, LEN_FULL );   break;
+            case 'R'  : ystrlcpy (x_str, x_work, LEN_RECD );   break;
             case 'O'  : strcpy  (x_str, x_work);              break;
-            default   : strlcpy  (x_str, x_work, LEN_SHORT);  break;
+            default   : ystrlcpy  (x_str, x_work, LEN_SHORT);  break;
             }
          }
          DEBUG_YPARSE   yLOG_complex ("string"    , "%d, %c, %3d, %s, %p, %s", i, x_type, rc, x_work, x_str, x_str);
@@ -1381,7 +1381,7 @@ yparse__unit_line       (char *a_question, int a_num)
    char        rc          =    0;
    char        t           [LEN_RECD];
    /*---(preprare)-----------------------*/
-   strlcpy  (yPARSE__unit_answer, "LINE unit        : question not understood", LEN_STR);
+   ystrlcpy  (yPARSE__unit_answer, "LINE unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "stats"    ) == 0) {
       sprintf (yPARSE__unit_answer, "LINE stats     : nline %2d, cline %2d, total %2d", s_qin.nline, s_qin.cline, s_count);
