@@ -99,7 +99,7 @@ yparse_out_defense      (void)
    char        rce         =  -10;
    /*---(defense)------------------------*/
    --rce;  if (myPARSE.ready != 'y')  {
-      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_config () first");
       return rce;
    }
    --rce;  if (myPARSE.verbs != YPARSE_SIMPLE && strchr ("-y", s_qout.good) == NULL)  {

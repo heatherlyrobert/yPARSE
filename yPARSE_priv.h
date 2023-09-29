@@ -37,9 +37,9 @@
 #define     P_CREATED   "2018-01"
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
-#define     P_VERMINOR  "0.3-, support yKINE and arachne"
-#define     P_VERNUM    "0.3w"
-#define     P_VERTXT    "updated ySTR functions to ¶ystr¶ prefix"
+#define     P_VERMINOR  "0.4-, update, fix, and tighten"
+#define     P_VERNUM    "0.4a"
+#define     P_VERTXT    "cleaned startup/config interface"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -156,6 +156,7 @@ extern      tMOCK       g_mocks     [10];
 extern      int         g_nmock;
 
 
+char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim);
 
 char        yparse_in_variadic      (va_list a_vlist, int n);
 char        yparse_out_variadic     (va_list a_vlist, int n);
@@ -189,7 +190,7 @@ char        yparse_topqueue         (tQUEUE *a_queue, char *a_item);
 char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
 char        yparse_peek_verb        (int *a_index, char *a_verb);
 
-char        yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
+char        yparse__main            (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
 char        yparse_reusable         (char a_masked);
 
 /*--------- ----------- ----------- ----------- ------------------------------*/

@@ -38,7 +38,7 @@ yparse_in_defense       (void)
    char        rce         =  -10;
    /*---(defense)------------------------*/
    --rce;  if (myPARSE.ready != 'y')  {
-      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_config () first");
       return rce;
    }
    --rce;  if (s_qin.good != 'y')  {
@@ -672,10 +672,8 @@ yparse__infile          (void)
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_senter  (__FUNCTION__);
    /*---(prepare)------------------------*/
-   if (s_qin.loc != NULL && strcmp ("stdin", s_qin.loc) == 0) {
-      x_stdin = 'y';
-      DEBUG_YPARSE  yLOG_snote    ("stdin");
-   }
+   DEBUG_YPARSE   yLOG_snote   (s_qin.loc);
+   if (s_qin.loc != NULL && strcmp ("stdin", s_qin.loc) == 0)  x_stdin = 'y';
    /*> printf ("loc    = %p\n", s_qin.loc);                                           <*/
    /*> if (s_qin.loc  != NULL)   printf ("loc  = %s\n", s_qin.loc);                   <*/
    /*> printf ("file = %p\n", s_qin.file);                                            <*/
@@ -810,7 +808,7 @@ yparse__main_rollback   (int a_line)
 }
 
 char  /*--> parse a full record -------------------[ ------ [ ------ ]-*/
-yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb)
+yparse__main            (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;                /* return code for errors    */
@@ -820,7 +818,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    char        x_mask      =   -1;
    char        x_exist     =  '-';
    /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE   yLOG_enter   (a_func);
    /*---(default)------------------------*/
    if (t != NULL)  *t = 0;
    if (n != NULL)  *n = 0;
@@ -828,8 +826,8 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    /*---(defense)------------------------*/
    DEBUG_YPARSE   yLOG_char    ("ready"     , myPARSE.ready);
    --rce;  if (myPARSE.ready != 'y')  {
-      DEBUG_YPARSE   yLOG_note    ("must call yPARSE_init () first");
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_note    ("must call yPARSE_config () first");
+      DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(prepare)------------------------*/
@@ -843,7 +841,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    /*> --rce;  if (a_line < 0) {                                                      <* 
     *>    if (s_qin.label == NULL || strcmp (s_qin  s_qin.file == NULL) {             <* 
     *>    DEBUG_YPARSE   yLOG_note    ("file is not open");                           <* 
-    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                            <* 
+    *>    DEBUG_YPARSE   yLOG_exitr   (a_func, rce);                            <* 
     *>    return rce;                                                                 <* 
     *> }                                                                              <*/
    /*---(line number)--------------------*/
@@ -873,7 +871,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
          if (rc == 1) {
             DEBUG_YPARSE  yLOG_note    ("end-of-file");
             yparse__main_rollback (a_line);
-            DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+            DEBUG_YPARSE  yLOG_exit    (a_func);
             return 0;
          }
       } else {
@@ -882,7 +880,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
       }
       if (rc < 0) {
          yparse__main_rollback (a_line);
-         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+         DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
          return rc;
       }
    } else {
@@ -897,7 +895,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
    --rce;  if (rc < 0) {
       yparse__main_rollback (a_line);
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
       return rc;
    }
    /*---(set as good)-----------------*/
@@ -909,7 +907,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    DEBUG_YPARSE  yLOG_value   ("peek"      , rc);
    if (rc < 0) {
       yparse__main_rollback (a_line);
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
       return rce;
    }
    DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.verb);
@@ -922,7 +920,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
          if (myPARSE.verber == NULL) {
             DEBUG_YPARSE  yLOG_note    ("verb unrecognized and verber not active");
             yparse__main_rollback (a_line);
-            DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+            DEBUG_YPARSE  yLOG_exitr   (a_func, rce);
             return rce;
          }
          DEBUG_YPARSE  yLOG_note    ("verb unrecognized, verber will need to sort out");
@@ -936,7 +934,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
       DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
       if (rc < 0) {
          yparse__main_rollback (a_line);
-         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+         DEBUG_YPARSE  yLOG_exitr   (a_func, rce);
          return rce;
       }
    }
@@ -948,7 +946,7 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
       x_mask = yparse_verb_mask (x_index);
       rc = yparse_reusable (x_mask);
       if (rc < 0) {
-         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+         DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
          return rce;
       }
    }
@@ -956,15 +954,15 @@ yparse__main            (int *t, int *n, int *c, int a_line, char *a_recd, char 
    DEBUG_YPARSE   yLOG_value   ("count"     , s_qin.count);
    if (a_verb != NULL)  ystrlcpy (a_verb, myPARSE.verb, LEN_LABEL);
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   DEBUG_YPARSE   yLOG_exit    (a_func);
    return s_qin.count;
 }
 
-char yPARSE_read        (int *t, int *n, int *c, uchar *a_verb)     { return yparse__main (t, n, c, -1, NULL, NULL, a_verb); }
-char yPARSE_read_one    (int *n, uchar *a_verb)                     { return yparse__main (NULL, n, NULL, -1, NULL, NULL, a_verb); }
-char yPARSE_load        (int *n, int *c, char *a_recd)              { return yparse__main (NULL, n, c, -1, a_recd, NULL, NULL); }
-char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return yparse__main (NULL, n, c, a_line, NULL, a_label, NULL); }
-char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse__main (NULL, n, c,  0, a_recd, NULL, NULL); }
+char yPARSE_read        (int *t, int *n, int *c, uchar *a_verb)     { return yparse__main (__FUNCTION__, t, n, c, -1, NULL, NULL, a_verb); }
+char yPARSE_read_one    (int *n, uchar *a_verb)                     { return yparse__main (__FUNCTION__, NULL, n, NULL, -1, NULL, NULL, a_verb); }
+char yPARSE_load        (int *n, int *c, char *a_recd)              { return yparse__main (__FUNCTION__, NULL, n, c, -1, a_recd, NULL, NULL); }
+char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return yparse__main (__FUNCTION__, NULL, n, c, a_line, NULL, a_label, NULL); }
+char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse__main (__FUNCTION__, NULL, n, c,  0, a_recd, NULL, NULL); }
 int  yPARSE_recdno      (void)  { return s_qin.tline; }
 
 

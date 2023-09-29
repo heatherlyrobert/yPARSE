@@ -4,19 +4,25 @@
 #define   YPARSE_HGUARD       loaded
 
 
-#define     YPARSE_FUNCTION         'a'
-#define     YPARSE_FIELD            'f'
-
 #define     YPARSE_NOREAD           '-'
 #define     YPARSE_READALL          'y'
 
-#define     YPARSE_ONETIME          '-'
-#define     YPARSE_REUSING          'y'
 
-/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+/*---(myPARSE.verbs = a_auto)---------*/
 #define     YPARSE_AUTO             'y'
 #define     YPARSE_SIMPLE           's'
 #define     YPARSE_MANUAL           '-'
+#define     YPARSE_VERBS            "ys-"
+
+/*---(myPARSE.reusing)----------------*/
+#define     YPARSE_ONETIME          '-'
+#define     YPARSE_REUSING          'y'
+#define     YPARSE_REUSES           "-y"
+
+/*---(myPARSE.delimiters)-------------*/
+#define     YPARSE_FUNCTION         'a'
+#define     YPARSE_FIELD            'f'
+#define     YPARSE_DELIMS           "af"
 
 
 typedef long long      llong;
@@ -46,8 +52,8 @@ char        yPARSE_set_reuse        (void);
 
 /*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
-char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);
-char        yPARSE_getready         (char a_auto, void *a_verber, char a_reusing, char a_delim);
+/*> char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);   <*/
+char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim);
 char        yPARSE_wrap             (void);
 
 

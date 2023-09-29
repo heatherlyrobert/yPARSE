@@ -379,7 +379,7 @@ yparse__openclose       (tQUEUE *a_queue)
    int         x_len       =    0;
    /*---(defense)------------------------*/
    --rce;  if (myPARSE.ready != 'y')  {
-      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_init () first");
+      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_config () first");
       return rce;
    }
    DEBUG_YPARSE  yLOG_spoint  (a_queue);
