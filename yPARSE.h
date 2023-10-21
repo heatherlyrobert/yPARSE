@@ -92,7 +92,9 @@ char        yparse_peek_verb        (int *a_index, char *a_verb);
 
 /*---(yPARSE_queue.c)-------*/
 char        yPARSE_purge_in         (void);
+char        yPARSE_reset_in         (void);
 char        yPARSE_purge_out        (void);
+char        yPARSE_reset_out        (void);
 
 /*---(yPARSE_in.c)----------*/
 char        yPARSE_ready            (int *a_count);

@@ -112,6 +112,7 @@ yparse_out_defense      (void)
 
 char yparse_init_out         (void) { return yparse_init  (&s_qout, "OUT"); }
 char yPARSE_purge_out        (void) { return yparse_purge (&s_qout);        }
+char yPARSE_reset_out        (void) { return yparse_reset (&s_qout);        }
 
 int
 yparse_field_len        (char a_type)

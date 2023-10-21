@@ -67,6 +67,7 @@ yparse__popable         (void)
 
 char yparse_init_in          (void) { return yparse_init  (&s_qin, "IN"); }
 char yPARSE_purge_in         (void) { return yparse_purge (&s_qin);       }
+char yPARSE_reset_in         (void) { return yparse_reset (&s_qin);       }
 char yparse_good_in          (void) { s_qin.good = 'y'; return 0; }
 
 char

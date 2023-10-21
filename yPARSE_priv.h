@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4a"
-#define     P_VERTXT    "cleaned startup/config interface"
+#define     P_VERNUM    "0.4b"
+#define     P_VERTXT    "created queue reset to enable better reuse, re-reading, and testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -182,6 +182,7 @@ char*       yparse__unit_verb       (char *a_question, char *a_verb, int a_seq);
 
 char        yparse_init             (tQUEUE *a_queue, char *a_label);
 char        yparse_purge            (tQUEUE *a_queue);
+char        yparse_reset            (tQUEUE *a_queue);
 char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
 char        yparse_enqueue_full     (tQUEUE *a_queue, char *a_item);
 char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);

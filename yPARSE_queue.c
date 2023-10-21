@@ -245,6 +245,8 @@ yparse_purge            (tQUEUE *a_queue)
 {
    /*---(locals)-----------+-----+-----+-*/
    tNODE      *x_curr      = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_FILE   yLOG_enter   (__FUNCTION__);
    /*---(walk-through)-------------------*/
    x_curr = a_queue->head;
    while (x_curr != NULL) {
@@ -264,7 +266,24 @@ yparse_purge            (tQUEUE *a_queue)
    a_queue->first    =    0;
    a_queue->count    =    0;
    /*---(complete)-----------------------*/
+   DEBUG_FILE   yLOG_exit    (__FUNCTION__);
    return 0;
+}
+
+char
+yparse_reset            (tQUEUE *a_queue)
+{
+   /*---(header)-------------------------*/
+   DEBUG_FILE   yLOG_enter   (__FUNCTION__);
+   yparse_purge (a_queue);
+   /*---(file)---------------------------*/
+   a_queue->tline    =    0;
+   a_queue->nline    =    0;
+   a_queue->cline    =    0;
+   /*---(complete)-----------------------*/
+   DEBUG_FILE   yLOG_exit    (__FUNCTION__);
+   return 0;
+
 }
 
 char
