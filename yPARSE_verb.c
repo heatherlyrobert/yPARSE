@@ -431,6 +431,18 @@ yparse_fancy__columns    (uchar *a_specs, uchar *a_labels)
 }
 
 char
+yPARSE_columns          (int c, char *a_specs, char *a_labels)
+{
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   if (c % 5 == 0) {
+      yparse_fancy__columns (a_specs, a_labels);
+      yparse_fancy__write (s_div);
+   }
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
 yPARSE_spacer           (char a_lines)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -560,6 +572,12 @@ yparse_fancy_end        (int c)
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
+}
+
+char
+yPARSE_footer           (int c)
+{
+   return yparse_fancy_end (c);
 }
 
 

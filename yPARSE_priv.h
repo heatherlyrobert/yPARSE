@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4b"
-#define     P_VERTXT    "created queue reset to enable better reuse, re-reading, and testing"
+#define     P_VERNUM    "0.4c"
+#define     P_VERTXT    "added a few short-cuts to help report output"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

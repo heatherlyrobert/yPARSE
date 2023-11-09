@@ -75,6 +75,8 @@ char        yPARSE_tmpout           (void);
 char        yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc);
 char        yPARSE_close_out        (void);
 char        yPARSE_section          (char *a_title);
+char        yPARSE_columns          (int c, char *a_specs, char *a_labels);
+char        yPARSE_footer           (int c);
 
 
 char        yPARSE_write            (int *n, int *c);
