@@ -509,6 +509,7 @@ yparse_recd             (uchar *a_recd)
    char       *p           = NULL;
    char       *r           = NULL;
    int         i           =    0;
+   char       *s           =  "·";
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
@@ -534,7 +535,8 @@ yparse_recd             (uchar *a_recd)
       /*---(clean it up)-----------------*/
       ystrltrim (p, ySTR_BOTH, LEN_RECD);
       x_len = ystrllen (p, LEN_RECD);
-      ystrlunstore (p, x_len);
+      if (x_len == 0 && myPARSE.fill == YPARSE_FILL)  p = s;
+      else                                            ystrlunstore (p, x_len);
       DEBUG_YPARSE yLOG_info    ("field"     , p);
       DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
       /*---(enqueue it)------------------*/
@@ -549,7 +551,6 @@ yparse_recd             (uchar *a_recd)
    /*---(check tail)---------------------*/
    rc = yparse_queue_tail (&s_qin);
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
-   /*---(set verb)-----------------------*/
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;

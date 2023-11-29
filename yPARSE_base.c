@@ -5,7 +5,7 @@
 
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-tACCESSOR   myPARSE = { 0, '-', '-', '-', "|§", NULL, "", "", "", '-', 0, 0, '-' };
+tACCESSOR   myPARSE = { 0, '-', '-', '-', "|§", NULL, 'y', "", "", "", '-', 0, 0, '-' };
 static      char        yPARSE_ver  [200] = "";
 
 
@@ -67,12 +67,13 @@ yparse__clear           (void)
    myPARSE.verber  = NULL;
    myPARSE.reusing = YPARSE_ONETIME;
    strcpy (myPARSE.delimiters, "");
+   myPARSE.fill    = '-';
    myPARSE.ready   = '-';
    return 0;
 }
 
 char
-yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusing, char a_delim)
+yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
 {
    char        rce         =  -10;
    char        rc          =    0;
@@ -128,15 +129,15 @@ yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusin
 }
 
 char
-yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim)
+yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
 {
-   return yparse__config ('-', a_auto, a_verber, a_reusing, a_delim);
+   return yparse__config ('-', a_auto, a_verber, a_reusing, a_delim, a_fill);
 }
 
 char
-yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim)
+yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
 {
-   return yparse__config ('y', a_auto, a_verber, a_reusing, a_delim);
+   return yparse__config ('y', a_auto, a_verber, a_reusing, a_delim, a_fill);
 }
 
 char
@@ -263,7 +264,7 @@ yparse_mock__unit       (char *a_question, int a_num)
 char         /*-> set up programgents/debugging ------[ light  [uz.320.011.05]*/ /*-[00.0000.00#.#]-*/ /*-[--.---.---.--]-*/
 yparse__unit_quiet      (void)
 {
-   yPARSE_config (YPARSE_MANUAL, NULL, YPARSE_ONETIME, YPARSE_FIELD);  /* defaults */
+   yPARSE_config (YPARSE_MANUAL, NULL, YPARSE_ONETIME, YPARSE_FIELD, YPARSE_FILL);  /* defaults */
    myPARSE.ready = '-';
    return 0;
 }
@@ -277,7 +278,7 @@ yparse__unit_loud       (void)
    yURG_urgs     (x_narg, x_args);
    yURG_by_name  ("yparse", 'y');
    yURG_by_name  ("ystr"  , 'y');
-   yPARSE_config (YPARSE_MANUAL, NULL, YPARSE_ONETIME, YPARSE_FIELD);  /* defaults */
+   yPARSE_config (YPARSE_MANUAL, NULL, YPARSE_ONETIME, YPARSE_FIELD, YPARSE_FILL);  /* defaults */
    myPARSE.ready = '-';
    return 0;
 }

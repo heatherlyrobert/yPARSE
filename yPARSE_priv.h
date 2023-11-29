@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4c"
-#define     P_VERTXT    "added a few short-cuts to help report output"
+#define     P_VERNUM    "0.4d"
+#define     P_VERTXT    "updated to optionally handle blank/null fields"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -95,6 +95,7 @@ struct cACCESSOR {
    char        reusing;                         /* must lines be saved        */
    char        delimiters  [LEN_LABEL];
    char        (*verber) (int n, uchar *a_verb, char a_exist, void *a_handler);
+   char        fill;
    char        orig        [LEN_RECD];
    char        recd        [LEN_RECD];
    char        verb        [LEN_LABEL];
@@ -156,7 +157,7 @@ extern      tMOCK       g_mocks     [10];
 extern      int         g_nmock;
 
 
-char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim);
+char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 
 char        yparse_in_variadic      (va_list a_vlist, int n);
 char        yparse_out_variadic     (va_list a_vlist, int n);

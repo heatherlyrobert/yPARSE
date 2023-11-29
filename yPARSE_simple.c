@@ -26,7 +26,7 @@ yparse_opener           (uchar a_auto, uchar *a_in, uchar *a_out, void *a_verber
    s_count = -1;
    s_last  = -1;
    /*---(initialize)---------------------*/
-   rc = yparse_reconfig (a_auto, a_verber, a_reuse, YPARSE_FIELD);
+   rc = yparse_reconfig (a_auto, a_verber, a_reuse, YPARSE_FIELD, YPARSE_FILL);
    DEBUG_YPARSE   yLOG_value   ("getready"  , rc);
    /*---(open)---------------------------*/
    --rce;  if (a_in != NULL && a_out != NULL) {

@@ -24,6 +24,10 @@
 #define     YPARSE_FIELD            'f'
 #define     YPARSE_DELIMS           "af"
 
+/*---(myPARSE.delimiters)-------------*/
+#define     YPARSE_FILL             'y'
+#define     YPARSE_NOFILL           '-'
+
 
 typedef long long      llong;
 typedef unsigned char  uchar;
@@ -53,7 +57,7 @@ char        yPARSE_set_reuse        (void);
 /*---(yPARSE_shared.c)------*/
 char       *yPARSE_version          (void);
 /*> char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);   <*/
-char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim);
+char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 char        yPARSE_wrap             (void);
 
 
