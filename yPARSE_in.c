@@ -967,6 +967,8 @@ char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return ypa
 char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse__main (__FUNCTION__, NULL, n, c,  0, a_recd, NULL, NULL); }
 int  yPARSE_recdno      (void)  { return s_qin.tline; }
 
+char yPARSE_inrecd      (char a_recd [LEN_RECD]) { ystrlcpy (a_recd, myPARSE.recd, LEN_RECD); }
+
 
 /*====================------------------------------------====================*/
 /*===----                           file control                       ----===*/

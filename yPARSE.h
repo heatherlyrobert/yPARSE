@@ -3,6 +3,7 @@
 #ifndef   YPARSE_HGUARD
 #define   YPARSE_HGUARD       loaded
 
+#include    <ySTR_solo.h> 
 
 #define     YPARSE_NOREAD           '-'
 #define     YPARSE_READALL          'y'
@@ -93,6 +94,7 @@ char        yPARSE_read_one         (int *n, uchar *a_verb);
 char        yPARSE_read_all         (void);
 int         yPARSE_recdno           (void);
 char        yparse_peek_verb        (int *a_index, char *a_verb);
+char        yPARSE_inrecd           (char a_recd [LEN_RECD]);
 
 
 

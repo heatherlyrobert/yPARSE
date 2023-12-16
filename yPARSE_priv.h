@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4d"
-#define     P_VERTXT    "updated to optionally handle blank/null fields"
+#define     P_VERNUM    "0.4e"
+#define     P_VERTXT    "quick accesssor to gain current input record"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
