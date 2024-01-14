@@ -5,7 +5,7 @@
 
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-tACCESSOR   myPARSE = { 0, '-', '-', '-', "|§", NULL, 'y', "", "", "", '-', 0, 0, '-' };
+tACCESSOR   myPARSE = { 0, '-', '-', '-', "|§", '-', NULL, 'y', "", "", "", '-', 0, 0, '-' };
 static      char        yPARSE_ver  [200] = "";
 
 
@@ -67,6 +67,7 @@ yparse__clear           (void)
    myPARSE.verber  = NULL;
    myPARSE.reusing = YPARSE_ONETIME;
    strcpy (myPARSE.delimiters, "");
+   myPARSE.delims  = '-';
    myPARSE.fill    = '-';
    myPARSE.ready   = '-';
    return 0;
@@ -96,7 +97,7 @@ yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusin
    }
    /*---(reusing)------------------------*/
    DEBUG_YPARSE  yLOG_char    ("a_delim"   , a_delim);
-   DEBUG_YPARSE  yLOG_info    ("valid"     , YPARSE_REUSES);
+   DEBUG_YPARSE  yLOG_info    ("valid"     , YPARSE_DELIMS);
    --rce;  if (a_delim == '\0' || strchr (YPARSE_DELIMS, a_delim) == NULL) {
       DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
       return rce;
@@ -105,15 +106,21 @@ yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusin
    case YPARSE_FUNCTION  :
       ystrlcpy (myPARSE.delimiters, "§(,)", LEN_LABEL);
       break;
+   case YPARSE_TRADITION :
+      ystrlcpy (myPARSE.delimiters, ""    , LEN_LABEL);
+      break;
    case YPARSE_FIELD     :
    default :
-      ystrlcpy (myPARSE.delimiters, "§" , LEN_LABEL);
+      ystrlcpy (myPARSE.delimiters, "§"   , LEN_LABEL);
       break;
    }
+   myPARSE.delims = a_delim;
+   DEBUG_YPARSE  yLOG_info    ("delims"    , myPARSE.delimiters);
    /*---(make settings)------------------*/
    myPARSE.verbs   = a_auto;
    myPARSE.verber  = a_verber;
    myPARSE.reusing = a_reusing;
+   myPARSE.fill    = a_fill;
    myPARSE.ready   = 'y';
    /*---(initialize all areas)-----------*/
    if (a_1st == 'y') {
@@ -148,11 +155,15 @@ yPARSE_delimiters       (uchar a_type)
    case YPARSE_FUNCTION  :
       ystrlcpy (myPARSE.delimiters, "§(,)", LEN_LABEL);
       break;
+   case YPARSE_TRADITION :
+      ystrlcpy (myPARSE.delimiters, ""    , LEN_LABEL);
+      break;
    case YPARSE_FIELD     :
    default :
-      ystrlcpy (myPARSE.delimiters, "§" , LEN_LABEL);
+      ystrlcpy (myPARSE.delimiters, "§"   , LEN_LABEL);
       break;
    }
+   myPARSE.delims = a_type;
    DEBUG_YPARSE  yLOG_info    ("delimit"   , myPARSE.delimiters);
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -307,6 +318,7 @@ yparse_base__unit       (char *a_question, int a_num)
       yPARSE_qout_info  (NULL, x_out, NULL, NULL);
       if      (strcmp (myPARSE.delimiters, "§")    == 0)  strcpy (x_del, "field");
       else if (strcmp (myPARSE.delimiters, "§(,)") == 0)  strcpy (x_del, "function");
+      else if (strcmp (myPARSE.delimiters, ""    ) == 0)  strcpy (x_del, "tradition");
       else if (strcmp (myPARSE.delimiters, "")       == 0)  strcpy (x_del, "·····");
       else                                                  strcpy (x_del, "custom");
       if      (myPARSE.verber != NULL)  strcpy (x_ver, "SET");

@@ -1329,7 +1329,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
             case 'T'  : ystrlcpy (x_str, x_work, LEN_TERSE);   break;
             case 'U'  : ystrlcpy (x_str, x_work, LEN_USER );   break;
             case 'L'  : ystrlcpy (x_str, x_work, LEN_LABEL);   break;
-            case '3'  : ystrlcpy (x_str, x_work, 30       );   break;
+            case '3'  : ystrlcpy (x_str, x_work, LEN_TITLE);   break;
             case '4'  : ystrlcpy (x_str, x_work, 40       );   break;
             case 'D'  : ystrlcpy (x_str, x_work, LEN_DESC );   break;
             case '6'  : ystrlcpy (x_str, x_work, 60       );   break;

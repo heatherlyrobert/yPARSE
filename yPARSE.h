@@ -23,7 +23,8 @@
 /*---(myPARSE.delimiters)-------------*/
 #define     YPARSE_FUNCTION         'a'
 #define     YPARSE_FIELD            'f'
-#define     YPARSE_DELIMS           "af"
+#define     YPARSE_TRADITION        't'
+#define     YPARSE_DELIMS           "aft"
 
 /*---(myPARSE.delimiters)-------------*/
 #define     YPARSE_FILL             'y'
