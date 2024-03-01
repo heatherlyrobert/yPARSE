@@ -61,6 +61,7 @@ char       *yPARSE_version          (void);
 /*> char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);   <*/
 char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 char        yPARSE_wrap             (void);
+char        yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler);
 
 
 

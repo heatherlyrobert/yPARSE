@@ -74,6 +74,12 @@ yparse__clear           (void)
 }
 
 char
+yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler)
+{
+   return 0;
+}
+
+char
 yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
 {
    char        rce         =  -10;
