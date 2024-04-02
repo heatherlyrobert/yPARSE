@@ -1344,6 +1344,10 @@ yparse_in_variadic      (va_list a_vlist, int n)
          }
          DEBUG_YPARSE   yLOG_complex ("string"    , "%d, %c, %3d, %s, %p, %s", i, x_type, rc, x_work, x_str, x_str);
          break;
+      case '-' :
+         DEBUG_YPARSE   yLOG_bullet  (i           , "skipping field");
+         rc = yPARSE_toss   ();
+         break;
       default  :
          DEBUG_YPARSE   yLOG_bullet  (i           , "unknown type");
          va_end (a_vlist);

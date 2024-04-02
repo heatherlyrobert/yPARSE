@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4g"
-#define     P_VERTXT    "added stub verber for testing other programs consistenly"
+#define     P_VERNUM    "0.4h"
+#define     P_VERTXT    "added spacers/ignore-field to yPARSE_scanf for complex input files"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

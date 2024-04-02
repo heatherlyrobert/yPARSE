@@ -173,7 +173,7 @@ yparse_specs_len        (tQUEUE *a_queue)
    /*> DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);    <*/
    for (i = 0; i < MAX_COLS; ++i) {
       if (s_verbs [a_queue->iverb].specs [i] == '\0')   break;
-      if (s_verbs [a_queue->iverb].specs [i] == '-')    break;
+      /*> if (s_verbs [a_queue->iverb].specs [i] == '-')    break;                    <*/
       ++n;
    }
    return n;
@@ -219,7 +219,7 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
       ystrlcpy (x_specs, a_specs, LEN_TITLE);
    }
    ystrltrim (x_specs, ySTR_BOTH, LEN_TITLE);
-   ystrlddel (x_specs, '-', LEN_TITLE);
+   /*> ystrlddel (x_specs, '-', LEN_TITLE);                                           <*/
    DEBUG_YPARSE   yLOG_info    ("x_specs"   , x_specs);
    --rce;  for (i = 0; i < strlen (x_specs); ++i) {
       l = yparse_field_len (x_specs [i]);
