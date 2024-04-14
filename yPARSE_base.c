@@ -183,7 +183,7 @@ yPARSE_wrap             (void)
    /*> yPARSE_close_out ();                                                           <*/
    yparse_line_purge ();
    yparse__clear ();
-   yLOG_exit    (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
