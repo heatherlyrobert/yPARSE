@@ -157,5 +157,16 @@ char        yPARSE_push             (char *a_item);
 
 
 
+/*===[[ yPARSE_exim.c ]]======================================================*/
+/*········´ ´···········interpret·´ ´·········································*/
+char        yPARSE_interpret        (char *a_parser, char *r_header, char *r_break, int a_max, char r_control [LEN_RECD], char r_feedback [LEN_RECD]);
+/*········´ ´··············export·´ ´·········································*/
+char        yPARSE_export_header    (char a_file [LEN_PATH], char a_fullname [LEN_HUND], char a_cmdline [LEN_HUND], char a_oneline [LEN_HUND], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_report [LEN_HUND], char a_parser [LEN_RECD], char c_exim, char c_titles);
+char        yPARSE_export_line      (char a_content [LEN_RECD]);
+char        yPARSE_export_footer    (void);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
 #endif
 /*============================[[    end-code    ]]============================*/

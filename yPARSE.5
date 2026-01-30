@@ -1,0 +1,342 @@
+.TH yPARSE· 5 2015-jun "linux" "end-user data files and data streams"
+
+.SH NAME
+.B yPARSE
+- text file parsing and aggregating library
+
+.SH PATRON
+.B jupiter-terminus (boundaries)
+god of boundaries and markers
+
+.SH IMAGERY
+head and torso of a man, connected to a boundary stone as a base
+
+.SH SUMMARY
+standardizes the reading/parsing and writing/aggregating of structured,
+multi-type, ascii-text data streams and files required by most non-trivial
+applications than dont require a binary database.
+
+.SH DOCUMENTATION FILES
+.nf  
+yPARSE (3)          overall discussion
+yPARSE_config (3)   general startup and shutdown
+yPARSE_input (3)    structure of config, files, and streams
+yPARSE_output (3)   structure of config, files, and streams
+.B yPARSE (5) ´´´´´´´´ target data files and streams structure
+yPARSE (7)          decision rationale, scope, and objectives
+
+.SH TABLE OF CONTENTS
+.nf  
+A) purpose          focus of this man page
+B) linux example    output from a linux command
+C) conf example     system utility configuration file
+D) app example      spreadsheet content data file
+E) spider example   spider script example
+F) turtle example   turtle graphics script (for spider)
+G) ctags example    ctags function identification
+
+.SH A) PURPOSE
+yPARSE focuses exclusively on efficiently and reliably creating and parsing
+8bit, ascii-text, columnar data files.  to help understand this library,
+several examples of data files will been shown below and their purpose/structure
+briefly described.
+
+.SH B) LINUX EXAMPLE
+the ps command, like so many unix/linux commands, is "mostly" columnar, but
+really space delimited (one or more), except where is isn't (in the command
+field) ;)
+   -- columnar for ease of human understanding
+   -- field separator is 0x20, the ascii space
+   -- this version (ps -au) has ten (10) fields from left-to-right
+   -- no "verb" is given as all lines, except the title are the same
+
+.nf
+##===[[ start-of-output ]]=============================================================================================================================================================#
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root      1878  0.0  0.0   7540  3200 tty2     S+   Apr13   0:00 /bin/sh /usr/bin/startx /usr/bin/startfluxbox -- vt7 -verbose 6 -logverbose 6
+root      1897  0.0  0.0   3980  2432 tty2     S+   Apr13   0:00 xinit /usr/bin/startfluxbox -- /usr/bin/X :0 vt7 -verbose 6 -logverbose 6 -auth /tmp/serverauth.8ECQvHl65Y
+root      1898  2.3  4.8 530376 380608 tty7    R<sl+ Apr13 7002:29 /usr/bin/X :0 vt7 -verbose 6 -logverbose 6 -auth /tmp/serverauth.8ECQvHl65Y
+root      1902  0.0  0.0   7540  3200 tty2     S    Apr13   0:00 sh /root/.fluxbox/startup
+root      1904  0.0  0.1  17876 11136 tty2     S    Apr13  43:04 fluxbox -verbose -sync -log /home/member/l_hlisda/fluxbox_log
+root      1924  0.0  0.0   4252  2816 tty2     S    Apr13  10:07 unclutter -idle 2 -jitter 10 -root
+root      1925  0.0  0.0   7920  6224 tty2     S    Apr13 119:48 xcompmgr -c -C -r15 -o.00 -l5 -t5
+root      2266  0.0  0.0   6292  2432 pts/18   S+   Oct16   0:00 make vi_edit
+root      2276  0.0  0.1  20276 14868 pts/18   Sl+  Oct16   0:59 vi -c call HBUF_on() -c call HTAG_on() yJOBS.h yJOBS_priv.h yJOBS_act.c yJOBS_args.c yJOBS_base.c yJOBS_db.c yJOBS_dir.c yJOBS_ends.c yJOBS_file.c yJOBS_gather.c yJOBS_in.c yJOBS_maint.c yJOBS_out.c yJOBS_prog.c yJOBS_run.c yJOBS_test.c yJOBS_world.c yJOBS_ySCORE.c
+root      3512  0.0  0.1  18172 14204 pts/35   Ss+  Sep13   0:00 -bash
+root      3924  0.0  0.0   6292  2432 pts/9    S+   Sep04   0:00 make vi_unit
+##===[[ end-of-output ]]===============================================================================================================================================================#
+
+.SH C) CONFIGURATION FILE
+eos is my system startup and shutdown manager.  below is one version of the
+startup configuration file.
+   -- columnar for ease of human understanding and editing
+   -- field separator is 0x1F, the ascii field separator, shown here as (§)
+   -- every line starting with space or hash (#) is ignored
+   -- this version has seven (7) fields from left-to-right
+   -- first column is a "verb" that helps process records properly
+
+.nf
+##===[[ start-of-file ]]===============================================================================================================================================================#
+#!/sbin/eos
+
+.nf
+##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+GROUP      § PRIORITY     § establish rudamentary environment   § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+  config   § hwclock      § set the clock from hardware         § root       §    1s § --·---·-·--- § /sbin/hwclock --hctosys --localtime                                              §
+  config   § hostname     § set the machines hostname           § root       §    1s § --·---·-·--- § /bin/hostname --file /etc/hostname                                               §
+  config   § boot_log     § save a copy of the boot log         § root       §    1s § --·---·-·--- § /bin/dmesg > /var/log/dmesg_after_boot.txt                                       §
+  once     § dmesg        § set the kernel logging level        § root       §    1s § --·---·-·--- § /bin/dmesg -n 2                                                                  §
+
+.nf
+##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+GROUP      § FILESYSTEM   § establish necessary file systems    § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+  AFTER    § PRIORITY     § · · · · · · · · · · · · · · · · · · § · · · · ·  § · · · § · · · · · ·  § · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  §
+  mount    § devpts_fs    § mount the devpts filesystem         § root       §    1s § --·---·-·--- § /bin/mount    /dev/pts                                                           §
+  mount    § sys_fs       § mount the sys filesystem            § root       §    1s § --·---·-·--- § /bin/mount    /sys                                                               §
+  mount    § swap_fs      § mount the swap filesystem           § root       §    1s § --·---·-·--- § /sbin/swapon  /dev/sda2                                                          §
+  mount    § boot_fs      § mount the boot filesystem           § root       §    1s § --·---·-·--- § /bin/mount    /dev/sda1                                                          §
+  mount    § shm_fs       § mount the shared memory area        § root       §    1s § --·---·-·--- § /bin/mount    /dev/shm                                                           §
+  mount    § run_fs       § mount the /run filesystem           § root       §    1s § --·---·-·--- § /bin/mount    /run                                                               §
+  mount    § tmp_fs       § mount the /tmp filesystem           § root       §    1s § --·---·-·--- § /bin/mount    /tmp                                                               §
+  mount    § machine      § mount the /home/machine filesystem  § root       §    1s § --·---·-·--- § /bin/mount    /home/machine                                                      §
+  mount    § system       § mount the /home/system filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /home/system                                                       §
+  mount    § member       § mount the /home/member filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /home/member                                                       §
+  mount    § archive      § mount the /srv/archive filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /srv/archive                                                       §
+  mount    § audio        § mount the /srv/audio filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /srv/audio                                                         §
+  mount    § video        § mount the /srv/video filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /srv/video                                                         §
+  mount    § image        § mount the /srv/image filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /srv/image                                                         §
+  mount    § website      § mount the /srv/website filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /srv/website                                                       §
+  mount    § exist        § mount the /mnt/exist filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /mnt/exist                                                         §
+
+.nf
+##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+GROUP      § USEABILITY   § establish rudamentary environment   § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+  AFTER    § FILESYSTEM   § · · · · · · · · · · · · · · · · · · § · · · · ·  § · · · § · · · · · ·  § · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  §
+  config   § setfont      § set the console font (cosmetic)     § root       §    1s § --·---·-·--- § /usr/bin/setfont  /usr/share/consolefonts/shrike -m 8859-1                       §
+  config   § loadkeys     § set the keyboard map                § root       §    1s § --·---·-·--- § /usr/bin/loadkeys /home/machine/keyboard/colemak-arensito.map                    §
+
+.nf
+##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+GROUP      § DAEMONS      § start critical daemons              § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+  AFTER    § USEABILITY   § · · · · · · · · · · · · · · · · · · § · · · · ·  § · · · § · · · · · ·  § · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  §
+  daemon   § hestia       § start the hestia getty daemon       § root       §    1s § --·---·-·--- § /sbin/hestia --loadsharing --aggressive --hardened --12345                       §
+  serial   § getty2       § place standard getty on tty2        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty2                                                       §
+  serial   § getty3       § place standard getty on tty3        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty3                                                       §
+  serial   § getty4       § place standard getty on tty4        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty4                                                       §
+  serial   § getty5       § place standard getty on tty5        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty5                                                       §
+  serial   § getty6       § place standard getty on tty6        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty6                                                       §
+  daemon   § khronos      § start the khronos daemon            § root       §    1s § --·---·-·--- § /usr/sbin/khronos --daemon --123456789-123456789-123456789-12345                 §
+
+.nf
+## end-of-file.  done, finito, completare, whimper.
+##===[[ end-of-file ]]=================================================================================================================================================================#
+
+.SH D) APPLICATION DATA
+gyges is my technical spreadsheet.  below is an extract from a formatting
+demonstration file.
+   -- columnar for ease of human understanding and editing
+   -- field separator is 0x1F, the ascii field separator, shown here as (§)
+   -- first column is a "verb" that helps process records properly
+   -- each "verb" indicates a different record structure
+   -- every line starting with space or hash (#) is ignored
+
+.nf
+##===[[ start-of-file ]]===============================================================================================================================================================#
+#!/usr/local/bin/gyges
+
+.nf
+s_program    § gyges                § 3.6m  § all²mreg²testing²all²caught²up²with²greater²detai § 
+s_oneline    § gyges-hecatoncheires²(hundred-handed)²wicked²technical²spreadsheet § 
+s_content    § spreadsheet²data § 
+s_filename   § /home/system/gyges.technical_spreadsheet/format.gyges § 
+s_written    § 22.04.23.21.36.16.6.16.113 § 
+
+.nf
+#===[[ GYGES TABS (UNIVERSE) ]]================================================#
+#---verb---- § ---name------------- § ---max---- § t § ---beg---- § ---cur---- § c § 
+tab          § mouse                § 0z100      § f § 0a1        § 0e20       § y § 
+
+.nf
+#===[[ GYGES DEPENDENT CELLS ]]================================================#
+#---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+cell_dep     § 0c15       § >?0--      § +125 § 
+cell_dep     § 0c17       § >?0--      § abc § 
+cell_dep     § 0d15       § >?0--      § =c15+10 § 
+cell_dep     § 0j6        § ??0--      § =j7 § 
+cell_dep     § 0d17       § >?0--      § #c17#\"+\" § 
+#---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+cell_dep     § 0e15       § >?0--      § ~$d15 § 
+cell_dep     § 0j9        § ??0--      § =j6 § 
+cell_dep     § 0e17       § >?0--      § ~$d17 § 
+cell_dep     § 0f15       § >?0--      § ~$d15 § 
+cell_dep     § 0i6        § ??0--      § =i7 § 
+
+.nf
+#===[[ GYGES FREE CELLS ]]=====================================================#
+#---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+cell_free    § 0a25       § ??0--      § ²++ § 
+cell_free    § 0a26       § ??0--      § ²-- § 
+cell_free    § 0a28       § ??0--      § ²yÆ § 
+cell_free    § 0a29       § ??0--      § ²yÇ § 
+cell_free    § 0a30       § ??0--      § ²yÈ § 
+#---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+cell_free    § 0a31       § ??0--      § ²yÎ § 
+cell_free    § 0a32       § ??0--      § ²yÉ § 
+cell_free    § 0a33       § ??0--      § ²yÊ § 
+cell_free    § 0a35       § ??0--      § ²(²²) § 
+cell_free    § 0a36       § ??0--      § ², § 
+
+.nf
+## end-of-file.  done, finito, completare, whimper.
+##===[[ end-of-file ]]=================================================================================================================================================================#
+
+.SH E) SPIDER DATA
+
+.nf
+##===[[ start-of-file ]]===============================================================================================================================================================#
+inizio            § -                  §
+  forward    § AA §   0   §     0.00   §     0.00   §     0.00   § -                    §
+  zero            §   1   §      0.0   §      0.0   §      0.0   § -                    §
+
+.nf
+passaggio         § x-axis             §
+  inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+  zero            § [10m] §     50.0r  §      -.-   §      -.-   § east                 §
+  zero            § [20m] §   -100.0r  §      -.-   §      -.-   § west                 §
+  zero            § [10m] §     50.0r  §      -.-   §      -.-   § neutral              §
+
+.nf
+passaggio         § z-axis             §
+  inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+  zero            § [10m] §      -.-   §     50.0r  §      -.-   § south                §
+  zero            § [20m] §      -.-   §   -100.0r  §      -.-   § north                §
+  zero            § [10m] §      -.-   §     50.0r  §      -.-   § neutral              §
+
+.nf
+passaggio         § y-axis             §
+  inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+  zero            § [10m] §      -.-   §      -.-   §     40.0r  § up                   §
+  zero            § [20m] §      -.-   §      -.-   §    -80.0r  § down                 §
+  zero            § [10m] §      -.-   §      -.-   §     40.0r  § neutral              §
+
+.nf
+passaggio         § se-nw              §
+  inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+  zero            § [10m] §     50.0r  §     50.0r  §      -.-   § SE                   §
+  zero            § [20m] §   -100.0r  §   -100.0r  §      -.-   § NW                   §
+  zero            § [10m] §     50.0r  §     50.0r  §      -.-   § neutral              §
+
+.nf
+passaggio         § ne-sw              §
+  inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+  zero            § [10m] §     50.0r  §    -50.0r  §      -.-   § NE                   §
+  zero            § [20m] §   -100.0r  §    100.0r  §      -.-   § SW                   §
+  zero            § [10m] §     50.0r  §    -50.0r  §      -.-   § neutral              §
+
+.nf
+finire            § -                  §
+##===[[ end-of-file ]]=================================================================================================================================================================#
+
+.SS F) TURTLE GRAPHICS
+.nf
+##===[[ start-of-file ]]===============================================================================================================================================================#
+tu_speed (5)
+
+.nf
+tu_raise ()
+tu_wait  (2)
+tu_move  (8)
+tu_wait  (2)
+tu_turn  (-90)
+tu_move  (18)
+tu_turn  (90)
+
+.nf
+segno    (!!)
+   tu_wait  (2)
+   tu_lower ()
+   tu_wait  (2)
+   segno    (!!)
+      tu_move  (30)
+      tu_turn  (90)
+      tu_wait  (5)
+   ripetere (!!, 3)
+   tu_turn  (45)
+   tu_raise ()
+   tu_wait  (2)
+   tu_move  (15)
+ripetere (!!, 7)
+
+.nf
+tu_wait  (2)
+tu_home  ()
+##===[[ end-of-file ]]=================================================================================================================================================================#
+
+
+
+.SS G) CTAGS OUTPUT
+data output from ctags using "ctags -x --sort=no --c-kinds=f polymnia_projs.c"
+   -- mostly columnar for ease of human understanding and editing
+   -- field separator is one or more spaces (except in fourth)
+   -- first column is a function, then verb/type, then line, and line content
+
+.nf
+##===[[ start-of-file ]]===============================================================================================================================================================#
+o___SUPPORT_________o function     16 polymnia_projs.c static void o___SUPPORT_________o () { return; }æ
+PROJS__wipe      function     19 polymnia_projs.c PROJS__wipe (tPROJ *a_dst)æ
+PROJS__memory    function     45 polymnia_projs.c PROJS__memory (tPROJ *a_proj)æ
+o___PROGRAM_________o function    121 polymnia_projs.c static void o___PROGRAM_________o () { return; }æ
+PROJS_init       function    124 polymnia_projs.c PROJS_init (void)æ
+PROJS_purge      function    144 polymnia_projs.c PROJS_purge (void)æ
+PROJS_wrap       function    177 polymnia_projs.c PROJS_wrap (void)æ
+o___MEMORY__________o function    201 polymnia_projs.c static void o___MEMORY__________o () { return; }æ
+PROJS__new       function    203 polymnia_projs.c char PROJS__new (tPROJ **r_new) { return poly_shared_new (\"proj\", sizeof (tPROJ), r_new, NULL, '-', PROJS__wipe); }æ
+PROJS_force      function    204 polymnia_projs.c char PROJS_force (tPROJ **r_new) { return poly_shared_new (\"proj\", sizeof (tPROJ), r_new, NULL, 'y', PROJS__wipe); }æ
+PROJS__free      function    205 polymnia_projs.c char PROJS__free (tPROJ **b_old) { return poly_shared_free (\"proj\", b_old, NULL); }æ
+o___HOOKING_________o function    212 polymnia_projs.c static void o___HOOKING_________o () { return; }æ
+PROJS__hook      function    215 polymnia_projs.c PROJS__hook (tPROJ *a_proj)æ
+PROJS__unhook    function    248 polymnia_projs.c PROJS__unhook (tPROJ *a_proj)æ
+o___EXISTANCE_______o function    280 polymnia_projs.c static void o___EXISTANCE_______o () { return; }æ
+PROJS__add_full  function    283 polymnia_projs.c PROJS__add_full (char a_name [LEN_LABEL], char a_home [LEN_HUND], char c_force, tPROJ **r_proj)æ
+PROJS_add        function    373 polymnia_projs.c PROJS_add (char a_name [LEN_LABEL], char a_home [LEN_HUND], tPROJ **r_proj)æ
+PROJS_replace    function    379 polymnia_projs.c PROJS_replace (char a_name [LEN_LABEL], char a_home [LEN_HUND], tPROJ **r_proj)æ
+PROJS_remove     function    385 polymnia_projs.c PROJS_remove (tPROJ **a_proj)æ
+o___SEARCH__________o function    441 polymnia_projs.c static void o___SEARCH__________o () { return; }æ
+PROJS_count      function    443 polymnia_projs.c int PROJS_count (void) { return ySORT_count (B_PROJ); }æ
+PROJS_by_name    function    444 polymnia_projs.c char PROJS_by_name (uchar *a_name, tPROJ **r_proj) { return ySORT_by_name (B_PROJ, a_name, r_proj); }æ
+PROJS_by_index   function    445 polymnia_projs.c char PROJS_by_index (int n, tPROJ **r_proj) { return ySORT_by_index (B_PROJ, n, r_proj); }æ
+PROJS_by_cursor  function    446 polymnia_projs.c char PROJS_by_cursor (char a_dir, tPROJ **r_proj) { return ySORT_by_cursor (B_PROJ, a_dir, r_proj); }æ
+o___SPECIAL_________o function    453 polymnia_projs.c static void o___SPECIAL_________o () { return; }æ
+PROJS_cli        function    456 polymnia_projs.c PROJS_cli (char a_name [LEN_LABEL])æ
+PROJS_here       function    505 polymnia_projs.c PROJS_here (tPROJ **a_proj)æ
+PROJS_git        function    536 polymnia_projs.c PROJS_git (tPROJ *a_proj)æ
+PROJS_footprint  function    601 polymnia_projs.c PROJS_footprint (tPROJ *a_proj)æ
+o___YJOBS___________o function    740 polymnia_projs.c static void o___YJOBS___________o () { return; }æ
+PROJS_gather     function    743 polymnia_projs.c PROJS_gather (cchar *a_data)æ
+o___REPORTING_______o function    822 polymnia_projs.c static void o___REPORTING_______o () { return; }æ
+PROJS_line       function    825 polymnia_projs.c PROJS_line (tPROJ *a_proj, char a_style, char a_use, char a_pre, int a, char a_print)æ
+o___UNITTEST________o function   1107 polymnia_projs.c static void o___UNITTEST________o () { return; }æ
+PROJS__unit_entry function   1110 polymnia_projs.c PROJS__unit_entry (tPROJ *a_proj)æ
+PROJS__unit_files function   1146 polymnia_projs.c PROJS__unit_files (tPROJ *a_proj)æ
+PROJS__unit      function   1170 polymnia_projs.c PROJS__unit (char *a_question, int i)æ
+##===[[ end-of-file ]]=================================================================================================================================================================#
+
+
+
+
+.SS H) THEIA CONF
+
+.nf
+# theia is the greek titan of sight and the shinning light of the clear blue sky                                                                                                                                                                                                                                   
+                                                                                                                                                                                                                                                                                                                   
+.nf
+# UNITTEST §     § ===[ LOCKED ]======= § t § -0----black----8- § -1-----red-----9- § -2----green----a- § -3----yellow---b- § -4-----blue----c- § -5---magenta---d- § -6-----cyan----e- § -7----brown----f- §                                                                                                      
+# rec type § hex § ---scheme-name------ § y §   norm  §  bright §   norm  §  bright §   norm  §  bright §   norm  §  bright §   norm  §  bright §   norm  §  bright §   norm  §  bright §   norm  §  bright § ---source------------------------------------------------------------------------------------------- 
+foreground § õ60 § unit test mine       § c § õ553311 § õcc8855 § õ880000 § õff0000 § õ007e00 § õ00cc00 § õ555500 § õbbbb00 § õ117788 § õ44bbdd § õ441588 § õ9930ee § õ773300 § õee7700 § õ771055 § õee2299 § custom                                                                                               
+foreground § õ61 § unit test classic    § - § õ000000 § õ404040 § õcd0000 § õff0000 § õ00cd00 § õ00ff00 § õcdcd00 § õffff00 § õ0000cd § õ0000ff § õcd00cd § õff00ff § õ00cdcd § õ00ffff § õfaebd7 § õffffff § http://www.diku.dk/hjemmesider/dikunix/doc/aterm.1.html                                              
+foreground § õ62 § unit test mega       § f § õ881066 § õdd20aa § õ881111 § õcc4545 § õ106e10 § õ20cc20 § õ777700 § õbbbb00 § õ2222ae § õ6644ff § õ551099 § õb030ff § õ664422 § õff8800 § õ104444 § õ208888 § custom                                                                                               
+                                                                                                                                                                                                                                                                                                                   
+.nf
+# end-of-file.  done, finito, completare, whimper [Ï´···                                                                                                                                                                                                                                                           
+
+

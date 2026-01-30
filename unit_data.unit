@@ -1,0 +1,269 @@
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+CONFIG   -÷-  process data                         process                     åabc·········æ  a=dir··········, b=file·········, c=lines········, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=··········· 
+   local      create working variable              - - - - - - - - - - - - -   char    x_source      [LEN_PATH]  = "";                                                                                                                                                                                      
+
+   COND       åabcæ create a header                                              - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((hh.002))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     code     åabcæ change directory               - - - - - - - - - - - - -   chdir ("/tmp");                                                                                                                                                                                                            
+     code     å·bcæ make header name               - - - - - - - - - - - - -   sprintf (x_source, "/tmp/yparse_ps.txt");
+     exec     å·bcæ remove header file             yENV_rm                     x_source                                                                                              c_equal     '-'                                                                                                  
+     exec     å·bcæ create header file             yENV_touch                  x_source                                                  , "root"  , "root"  , "0600"                c_equal     'r'                                                                                                  
+     file     å··cæ read for writing               - - - - - - - - - - - - -   [[ x_source ]]                                                                                                                                                                                                             
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1878  0.0  0.0   7540  3200 tty2     S+   Apr13   0:00 /bin/sh /usr/bin/startx /usr/bin/startfluxbox -- vt7 -verbose 6 -logverbose 6
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1897  0.0  0.0   3980  2432 tty2     S+   Apr13   0:00 xinit /usr/bin/startfluxbox -- /usr/bin/X :0 vt7 -verbose 6 -logverbose 6 -auth /tmp/serverauth.8ECQvHl65Y
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1898  2.3  4.8 530376 380608 tty7    R<sl+ Apr13 7002:29 /usr/bin/X :0 vt7 -verbose 6 -logverbose 6 -auth /tmp/serverauth.8ECQvHl65Y
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1902  0.0  0.0   7540  3200 tty2     S    Apr13   0:00 sh /root/.fluxbox/startup
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1904  0.0  0.1  17876 11136 tty2     S    Apr13  43:04 fluxbox -verbose -sync -log /home/member/l_hlisda/fluxbox_log
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1924  0.0  0.0   4252  2816 tty2     S    Apr13  10:07 unclutter -idle 2 -jitter 10 -root
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      1925  0.0  0.0   7920  6224 tty2     S    Apr13 119:48 xcompmgr -c -C -r15 -o.00 -l5 -t5
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      2266  0.0  0.0   6292  2432 pts/18   S+   Oct16   0:00 make vi_edit
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      2276  0.0  0.1  20276 14868 pts/18   Sl+  Oct16   0:59 vi -c call HBUF_on() -c call HTAG_on() yJOBS.h yJOBS_priv.h yJOBS_act.c yJOBS_args.c yJOBS_base.c yJOBS_db.c yJOBS_dir.c yJOBS_ends.c yJOBS_file.c yJOBS_gather.c yJOBS_in.c yJOBS_maint.c yJOBS_out.c yJOBS_prog.c yJOBS_run.c yJOBS_test.c yJOBS_world.c yJOBS_ySCORE.c
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      3512  0.0  0.1  18172 14204 pts/35   Ss+  Sep13   0:00 -bash
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   root      3924  0.0  0.0   6292  2432 pts/9    S+   Sep04   0:00 make vi_unit
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+CONFIG   -ì-  eos startup                          eos                         åabc·········æ  a=dir··········, b=file·········, c=lines········, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=··········· 
+   local      create working variable              - - - - - - - - - - - - -   char    x_source      [LEN_PATH]  = "";                                                                                                                                                                                      
+
+   COND       åabcæ create a header                                              - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((hh.002))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     code     åabcæ change directory               - - - - - - - - - - - - -   chdir ("/tmp");                                                                                                                                                                                                            
+     code     å·bcæ make header name               - - - - - - - - - - - - -   sprintf (x_source, "/tmp/yparse_eos.txt");
+     exec     å·bcæ remove header file             yENV_rm                     x_source                                                                                              c_equal     '-'                                                                                                  
+     exec     å·bcæ create header file             yENV_touch                  x_source                                                  , "root"  , "root"  , "0600"                c_equal     'r'                                                                                                  
+     file     å··cæ read for writing               - - - - - - - - - - - - -   [[ x_source ]]                                                                                                                                                                                                             
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ start-of-file ]]===============================================================================================================================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #!/sbin/eos
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   GROUP      § PRIORITY     § establish rudamentary environment   § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     config   § hwclock      § set the clock from hardware         § root       §    1s § --·---·-·--- § /sbin/hwclock --hctosys --localtime                                              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     config   § hostname     § set the machines hostname           § root       §    1s § --·---·-·--- § /bin/hostname --file /etc/hostname                                               §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     config   § boot_log     § save a copy of the boot log         § root       §    1s § --·---·-·--- § /bin/dmesg > /var/log/dmesg_after_boot.txt                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     once     § dmesg        § set the kernel logging level        § root       §    1s § --·---·-·--- § /bin/dmesg -n 2                                                                  §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   GROUP      § FILESYSTEM   § establish necessary file systems    § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     AFTER    § PRIORITY     § · · · · · · · · · · · · · · · · · · § · · · · ·  § · · · § · · · · · ·  § · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § devpts_fs    § mount the devpts filesystem         § root       §    1s § --·---·-·--- § /bin/mount    /dev/pts                                                           §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § sys_fs       § mount the sys filesystem            § root       §    1s § --·---·-·--- § /bin/mount    /sys                                                               §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § swap_fs      § mount the swap filesystem           § root       §    1s § --·---·-·--- § /sbin/swapon  /dev/sda2                                                          §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § boot_fs      § mount the boot filesystem           § root       §    1s § --·---·-·--- § /bin/mount    /dev/sda1                                                          §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § shm_fs       § mount the shared memory area        § root       §    1s § --·---·-·--- § /bin/mount    /dev/shm                                                           §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § run_fs       § mount the /run filesystem           § root       §    1s § --·---·-·--- § /bin/mount    /run                                                               §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § tmp_fs       § mount the /tmp filesystem           § root       §    1s § --·---·-·--- § /bin/mount    /tmp                                                               §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § machine      § mount the /home/machine filesystem  § root       §    1s § --·---·-·--- § /bin/mount    /home/machine                                                      §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § system       § mount the /home/system filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /home/system                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § member       § mount the /home/member filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /home/member                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § archive      § mount the /srv/archive filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /srv/archive                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § audio        § mount the /srv/audio filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /srv/audio                                                         §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § video        § mount the /srv/video filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /srv/video                                                         §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § image        § mount the /srv/image filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /srv/image                                                         §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § website      § mount the /srv/website filesystem   § root       §    1s § --·---·-·--- § /bin/mount    /srv/website                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     mount    § exist        § mount the /mnt/exist filesystem     § root       §    1s § --·---·-·--- § /bin/mount    /mnt/exist                                                         §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   GROUP      § USEABILITY   § establish rudamentary environment   § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     AFTER    § FILESYSTEM   § · · · · · · · · · · · · · · · · · · § · · · · ·  § · · · § · · · · · ·  § · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     config   § setfont      § set the console font (cosmetic)     § root       §    1s § --·---·-·--- § /usr/bin/setfont  /usr/share/consolefonts/shrike -m 8859-1                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     config   § loadkeys     § set the keyboard map                § root       §    1s § --·---·-·--- § /usr/bin/loadkeys /home/machine/keyboard/colemak-arensito.map                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##········ § ···name····· § ···description····················· § ···user··· § ·dur· § ··control··· § ···command······································································ §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   GROUP      § DAEMONS      § start critical daemons              § =[ USER ]= § [DUR] § ===[CTRL]=== § =============================[ COMMAND ]======================================== §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     AFTER    § USEABILITY   § · · · · · · · · · · · · · · · · · · § · · · · ·  § · · · § · · · · · ·  § · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · ·  §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     daemon   § hestia       § start the hestia getty daemon       § root       §    1s § --·---·-·--- § /sbin/hestia --loadsharing --aggressive --hardened --12345                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     serial   § getty2       § place standard getty on tty2        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty2                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     serial   § getty3       § place standard getty on tty3        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty3                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     serial   § getty4       § place standard getty on tty4        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty4                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     serial   § getty5       § place standard getty on tty5        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty5                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     serial   § getty6       § place standard getty on tty6        § root       §    1s § --·---·-·--- § /sbin/agetty -i 38400 tty6                                                       §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     daemon   § khronos      § start the khronos daemon            § root       §    1s § --·---·-·--- § /usr/sbin/khronos --daemon --123456789-123456789-123456789-12345                 §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ## end-of-file.  done, finito, completare, whimper.
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ end-of-file ]]=================================================================================================================================================================#
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+CONFIG   -ê-  gyges spreadsheet                    gyges                       åabc·········æ  a=dir··········, b=file·········, c=lines········, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=··········· 
+   local      create working variable              - - - - - - - - - - - - -   char    x_source      [LEN_PATH]  = "";                                                                                                                                                                                      
+
+   COND       åabcæ create a header                                              - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((hh.002))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     code     åabcæ change directory               - - - - - - - - - - - - -   chdir ("/tmp");                                                                                                                                                                                                            
+     code     å·bcæ make header name               - - - - - - - - - - - - -   sprintf (x_source, "/tmp/yparse_gyges.txt");
+     exec     å·bcæ remove header file             yENV_rm                     x_source                                                                                              c_equal     '-'                                                                                                  
+     exec     å·bcæ create header file             yENV_touch                  x_source                                                  , "root"  , "root"  , "0600"                c_equal     'r'                                                                                                  
+     file     å··cæ read for writing               - - - - - - - - - - - - -   [[ x_source ]]                                                                                                                                                                                                             
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ start-of-file ]]===============================================================================================================================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #!/usr/local/bin/gyges
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   s_program    § gyges                § 3.6m  § all²mreg²testing²all²caught²up²with²greater²detai § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   s_oneline    § gyges-hecatoncheires²(hundred-handed)²wicked²technical²spreadsheet § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   s_content    § spreadsheet²data § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   s_filename   § /home/system/gyges.technical_spreadsheet/format.gyges § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   s_written    § 22.04.23.21.36.16.6.16.113 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #===[[ GYGES TABS (UNIVERSE) ]]================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #---verb---- § ---name------------- § ---max---- § t § ---beg---- § ---cur---- § c § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tab          § mouse                § 0z100      § f § 0a1        § 0e20       § y § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #===[[ GYGES DEPENDENT CELLS ]]================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0c15       § >?0--      § +125 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0c17       § >?0--      § abc § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0d15       § >?0--      § =c15+10 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0j6        § ??0--      § =j7 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0d17       § >?0--      § #c17#\"+\" § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0e15       § >?0--      § ~$d15 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0j9        § ??0--      § =j6 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0e17       § >?0--      § ~$d17 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0f15       § >?0--      § ~$d15 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_dep     § 0i6        § ??0--      § =i7 § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #===[[ GYGES FREE CELLS ]]=====================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a25       § ??0--      § ²++ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a26       § ??0--      § ²-- § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a28       § ??0--      § ²yÆ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a29       § ??0--      § ²yÇ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a30       § ??0--      § ²yÈ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   #---verb---- § ---label-- § ---afdu?-- § ---contents------------------------------------------------- § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a31       § ??0--      § ²yÎ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a32       § ??0--      § ²yÉ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a33       § ??0--      § ²yÊ § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a35       § ??0--      § ²(²²) § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   cell_free    § 0a36       § ??0--      § ², § 
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ## end-of-file.  done, finito, completare, whimper.
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ end-of-file ]]=================================================================================================================================================================#
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+CONFIG   -è-  arachne script                       arachne                     åabc·········æ  a=dir··········, b=file·········, c=lines········, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=··········· 
+   local      create working variable              - - - - - - - - - - - - -   char    x_source      [LEN_PATH]  = "";                                                                                                                                                                                      
+
+   COND       åabcæ create a header                                              - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((hh.002))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     code     åabcæ change directory               - - - - - - - - - - - - -   chdir ("/tmp");                                                                                                                                                                                                            
+     code     å·bcæ make header name               - - - - - - - - - - - - -   sprintf (x_source, "/tmp/yparse_arachne.txt");
+     exec     å·bcæ remove header file             yENV_rm                     x_source                                                                                              c_equal     '-'                                                                                                  
+     exec     å·bcæ create header file             yENV_touch                  x_source                                                  , "root"  , "root"  , "0600"                c_equal     'r'                                                                                                  
+     file     å··cæ read for writing               - - - - - - - - - - - - -   [[ x_source ]]                                                                                                                                                                                                             
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ start-of-file ]]===============================================================================================================================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   inizio            § -                  §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     forward    § AA §   0   §     0.00   §     0.00   §     0.00   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            §   1   §      0.0   §      0.0   §      0.0   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   passaggio         § x-axis             §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §     50.0r  §      -.-   §      -.-   § east                 §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [20m] §   -100.0r  §      -.-   §      -.-   § west                 §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §     50.0r  §      -.-   §      -.-   § neutral              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   passaggio         § z-axis             §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §      -.-   §     50.0r  §      -.-   § south                §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [20m] §      -.-   §   -100.0r  §      -.-   § north                §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §      -.-   §     50.0r  §      -.-   § neutral              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   passaggio         § y-axis             §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §      -.-   §      -.-   §     40.0r  § up                   §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [20m] §      -.-   §      -.-   §    -80.0r  § down                 §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §      -.-   §      -.-   §     40.0r  § neutral              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   passaggio         § se-nw              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §     50.0r  §     50.0r  §      -.-   § SE                   §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [20m] §   -100.0r  §   -100.0r  §      -.-   § NW                   §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §     50.0r  §     50.0r  §      -.-   § neutral              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   passaggio         § ne-sw              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     inverse    § AA §   0   §     -.--   §     -.--   §     -.--   § -                    §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §     50.0r  §    -50.0r  §      -.-   § NE                   §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [20m] §   -100.0r  §    100.0r  §      -.-   § SW                   §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -     zero            § [10m] §     50.0r  §    -50.0r  §      -.-   § neutral              §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   finire            § -                  §
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ## end-of-file.  done, finito, completare, whimper.
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ end-of-file ]]=================================================================================================================================================================#
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+CONFIG   -ú-  turtle script                        turtle                      åabc·········æ  a=dir··········, b=file·········, c=lines········, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=··········· 
+   local      create working variable              - - - - - - - - - - - - -   char    x_source      [LEN_PATH]  = "";                                                                                                                                                                                      
+
+   COND       åabcæ create a header                                              - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((hh.002))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     code     åabcæ change directory               - - - - - - - - - - - - -   chdir ("/tmp");                                                                                                                                                                                                            
+     code     å·bcæ make header name               - - - - - - - - - - - - -   sprintf (x_source, "/tmp/yparse_turtle.txt");
+     exec     å·bcæ remove header file             yENV_rm                     x_source                                                                                              c_equal     '-'                                                                                                  
+     exec     å·bcæ create header file             yENV_touch                  x_source                                                  , "root"  , "root"  , "0600"                c_equal     'r'                                                                                                  
+     file     å··cæ read for writing               - - - - - - - - - - - - -   [[ x_source ]]                                                                                                                                                                                                             
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ start-of-file ]]===============================================================================================================================================================#
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_speed (5)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_raise ()
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_wait  (2)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_move  (8)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_wait  (2)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_turn  (-90)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_move  (18)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_turn  (90)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   segno    (!!)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_wait  (2)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_lower ()
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_wait  (2)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      segno    (!!)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -         tu_move  (30)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -         tu_turn  (90)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -         tu_wait  (5)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      ripetere (!!, 3)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_turn  (45)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_raise ()
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_wait  (2)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -      tu_move  (15)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ripetere (!!, 7)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_wait  (2)
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   tu_home  ()
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ²
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ## end-of-file.  done, finito, completare, whimper.
+     append   å··cæ ... add a record               - - - - - - - - - - - - -   ##===[[ end-of-file ]]=================================================================================================================================================================#
+
+
+
+#23456789-12  123456789-123456789-123456789-12345  123456789-123456789-123456  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-  123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-  123456789-123456789- 
+#==(verb)===  ===========(description)===========  =====(function)===========  ========================(arguments)=================================================================  ==(test)==  ==========================(results)=================================================================  ========(var)======= 
+CONFIG   -ÿ-  remove files                         remove                      å············æ  Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=·············, Ï=··········· 
+
+   COND       remove projects                                                    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -   ((hh.002))  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  
+     code     return to project directory          - - - - - - - - - - - - -   chdir  (u_home);                                                                                                                                                                                                           
+     exec     remove file                          yENV_rm                     "/tmp/yparse_ps.txt"                                                                                  c_equal     '-'                                                                                                  
+     exec     remove file                          yENV_rm                     "/tmp/yparse_eos.txt"                                                                                 c_equal     '-'                                                                                                  
+     exec     remove file                          yENV_rm                     "/tmp/yparse_gyges.txt"                                                                               c_equal     '-'                                                                                                  
+     exec     remove file                          yENV_rm                     "/tmp/yparse_arachne.txt"                                                                             c_equal     '-'                                                                                                  
+     exec     remove file                          yENV_rm                     "/tmp/yparse_turtle.txt"                                                                              c_equal     '-'                                                                                                  
+
+
+

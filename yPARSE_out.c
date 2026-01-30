@@ -185,7 +185,7 @@ yparse__push_string     (uchar *a_str)
    }
    x_len = strlen (a_str);
    ystrlcpy  (s, a_str, LEN_RECD);
-   ystrlmark (s, ySTR_HEATHERLY, LEN_RECD);
+   ystrlmark (s, ySTR_HEATH, LEN_RECD);
    /*---(prepare)------------------------*/
    x_type = yparse_specs_next_write ();
    DEBUG_YPARSE   yLOG_schar   (x_type);

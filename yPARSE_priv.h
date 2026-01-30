@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4i"
-#define     P_VERTXT    "minor changes to support library changes"
+#define     P_VERNUM    "0.4j"
+#define     P_VERTXT    "added argus export/exim generalized ability, unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -70,6 +70,8 @@
 #include    <yURG.h>                /* CUSTOM heatherly urgent processing     */
 #include    <yLOG.h>                /* CUSTOM heatherly program logging       */
 #include    <ySTR.h>                /* CUSTOM heatherly string handling       */
+#include    <yENV.h>                /* CUSTOM heatherly string handling       */
+#include    <yCOLOR_solo.h>
 
 
 
@@ -81,6 +83,7 @@
 #define     LEN_LABEL   20
 
 
+typedef struct tm        tTIME;
 
 
 extern char yPARSE__unit_answer [ LEN_STR  ];
@@ -237,9 +240,6 @@ char        yparse_out__count       (void);
 char        yparse_handler_remove   (char *a_verb);
 
 char        yparse__unit_verber     (void);
-char        yparse__unit_quiet      (void);
-char        yparse__unit_loud       (void);
-char        yparse__unit_end        (void);
 
 
 /*===[[ SIMPLE ]]=========================================*/
@@ -274,6 +274,20 @@ char        yparse_fancy__begin     (uchar *a_verb, uchar *a_specs, uchar *a_lab
 char        yparse_fancy_begin      (int n);
 char        yparse_fancy_end        (int c);
 char        yparse_fancy_break      (int c);;
+
+
+
+/*===[[ yPARSE_exim.c ]]======================================================*/
+/*········´ ´···········interpret·´ ´·········································*/
+char        yparse__exim_prepare    (char *a_parser, char r_feedback [LEN_RECD]);
+char        yparse__exim_clear      (char *r_width, char *r_gap, char *r_dots, char *r_suffix, char r_field [LEN_RECD], char *r_delm, char *r_algn, char *r_form, char *r_decs, char *r_unit, char r_check [LEN_HUND]);
+char        yparse__exim_title      (char a_ch, char a_curr [LEN_TERSE], char *b_width, char *b_gap, char *b_dots, char *b_suffix, char b_field [LEN_RECD], char r_check [LEN_HUND]);
+char        yparse__exim_suffix     (char a_ch, char a_width, char *b_suffix, char *r_delm, char *r_algn, char *r_form, char *r_decs, char *r_unit, char r_check [LEN_HUND]);
+char        yparse__exim_field      (char *b_count, char a_ch, char a_width, char a_gap, char a_field [LEN_FULL], char a_delm, char a_algn, char a_form, char a_decs, char a_unit, char b_header [LEN_RECD], char b_break [LEN_RECD], char b_control [LEN_RECD]);
+char        yPARSE_interpret        (char *a_parser, char *r_header, char *r_break, int a_max, char r_control [LEN_RECD], char r_feedback [LEN_RECD]);
+/*········´ ´··············export·´ ´·········································*/
+/*········´ ´··············import·´ ´·········································*/
+/*········´ ´················DONE·´ ´·········································*/
 
 
 

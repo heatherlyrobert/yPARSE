@@ -1,0 +1,110 @@
+.TH yPARSE_stds· 5 2015-jun "linux" "interfacing applications with library"
+
+.SH NAME
+.B yPARSE
+- text file parsing and aggregating library
+
+.SH PATRON
+.B jupiter-terminus (boundaries)
+god of boundaries and markers
+
+.SH IMAGERY
+head and torso of a man, connected to a boundary stone as a base
+
+.SH SUMMARY
+standardizes the reading/parsing and writing/aggregating of structured,
+multi-type, ascii-text data streams and files required by most non-trivial
+applications than dont require a binary database.
+
+.SH DOCUMENTATION FILES
+.nf  
+.B yPARSE (3) ´´´´´´´´ overall discussion
+yPARSE_config (3)   general startup and shutdown
+yPARSE_input (3)    structure of config, files, and streams
+yPARSE_output (3)   structure of config, files, and streams
+yPARSE (5)          target data files and streams structure
+yPARSE_stds (5)     field length standards
+yPARSE (7)          decision rationale, scope, and objectives
+
+.SH TABLE OF CONTENTS
+.nf  
+a) synopsis        command line options overview
+b) user-mode       detailed command line options
+c) daemon-mode     detailed command line options
+
+.SH A) OVERVIEW
+yPARSE_stds will cover the standard input/output field specifications and
+how they are defined.  while being exact might be fun, generalizing field
+types allows a great deal of low complexity, shared usage.
+
+.SH B) RECORD SPECIFICATION
+each field specification is a single letter and a record specification is
+then an ordered string of field letters.
+
+.nf
+ex, for gyges
+  --  ---name---- -spec--  cnt   ----translated fields------------------
+   1  tabs·········LTcTTc···6····LABEL, TERSE, char, TERSE, TERSE, char
+   2  width········Tss······3····TERSE, short, short
+   3  height·······Tss······3····TERSE, short, short
+   4  free cells···TTO······3····TERSE, TERSE, remainder
+   5  dep cells····TTO······3····TERSE, TERSE, remainder
+
+.SH C) NUMERIC FIELDS
+there are 14 standard numeric field specifications.  if you what something
+more specific, simply print to a string and output that to an an appropriately
+long string field.
+
+.SS character
+c      char            
+
+.SS integers
+s      short            3    ¬                 -99 to 999                  ¬
+i      int              6    ¬             -999999 to 999999               ¬
+l      llong           10    ¬          -999999999 to 9999999999           ¬
+h      huge llong      16    ¬    -999999999999998 to 9999999999999998     ¬
+
+.SS integers with commas
+,      comma int       10    ¬          -9,999,999 to 99,999,999           ¬
+;      comma llong     19    ¬ -99,999,999,999,999 to 999,999,999,999,999  ¬
+
+.SS floats
+k      kinematics      6/1   ¬              -999.9 to 9999.9               ¬
+f      float           8/2   ¬            -9999.99 to 99999.99             ¬
+d      double         10/3   ¬          -99999.999 to 999999.999           ¬
+t      technical      18/6   ¬  -9999999999.999999 to 99999999999.999999   ¬
+
+.SS exponential format
+e      s.exponent      2/3   ¬
+m      m.exponent      2.7   ¬
+b      b.exponent      2/12  ¬
+
+.SH D) STRING FIELDS
+there are 15 standard string field specifications.  if you want something more
+specific just round up and trim later.
+
+.SS character
+C      char            1.1s
+
+.SS short
+S      LEN_SHORT       5.5s
+T      LEN_TERSE      10.10s
+U      LEN_USER       12.12s
+L      LEN_LABEL      20.20s
+
+.SS medium
+3      LEN_TITLE      30.30s
+4      40             40.40s
+D      LEN_DESC       50.50s
+6      60             60.60s
+7      70             70.70s
+8      80             80.80s
+
+.SS long
+H      LEN_HUND      100.100s
+F      LEN_FULL      200.200s
+R      LEN_RECD     2000.2000s
+O      all remaining
+
+.SH E) SKIPPING
+-      skip field
