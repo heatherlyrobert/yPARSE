@@ -417,8 +417,10 @@ static char  s_break    [LEN_RECD]  = "";
 static char  s_control  [LEN_RECD]  = "";
 static char  s_feedback [LEN_RECD]  = "";
 static int   s_count    =   0;
+static int   s_len      =   0;
 static char  s_exim     =  '-';
 static char  s_titles   =  '-';
+static char  s_group    =  '-';
 
 char*
 yparse__exim_timestamp  (void)
@@ -439,8 +441,10 @@ char
 yparse__export_clear    (void)
 {
    s_count  = 0;
+   s_len    = 0;
    s_exim   = '-';
    s_titles = '-';
+   s_group  = '-';
    strcpy (s_parser   , "");
    strcpy (s_header   , "");
    strcpy (s_break    , "");
@@ -491,8 +495,29 @@ yPARSE_export_header    (char a_file [LEN_PATH], char a_fullname [LEN_HUND], cha
    }
    /*---(update count)-------------------*/
    s_count  = 0;
+   s_len    = strlen (s_header);
    s_exim   = c_exim;
    s_titles = c_titles;
+   /*---(complete)-----------------------*/
+   return 1;
+}
+
+char
+yPARSE_export_group     (char a_content [LEN_RECD])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        l           =    0;
+   /*---(defense)------------------------*/
+   --rce;  if (a_content   == NULL)  return rce;
+   /*---(handle line)--------------------*/
+   l = s_len - strlen (a_content) - 7;
+   fprintf (s_output, "\n\n##=== %s %*.*s\n", a_content, l, l, YSTR_EQUAL);
+   /*---(handle titles)------------------*/
+   if (s_titles == 'y') fprintf (s_output, "%s\n\n", s_header);
+   /*---(update count)-------------------*/
+   s_count = 0;
+   s_group = 'y';
    /*---(complete)-----------------------*/
    return 1;
 }
@@ -505,7 +530,7 @@ yPARSE_export_line      (char a_content [LEN_RECD])
    /*---(defense)------------------------*/
    --rce;  if (a_content   == NULL)  return rce;
    /*---(handle titles)------------------*/
-   if (s_titles == 'y') {
+   if (s_titles == 'y' && s_group == '-') {
       if      (s_count % 25 == 0) fprintf (s_output, "\n%s\n\n", s_header);
       else if (s_count %  5 == 0) fprintf (s_output, "\n%s\n\n", s_break);
    }
@@ -513,12 +538,13 @@ yPARSE_export_line      (char a_content [LEN_RECD])
    fprintf (s_output, "%s\n", a_content);
    /*---(update count)-------------------*/
    ++s_count;
+   s_group = '-';
    /*---(complete)-----------------------*/
    return 1;
 }
 
 char
-yPARSE_export_footer    (void)
+yPARSE_export_footer    (char a_total [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -527,6 +553,7 @@ yPARSE_export_footer    (void)
    if (s_titles == 'y' && s_count %  5 >= 3) fprintf (s_output, "\n%s\n", s_break);
    if (s_exim   == 'y') {
       if (s_titles == 'y') fprintf (s_output, "\n");
+      if (a_total != NULL && a_total [0] != '\0') fprintf (s_output, "%s\n\n", a_total);
       fprintf (s_output, "#ÿ end-of-data.  fatto, completare, finito, morto, sepolta, y la signora grassa sta cantando.\n");
    }
    /*---(close output)-------------------*/
