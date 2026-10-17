@@ -1,6 +1,38 @@
 /*============================[[    beg-code    ]]============================*/
+/*········´ ´·············headers·´ ´·········································*/
 #include    "yPARSE.h"
 #include    "yPARSE_priv.h"
+
+
+
+/*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
+/*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
+
+#define  P_COPYRIGHT   \
+   "copyright (c) 2018 robert.s.heatherly at balsashrike at gmail dot com"
+
+#define  P_LICENSE     \
+   "the only place you could have gotten this code is my github, my website,¦"   \
+   "or illegal sharing. given that, you should be aware that this is GPL licensed."
+
+#define  P_COPYLEFT    \
+   "the GPL COPYLEFT REQUIREMENT means any modifications or derivative works¦"   \
+   "must be released under the same GPL license, i.e, must be free and open."
+
+#define  P_INCLUDE     \
+   "the GPL DOCUMENTATION REQUIREMENT means that you must include the original¦" \
+   "copyright notice and the full licence text with any resulting anything."
+
+#define  P_AS_IS       \
+   "the GPL NO WARRANTY CLAUSE means the software is provided without any¦"      \
+   "warranty and the author cannot be held liable for damages."
+
+#define  P_THEFT    \
+   "if you knowingly violate the spirit of these ideas, i suspect you might "    \
+   "find any number of freedom-minded hackers may take it quite personally ;)"
+
+/*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
+/*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
 
 /*
  *  readers and writers must accept two arguments...
@@ -106,7 +138,7 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
    /*> DEBUG_YPARSE   yLOG_sint    (n);                                               <*/
    /*> DEBUG_YPARSE   yLOG_snote   (x_last);                                          <*/
    /*> if (n >= 0 && strcmp (a_verb, x_last) == 0) {                                  <* 
-    *>    if (a_queue != NULL)  a_queue->iverb = n;                                   <* 
+    *>    if (a_queue != NULL)  a_queue->q_iverb = n;                                   <* 
     *>    DEBUG_YPARSE   yLOG_snote   ("short-cut");                                  <* 
     *>    DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);                                 <* 
     *>    return n;                                                                   <* 
@@ -128,12 +160,12 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
    /*---(save)---------------------------*/
    ystrlcpy (x_last, a_verb, LEN_LABEL);
    if (a_queue != NULL) {
-      a_queue->iverb   = n;
+      a_queue->q_iverb   = n;
       if (n >= 0) {
-         if (a_queue == &s_qin)  a_queue->handler = s_verbs [n].reader;
-         else                    a_queue->handler = s_verbs [n].writer;
+         if (a_queue == &s_qin)  a_queue->q_handler = s_verbs [n].reader;
+         else                    a_queue->q_handler = s_verbs [n].writer;
       } else {
-         a_queue->handler = NULL;
+         a_queue->q_handler = NULL;
       }
    }
    DEBUG_YPARSE   yLOG_sint    (n);
@@ -148,19 +180,19 @@ char yparse_verb_mask        (int n) { return s_verbs [n].mask; }
 char
 yparse_specs_next_write  (void)
 {
-   if (s_qout.iverb <  0       )  return -2;
-   if (s_qout.count <  0       )  return -3;
-   if (s_qout.count >= MAX_COLS)  return -4;
-   return s_verbs [s_qout.iverb].specs [s_qout.count - 1];
+   if (s_qout.q_iverb <  0       )  return -2;
+   if (s_qout.q_count <  0       )  return -3;
+   if (s_qout.q_count >= MAX_COLS)  return -4;
+   return s_verbs [s_qout.q_iverb].specs [s_qout.q_count - 1];
 }
 
 char
 yparse_specs_next_read  (void)
 {
-   if (s_qin.iverb <  0       )  return -2;
-   if (s_qin.first <  0       )  return -3;
-   if (s_qin.first >= MAX_COLS)  return -4;
-   return s_verbs [s_qin.iverb].specs [s_qin.first - 1];
+   if (s_qin.q_iverb <  0       )  return -2;
+   if (s_qin.q_first <  0       )  return -3;
+   if (s_qin.q_first >= MAX_COLS)  return -4;
+   return s_verbs [s_qin.q_iverb].specs [s_qin.q_first - 1];
 }
 
 char
@@ -169,11 +201,11 @@ yparse_specs_len        (tQUEUE *a_queue)
    int         i           =    0;
    int         n           =    1;   /* start with one for verb  */
    if (a_queue        == NULL)  return -1;
-   if (a_queue->iverb <  0   )  return -2;
-   /*> DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->iverb].specs);    <*/
+   if (a_queue->q_iverb <  0   )  return -2;
+   /*> DEBUG_YPARSE   yLOG_info    ("spec"      , s_verbs [a_queue->q_iverb].specs);    <*/
    for (i = 0; i < MAX_COLS; ++i) {
-      if (s_verbs [a_queue->iverb].specs [i] == '\0')   break;
-      /*> if (s_verbs [a_queue->iverb].specs [i] == '-')    break;                    <*/
+      if (s_verbs [a_queue->q_iverb].specs [i] == '\0')   break;
+      /*> if (s_verbs [a_queue->q_iverb].specs [i] == '-')    break;                    <*/
       ++n;
    }
    return n;
@@ -289,8 +321,8 @@ yparse_fancy__write     (uchar *a_line)
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.file);
-   --rce;  if (s_qout.file == NULL) {
+   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
+   --rce;  if (s_qout.q_file == NULL) {
       DEBUG_YPARSE   yLOG_snote   ("file not open");
       return rce;
    }
@@ -300,7 +332,7 @@ yparse_fancy__write     (uchar *a_line)
       return rce;
    }
    /*---(print)--------------------------*/
-   fprintf (s_qout.file, "%s\n", a_line);
+   fprintf (s_qout.q_file, "%s\n", a_line);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -451,8 +483,8 @@ yPARSE_spacer           (char a_lines)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.file);
-   --rce;  if (s_qout.file == NULL) {
+   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
+   --rce;  if (s_qout.q_file == NULL) {
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -461,7 +493,7 @@ yPARSE_spacer           (char a_lines)
    DEBUG_YPARSE  yLOG_snote   ("print");
    if (a_lines < 1)  a_lines = 1;
    if (a_lines > 5)  a_lines = 5;
-   for (i = 0; i < a_lines; ++i)   fprintf  (s_qout.file, "\n");
+   for (i = 0; i < a_lines; ++i)   fprintf  (s_qout.q_file, "\n");
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
@@ -647,7 +679,7 @@ yPARSE_write_all        (void)
       DEBUG_INPT  yLOG_point   ("reader"    , s_verbs [x_next].writer);
       if (s_verbs [x_next].writer == NULL)  continue;
       /*---(handle)----------------------*/
-      rc = s_verbs [x_next].writer (s_qout.tline, s_verbs [x_next].verb);
+      rc = s_verbs [x_next].writer (s_qout.q_tline, s_verbs [x_next].verb);
       if (rc >= 0)  c += rc;
    }
    /*---(complete)-----------------------*/
@@ -691,7 +723,7 @@ yPARSE_read_all         (void)
          DEBUG_YPARSE   yLOG_note    ("reader not assigned");
          continue;
       }
-      rc = s_verbs [n].reader (s_qin.tline, x_verb);
+      rc = s_verbs [n].reader (s_qin.q_tline, x_verb);
       if (rc < 0)  {
          DEBUG_YPARSE   yLOG_note    ("handler not successful");
          continue;

@@ -1,6 +1,38 @@
 /*============================[[    beg-code    ]]============================*/
-#ifndef   YPARSE_PGUARD
-#define   YPARSE_PGUARD       loaded
+/*········´ ´···············guard·´ ´·········································*/
+#ifndef     YPARSE_priv_guard
+#define     YPARSE_priv_guard       loaded
+
+
+
+/*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
+/*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
+
+#define  P_COPYRIGHT   \
+   "copyright (c) 2018 robert.s.heatherly at balsashrike at gmail dot com"
+
+#define  P_LICENSE     \
+   "the only place you could have gotten this code is my github, my website,¦"   \
+   "or illegal sharing. given that, you should be aware that this is GPL licensed."
+
+#define  P_COPYLEFT    \
+   "the GPL COPYLEFT REQUIREMENT means any modifications or derivative works¦"   \
+   "must be released under the same GPL license, i.e, must be free and open."
+
+#define  P_INCLUDE     \
+   "the GPL DOCUMENTATION REQUIREMENT means that you must include the original¦" \
+   "copyright notice and the full licence text with any resulting anything."
+
+#define  P_AS_IS       \
+   "the GPL NO WARRANTY CLAUSE means the software is provided without any¦"      \
+   "warranty and the author cannot be held liable for damages."
+
+#define  P_THEFT    \
+   "if you knowingly violate the spirit of these ideas, i suspect you might "    \
+   "find any number of freedom-minded hackers may take it quite personally ;)"
+
+/*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
+/*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
 
 #include    "yPARSE.h"
 
@@ -37,9 +69,9 @@
 #define     P_CREATED   "2018-01"
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
-#define     P_VERMINOR  "0.4-, update, fix, and tighten"
-#define     P_VERNUM    "0.4k"
-#define     P_VERTXT    "updates to export/exim to allow grouping and a total line"
+#define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
+#define     P_VERNUM    "0.5a"
+#define     P_VERTXT    "yPARSE_queue updating of structure, init, purge, reset, entry"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -113,7 +145,7 @@ extern   tACCESSOR  myPARSE;
 typedef     struct      cNODE       tNODE;
 struct      cNODE {
    int         ref;
-   uchar      *item;
+   uchar      *n_item;
    tNODE      *next;
    tNODE      *prev;
 };
@@ -123,25 +155,28 @@ struct      cNODE {
 typedef     struct      cQUEUE      tQUEUE;
 struct      cQUEUE {
    /*---(master)------------*/
-   char        label       [LEN_LABEL];   /* queue descriptive label          */
-   int         iverb;                     /* verb index                       */
-   char      (*handler)      (int n, char *a_verb);
-   char        good;
-   char        hidden;
+   char        q_dir;                     /* I=in, O=out                      */
+   char        q_label     [LEN_SHORT];   /* queue descriptive label          */
+   int         q_iverb;                   /* verb index                       */
+   char      (*q_handler)  (int n, char *a_verb);
+   /*---(status)------------*/
+   char        q_good;
+   char        q_hidden;
    /*---(file)--------------*/
-   char       *loc;
-   FILE       *file;
-   int         tline;                           /* line number in source      */
-   int         nline;                           /* line number of accepted    */
-   int         cline;                           /* current line in use        */
+   char        q_loc       [LEN_PATH];    /* attached file name               */
+   FILE       *q_file;                    /* attached file pointer            */
+   /*---(statistics)--------*/
+   int         q_tline;                   /* line number in source            */
+   int         q_nline;                   /* line number of accepted          */
+   int         q_cline;                   /* current line in use              */
    /*---(record)------------*/
-   uchar       recd        [LEN_RECD];
-   int         len;
+   uchar       q_recd      [LEN_RECD];    /* current record text              */
+   int         q_len;                     /* current record length            */
    /*---(fields)------------*/
-   tNODE      *head;
-   tNODE      *tail;
-   int         first;
-   int         count;
+   tNODE      *q_head;
+   tNODE      *q_tail;
+   int         q_first;
+   int         q_count;
    /*---(done)--------------*/
 };
 extern     tQUEUE      s_qin;
@@ -161,6 +196,26 @@ extern      tMOCK       g_mocks     [10];
 extern      int         g_nmock;
 
 
+
+/*===[[ yPARSE_queue.c ]]=====================================================*/
+/*········´ ´·············program·´ ´·········································*/
+char        yparse_queue_init       (tQUEUE *a_queue, char a_dir, char a_label [LEN_SHORT]);
+char        yparse_queue_purge      (tQUEUE *a_queue);
+char        yparse_queue_reset      (tQUEUE *a_queue);
+char        yparse_queue_rando      (tQUEUE *a_queue);
+char*       yparse_queue_entry      (tQUEUE *a_queue);
+/*········´ ´··············access·´ ´·········································*/
+char        yparse_queue__defense   (tQUEUE *a_queue);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+
+
+
+
+
+
 char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 
 char        yparse_in_variadic      (va_list a_vlist, int n);
@@ -172,7 +227,6 @@ char*       yparse_base__unit       (char *a_question, int a_num);
 char        yparse_init_types       (void);
 
 
-char        yparse__check           (char *a_name, char a_mode);
 char        yparse_open             (tQUEUE *a_queue, char *a_name);
 char        yparse_close            (tQUEUE *a_queue);
 char        yparse_good_in          (void);
@@ -185,13 +239,8 @@ char        yparse_verb_init        (void);
 char        yparse__verb_divider    (int a_iverb);
 char*       yparse__unit_verb       (char *a_question, char *a_verb, int a_seq);
 
-char        yparse_init             (tQUEUE *a_queue, char *a_label);
-char        yparse_purge            (tQUEUE *a_queue);
-char        yparse_reset            (tQUEUE *a_queue);
 char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
-char        yparse_enqueue_full     (tQUEUE *a_queue, char *a_item);
 char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);
-char        yparse_dequeue_full     (tQUEUE *a_queue, char *a_item);
 char        yparse_topqueue         (tQUEUE *a_queue, char *a_item);
 char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
 char        yparse_peek_verb        (int *a_index, char *a_verb);

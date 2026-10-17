@@ -1,7 +1,40 @@
 /*============================[[    beg-code    ]]============================*/
+/*········´ ´···············guard·´ ´·········································*/
+#ifndef     YPARSE_guard  
+#define     YPARSE_guard            loaded
 
-#ifndef   YPARSE_HGUARD
-#define   YPARSE_HGUARD       loaded
+
+
+/*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
+/*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
+
+#define  P_COPYRIGHT   \
+   "copyright (c) 2018 robert.s.heatherly at balsashrike at gmail dot com"
+
+#define  P_LICENSE     \
+   "the only place you could have gotten this code is my github, my website,¦"   \
+   "or illegal sharing. given that, you should be aware that this is GPL licensed."
+
+#define  P_COPYLEFT    \
+   "the GPL COPYLEFT REQUIREMENT means any modifications or derivative works¦"   \
+   "must be released under the same GPL license, i.e, must be free and open."
+
+#define  P_INCLUDE     \
+   "the GPL DOCUMENTATION REQUIREMENT means that you must include the original¦" \
+   "copyright notice and the full licence text with any resulting anything."
+
+#define  P_AS_IS       \
+   "the GPL NO WARRANTY CLAUSE means the software is provided without any¦"      \
+   "warranty and the author cannot be held liable for damages."
+
+#define  P_THEFT    \
+   "if you knowingly violate the spirit of these ideas, i suspect you might "    \
+   "find any number of freedom-minded hackers may take it quite personally ;)"
+
+/*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
+/*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
+
+
 
 #include    <ySTR_solo.h> 
 
@@ -22,17 +55,38 @@
 
 /*---(myPARSE.delimiters)-------------*/
 #define     YPARSE_FUNCTION         'a'
+#define     YPARSE_FUNCTIONS        "§(,)"
 #define     YPARSE_FIELD            'f'
+#define     YPARSE_FIELDS           "§"
 #define     YPARSE_TRADITION        't'
-#define     YPARSE_DELIMS           "aft"
-
-/*---(myPARSE.delimiters)-------------*/
+#define     YPARSE_TRADITIONS       ""
+#define     YPARSE_DELIMS           "-aft"
+/*---(myPARSE.fill)-------------------*/
 #define     YPARSE_FILL             'y'
 #define     YPARSE_NOFILL           '-'
+#define     YPARSE_FILLS            "y-"
+
 
 
 typedef long long      llong;
 typedef unsigned char  uchar;
+
+
+
+/*===[[ yPARSE_base.c ]]======================================================*/
+/*········´ ´·············utility·´ ´·········································*/
+char       *yPARSE_version          (void);
+/*········´ ´··············config·´ ´·········································*/
+char        yPARSE_delimiters       (char a_delim, char a_fill);
+char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
+/*········´ ´·············program·´ ´·········································*/
+char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+char        yPARSE_wrap             (void);
+/*········´ ´···········unit-test·´ ´·········································*/
+char        yPARSE_force            (void);
+/*········´ ´················DONE·´ ´·········································*/
+
+
 
 
 /*===[[ SIMPLE ]]=========================================*/
@@ -56,11 +110,10 @@ char        yPARSE_set_reuse        (void);
 
 
 
+
+
 /*---(yPARSE_shared.c)------*/
-char       *yPARSE_version          (void);
 /*> char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);   <*/
-char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
-char        yPARSE_wrap             (void);
 char        yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler);
 
 
@@ -108,7 +161,6 @@ char        yPARSE_reset_out        (void);
 
 /*---(yPARSE_in.c)----------*/
 char        yPARSE_ready            (int *a_count);
-char        yPARSE_delimiters       (uchar a_type);
 char        yPARSE_toss             (void);
 char        yPARSE_top              (char *a_item);
 char        yPARSE_popstr           (char *a_item);
@@ -122,8 +174,8 @@ char        yPARSE_popfloat         (float  *a_new);
 char        yPARSE_popdouble        (double *a_new);
 char        yPARSE_popexp           (double *a_new);
 
-char        yPARSE_qin_info         (char *a_label, char *a_loc, void **a_file, int *t);
-char        yPARSE_qout_info        (char *a_label, char *a_loc, void **a_file, int *t);
+char        yPARSE_qin_info          (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_total);
+char        yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_total);
 
 
 /*---(yPARSE_out.c)---------*/
@@ -152,7 +204,6 @@ char*       yPARSE_outrecd          (void);
 
 
 /*---(external testing)-----*/
-char        yPARSE_force            (void);
 char        yPARSE_push             (char *a_item);
 
 

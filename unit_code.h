@@ -4,4 +4,6 @@
 char        yparse__unit_quiet      (void);
 char        yparse__unit_loud       (void);
 char        yparse__unit_end        (void);
+/*········´ ´················data·´ ´·········································*/
+char       *yparse_config_status    (void);
 /*········´ ´················DONE·´ ´·········································*/
