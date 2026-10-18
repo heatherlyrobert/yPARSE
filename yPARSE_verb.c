@@ -223,8 +223,8 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
    char        x_specs     [LEN_TITLE] = "";
    int         l           =    0;
    /*---(defense)------------------------*/
-   if (myPARSE.ready != 'y')  return -1;
-   if (a_verb == NULL)        return -2;
+   if (myPARSE.y_ready != 'y')  return -1;
+   if (a_verb == NULL)          return -2;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(note)---------------------------*/
@@ -232,7 +232,7 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
       DEBUG_YPARSE   yLOG_info    ("a_desc"    , a_desc);
    }
    /*---(check verb)---------------------*/
-   if (myPARSE.verbs  != YPARSE_MANUAL) {
+   if (myPARSE.y_verbs  != YPARSE_MANUAL) {
       rc = ystrlgood (a_verb, ySTR_ALNUM, LEN_USER);
       --rce;  if (rc < 0) {
          DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -706,7 +706,7 @@ yPARSE_read_all         (void)
          DEBUG_YPARSE   yLOG_note    ("end-of-file");
          break;
       }
-      /*> printf ("%s\n", myPARSE.recd);                                              <*/
+      /*> printf ("%s\n", myPARSE.y_recd);                                              <*/
       if (rc <  0)  {
          DEBUG_YPARSE   yLOG_note    ("trouble reading record");
          continue;

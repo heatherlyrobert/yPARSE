@@ -130,11 +130,11 @@ yparse_out_defense      (void)
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    /*---(defense)------------------------*/
-   --rce;  if (myPARSE.ready != 'y')  {
+   --rce;  if (myPARSE.y_ready != 'y')  {
       DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_config () first");
       return rce;
    }
-   --rce;  if (myPARSE.verbs != YPARSE_SIMPLE && strchr ("-y", s_qout.q_good) == NULL)  {
+   --rce;  if (myPARSE.y_verbs != YPARSE_SIMPLE && strchr ("-y", s_qout.q_good) == NULL)  {
       DEBUG_YPARSE   yLOG_snote   ("output record has failed");
       return rce;
    }
@@ -639,7 +639,7 @@ yPARSE_write            (int *n, int *c)
       return 0;
    }
    /*---(write)--------------------------*/
-   ystrlcpy  (myPARSE.recd, s_qout.q_recd, LEN_RECD);
+   ystrlcpy  (myPARSE.y_recd, s_qout.q_recd, LEN_RECD);
    ystrlcpy  (t, s_qout.q_recd, LEN_RECD);
    ystrldchg (t, G_CHAR_FIELD, G_KEY_FIELD, LEN_RECD);
    if (s_qout.q_file != NULL)   fprintf  (s_qout.q_file, "%s\n", t);
@@ -731,8 +731,8 @@ yparse_out_variadic    (va_list a_vlist, int n)
 /*====================------------------------------------====================*/
 static void      o___FILES___________________o (void) {;};
 
-char yPARSE_stdout     (void)          { return yparse_open  (&s_qout, "stdout"); }
-char yPARSE_tmpout     (void)          { return yparse_open  (&s_qout, "/tmp/yparse.txt"); }
+char yPARSE_stdout     (void)          { return yparse_queue_open  (&s_qout, "stdout"); }
+char yPARSE_tmpout     (void)          { return yparse_queue_open  (&s_qout, "/tmp/yparse.txt"); }
 
 char
 yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc)
@@ -743,7 +743,7 @@ yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(open)---------------------------*/
-   rc = yparse_open  (&s_qout, a_name);
+   rc = yparse_queue_open  (&s_qout, a_name);
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
       return rc;
@@ -769,7 +769,7 @@ yPARSE_close_out  (void)
    yPARSE_spacer  (3);
    if (s_qout.q_file != NULL)   fprintf (s_qout.q_file, "# end-of-file.  done, finito, completare, whimper [Ï´···\n");
    /*---(close)--------------------------*/
-   rc = yparse_close (&s_qout);
+   rc = yparse_queue_close (&s_qout);
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
       return rc;

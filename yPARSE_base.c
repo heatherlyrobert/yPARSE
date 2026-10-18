@@ -35,9 +35,14 @@
 /*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
 
 
-
 /*--------- ----------- ----------- ----------- ------------------------------*/
-tACCESSOR   myPARSE = { 0, '-', '-', '-', "|§", '-', NULL, 'y', "", "", "", '-', 0, 0, '-' };
+tACCESSOR   myPARSE = {
+   0, '-',
+   YPARSE_MANUAL, NULL, YPARSE_ONETIME,
+   '-', YPARSE_FIELDS, YPARSE_NOFILL,
+   "", "", '-', 0
+};
+
 static      char        yPARSE_ver  [200] = "";
 
 
@@ -76,173 +81,27 @@ static void      o___PROGRAM_________________o (void) {;}
  *> {                                                                                           <* 
  *>    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);                                               <* 
  *>    DEBUG_YPARSE  yLOG_char    ("a_reusing" , a_reusing);                                    <* 
- *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);                              <* 
- *>    myPARSE.verbs   = a_auto;                                                                <* 
- *>    myPARSE.verber  = a_verber;                                                              <* 
- *>    myPARSE.ready   = 'y';                                                                   <* 
- *>    myPARSE.reusing = a_reusing;                                                             <* 
- *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);                              <* 
+ *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
+ *>    myPARSE.y_verbs   = a_auto;                                                                <* 
+ *>    myPARSE.y_verber  = a_verber;                                                              <* 
+ *>    myPARSE.y_ready   = 'y';                                                                   <* 
+ *>    myPARSE.y_reusing = a_reusing;                                                             <* 
+ *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
  *>    yparse_init_types ();                                                                    <* 
  *>    yparse_verb_init  ();                                                                    <* 
  *>    yparse_init_in    ();                                                                    <* 
  *>    yparse_init_out   ();                                                                    <* 
- *>    yparse_initline   ();                                                                    <* 
+ *>    yparse_line_init  ();                                                                    <* 
  *>    /+> yPARSE_delimiters (YPARSE_FIELD);                                              <+/   <* 
- *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.reusing);                              <* 
+ *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
  *>    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);                                               <* 
  *>    return 0;                                                                                <* 
  *> }                                                                                           <*/
-char
-yparse__clear           (void)
-{
-   myPARSE.verbs   = YPARSE_MANUAL;
-   myPARSE.verber  = NULL;
-   myPARSE.reusing = YPARSE_ONETIME;
-   strcpy (myPARSE.delimiters, "");
-   myPARSE.delims  = '-';
-   myPARSE.fill    = '-';
-   myPARSE.ready   = '-';
-   return 0;
-}
 
 char
 yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler)
 {
    return 0;
-}
-
-char
-yPARSE_delimiters       (char a_delim, char a_fill)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_char    ("a_delim"   , a_delim);
-   DEBUG_YPARSE  yLOG_info    ("valid"     , YPARSE_DELIMS);
-   --rce;  if (a_delim == '\0' || strchr (YPARSE_DELIMS, a_delim) == NULL) {
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_char    ("a_fill"    , a_fill);
-   DEBUG_YPARSE  yLOG_info    ("valid"     , YPARSE_FILLS);
-   --rce;  if (a_fill == '\0' || strchr (YPARSE_FILLS, a_fill) == NULL) {
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(set delimiters)-----------------*/
-   switch (a_delim) {
-   case YPARSE_FUNCTION  :
-      ystrlcpy (myPARSE.delimiters, YPARSE_FUNCTIONS , LEN_LABEL);
-      break;
-   case YPARSE_TRADITION :
-      ystrlcpy (myPARSE.delimiters, YPARSE_TRADITIONS, LEN_LABEL);
-      break;
-   case YPARSE_FIELD     : default :
-      ystrlcpy (myPARSE.delimiters, YPARSE_FIELDS    , LEN_LABEL);
-      a_delim = YPARSE_FIELD;
-      break;
-   }
-   DEBUG_YPARSE  yLOG_info    ("delimit"   , myPARSE.delimiters);
-   /*---(set global)---------------------*/
-   myPARSE.delims = a_delim;
-   myPARSE.fill   = a_fill;
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 1;
-}
-
-char
-yPARSE_verber           (char a_auto, void *a_verber, char a_reusing)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_char    ("a_auto"    , a_auto);
-   DEBUG_YPARSE  yLOG_info    ("valid"     , YPARSE_VERBS);
-   --rce;  if (a_auto == '\0' || strchr (YPARSE_VERBS, a_auto) == NULL) {
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(reusing)------------------------*/
-   DEBUG_YPARSE  yLOG_char    ("a_reusing" , a_reusing);
-   DEBUG_YPARSE  yLOG_info    ("valid"     , YPARSE_REUSES);
-   --rce;  if (a_reusing == '\0' || strchr (YPARSE_REUSES, a_reusing) == NULL) {
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(set global)---------------------*/
-   myPARSE.verbs   = a_auto;
-   myPARSE.verber  = a_verber;
-   myPARSE.reusing = a_reusing;
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 1;
-}
-
-char
-yparse__config           (char a_1st, char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(reset all)----------------------*/
-   rc = yparse__clear ();
-   DEBUG_YPARSE  yLOG_value   ("clear"     , rc);
-   /*---(verber)-------------------------*/
-   rc = yPARSE_verber (a_auto, a_verber, a_reusing);
-   DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
-   --rce;  if (rc < 0) {
-      yparse__clear ();
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(reusing)------------------------*/
-   rc = yPARSE_delimiters  (a_delim, a_fill);
-   DEBUG_YPARSE  yLOG_value   ("delims"    , rc);
-   --rce;  if (rc < 0) {
-      yparse__clear ();
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return rce;
-   }
-   /*---(initialize all areas)-----------*/
-   if (a_1st == 'y') {
-      DEBUG_YPARSE  yLOG_note    ("first time run, intialize data structures");
-      rc = yparse_init_types ();
-      DEBUG_YPARSE  yLOG_value   ("init_types", rc);
-      rc = yparse_verb_init  ();
-      DEBUG_YPARSE  yLOG_value   ("verb_init" , rc);
-      rc = yparse_init_in    ();
-      DEBUG_YPARSE  yLOG_value   ("init_in"   , rc);
-      rc = yparse_init_out   ();
-      DEBUG_YPARSE  yLOG_value   ("init_out"  , rc);
-      rc = yparse_initline   ();
-      DEBUG_YPARSE  yLOG_value   ("initline"  , rc);
-   } else {
-      DEBUG_YPARSE  yLOG_note    ("reconfig run, do not intialize data structures");
-   }
-   /*---(set ready)----------------------*/
-   myPARSE.ready   = 'y';
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 1;
-}
-
-char
-yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
-{
-   return yparse__config ('-', a_auto, a_verber, a_reusing, a_delim, a_fill);
-}
-
-char
-yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill)
-{
-   return yparse__config ('y', a_auto, a_verber, a_reusing, a_delim, a_fill);
 }
 
 char
@@ -252,7 +111,7 @@ yPARSE_wrap             (void)
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
    yparse_line_purge ();
-   yparse__clear ();
+   yparse_config_clear ();
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
@@ -260,7 +119,7 @@ yPARSE_wrap             (void)
 char
 yPARSE_force            (void)
 {
-   myPARSE.good = 'y';
+   myPARSE.y_good = 'y';
    return 0;
 }
 
@@ -280,7 +139,7 @@ yparse__unit_verber     (void)
    char       *x_masking   = " ik_pure ik_from fk_pure fk_from ";
    char        t           [LEN_LABEL];
    yPARSE_toss ();
-   sprintf (t, " %s ", myPARSE.verb);
+   sprintf (t, " %s ", myPARSE.y_verb);
    /*> if (strstr (x_masking, t) != NULL)  return 1;                                  <*/
    return 0;
 }
@@ -305,11 +164,11 @@ char
 yparse_mock__writer     (void)
 {
    yPARSE_vprintf   (-1, "macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
+   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
    yPARSE_vprintf   (-1, "macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
+   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
    yPARSE_vprintf   (-1, "macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
+   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
    return 0;
 }
 
@@ -319,8 +178,8 @@ yparse_mock__reader     (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE  yLOG_value   ("g_nmock"   , g_nmock);
    yPARSE_vscanf    ("macro", &(g_mocks[g_nmock].x_ch), &(g_mocks[g_nmock].x_int), &(g_mocks[g_nmock].x_str), &(g_mocks[g_nmock].x_float), &(g_mocks[g_nmock].x_str2));
-   DEBUG_YPARSE  yLOG_info    ("recd"      , myPARSE.recd);
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.recd);
+   DEBUG_YPARSE  yLOG_info    ("recd"      , myPARSE.y_recd);
+   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
    DEBUG_YPARSE  yLOG_value   ("g_nmock"   , g_nmock);
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 1;
@@ -363,14 +222,14 @@ yparse_base__unit       (char *a_question, int a_num)
    if      (strcmp (a_question, "ready"    ) == 0) {
       yPARSE_qin_info   (NULL, x_in , NULL, NULL);
       yPARSE_qout_info  (NULL, x_out, NULL, NULL);
-      if      (strcmp (myPARSE.delimiters, "§")    == 0)  strcpy (x_del, "field");
-      else if (strcmp (myPARSE.delimiters, "§(,)") == 0)  strcpy (x_del, "function");
-      else if (strcmp (myPARSE.delimiters, ""    ) == 0)  strcpy (x_del, "tradition");
-      else if (strcmp (myPARSE.delimiters, "")       == 0)  strcpy (x_del, "·····");
+      if      (strcmp (myPARSE.y_dellist, "§")    == 0)  strcpy (x_del, "field");
+      else if (strcmp (myPARSE.y_dellist, "§(,)") == 0)  strcpy (x_del, "function");
+      else if (strcmp (myPARSE.y_dellist, ""    ) == 0)  strcpy (x_del, "tradition");
+      else if (strcmp (myPARSE.y_dellist, "")       == 0)  strcpy (x_del, "·····");
       else                                                  strcpy (x_del, "custom");
-      if      (myPARSE.verber != NULL)  strcpy (x_ver, "SET");
-      else                              strcpy (x_ver, "···");
-      sprintf (yPARSE__unit_answer, "BASE ready     : %c  %c  %-3.3s  %c   å%-20.20sæ  å%-20.20sæ  %s", myPARSE.ready, myPARSE.verbs, x_ver, myPARSE.reusing, x_in, x_out, x_del);
+      if      (myPARSE.y_verber != NULL)  strcpy (x_ver, "SET");
+      else                                strcpy (x_ver, "···");
+      sprintf (yPARSE__unit_answer, "BASE ready     : %c  %c  %-3.3s  %c   å%-20.20sæ  å%-20.20sæ  %s", myPARSE.y_ready, myPARSE.y_verbs, x_ver, myPARSE.y_reusing, x_in, x_out, x_del);
    }
    /*---(complete)----------------------------------------*/
    return yPARSE__unit_answer;

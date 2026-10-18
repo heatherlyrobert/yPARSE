@@ -70,8 +70,8 @@
 
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5a"
-#define     P_VERTXT    "yPARSE_queue updating of structure, init, purge, reset, entry"
+#define     P_VERNUM    "0.5b"
+#define     P_VERTXT    "yPARSE_config isolated, cleaned-up, and unit-tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -124,30 +124,32 @@ extern char yPARSE__unit_answer [ LEN_STR  ];
 
 typedef  struct cACCESSOR  tACCESSOR;
 struct cACCESSOR {
-   char        logger;                          /* yURG debugging handle      */
-   char        ready;
-   char        verbs;
-   char        reusing;                         /* must lines be saved        */
-   char        delimiters  [LEN_LABEL];
-   char        delims;
-   char        (*verber) (int n, uchar *a_verb, char a_exist, void *a_handler);
-   char        fill;
-   char        orig        [LEN_RECD];
-   char        recd        [LEN_RECD];
-   char        verb        [LEN_LABEL];
-   char        good;
-   int         len;
-   int         nfield;
-   char        hidden;
+   /*---(control)-----------*/
+   char        y_logger;                        /* yURG debugging handle      */
+   char        y_ready;
+   /*---(verby)-------------*/
+   char        y_verbs;
+   char        (*y_verber) (int n, uchar *a_verb, char a_exist, void *a_handler);
+   char        y_reusing;                       /* must lines be saved        */
+   /*---(delimiters)--------*/
+   char        y_deltype;
+   char        y_dellist     [LEN_LABEL];
+   char        y_fill;
+   /*---(delimiters)--------*/
+   char        y_recd        [LEN_RECD];
+   char        y_verb        [LEN_LABEL];
+   char        y_good;
+   int         y_nfield;
+   /*---(done)--------------*/
 };
 extern   tACCESSOR  myPARSE;
 
 typedef     struct      cNODE       tNODE;
 struct      cNODE {
-   int         ref;
+   int         n_ref;
    uchar      *n_item;
-   tNODE      *next;
-   tNODE      *prev;
+   tNODE      *n_next;
+   tNODE      *n_prev;
 };
 
 
@@ -197,15 +199,46 @@ extern      int         g_nmock;
 
 
 
+/*===[[ yPARSE_base.c ]]======================================================*/
+/*········´ ´·····················´ ´·········································*/
+char*       yPARSE_version          (void);
+
+
+
+/*===[[ yPARSE_config.c ]]====================================================*/
+/*········´ ´···············logic·´ ´·········································*/
+char        yparse_config_clear     (void);
+char        yparse_config__delimit  (char a_delim, char a_fill);
+char        yparse_config__verber   (char a_auto, void *a_verber, char a_reusing);
+char        yparse_config           (char a_1st, char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+/*········´ ´·········simplifiers·´ ´·········································*/
+char        yPARSE_delimiters       (char a_delim, char a_fill);
+char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
+char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+/*········´ ´················DONE·´ ´·········································*/
+
+
 /*===[[ yPARSE_queue.c ]]=====================================================*/
 /*········´ ´·············program·´ ´·········································*/
-char        yparse_queue_init       (tQUEUE *a_queue, char a_dir, char a_label [LEN_SHORT]);
+char        yparse_queue__wipe      (tQUEUE *a_queue, char a_type);
 char        yparse_queue_purge      (tQUEUE *a_queue);
 char        yparse_queue_reset      (tQUEUE *a_queue);
-char        yparse_queue_rando      (tQUEUE *a_queue);
-char*       yparse_queue_entry      (tQUEUE *a_queue);
+char        yparse_queue_init       (tQUEUE *a_queue, char a_dir, char a_label [LEN_SHORT]);
 /*········´ ´··············access·´ ´·········································*/
-char        yparse_queue__defense   (tQUEUE *a_queue);
+char        yparse_queue__defense   (tQUEUE *a_queue, char a_action);
+char        yparse_queue_open       (tQUEUE *a_queue, char a_name [LEN_PATH]);
+char        yparse_queue_close      (tQUEUE *a_queue);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_line.c ]]======================================================*/
+/*········´ ´·····················´ ´·········································*/
+char        yparse_line_purge       (void);
+char        yparse_line_init        (void);
+char        yparse_line_add         (int a_line, char a_recd [LEN_RECD]);
+char        yparse_line_get         (int a_line, char r_recd [LEN_RECD]);
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -213,10 +246,6 @@ char        yparse_queue__defense   (tQUEUE *a_queue);
 
 
 
-
-
-
-char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 
 char        yparse_in_variadic      (va_list a_vlist, int n);
 char        yparse_out_variadic     (va_list a_vlist, int n);
@@ -227,8 +256,6 @@ char*       yparse_base__unit       (char *a_question, int a_num);
 char        yparse_init_types       (void);
 
 
-char        yparse_open             (tQUEUE *a_queue, char *a_name);
-char        yparse_close            (tQUEUE *a_queue);
 char        yparse_good_in          (void);
 char        yparse_queue_tail       (tQUEUE *a_queue);
 
@@ -262,9 +289,6 @@ char        yparse_init_out         (void);
 
 
 /*---(saving)---------------*/
-char        yparse_initline         (void);
-char        yparse_addline          (const int a_line, const char *a_recd);
-char        yparse_getline          (const int a_line, char *a_recd);
 
 char        yparse_specs_len        (tQUEUE *a_queue);
 char        yparse_specs_next_write (void);
