@@ -91,19 +91,21 @@ yparse_queue__wipe      (tQUEUE *a_queue, char a_type)
       a_queue->q_len      =    0;
    }
    /*---(fields)-------------------------*/
-   /*> if (a_type != 0 && strchr ("*ipr", a_type) != 0) {                             <* 
-    *>    x_curr = a_queue->q_head;                                                   <* 
-    *>    while (x_curr != NULL) {                                                    <* 
-    *>       yparse_dequeue (a_queue, NULL);                                          <* 
-    *>       x_curr = a_queue->q_head;                                                <* 
-    *>    }                                                                           <* 
-    *> }                                                                              <*/
+   if (a_type != 0 && strchr ("pr", a_type) != 0) {
+      x_curr = a_queue->q_head;
+      while (x_curr != NULL) {
+         yparse_queue_dequeue (a_queue, NULL);
+         x_curr = a_queue->q_head;
+      }
+   }
    /*---(field counters)-----------------*/
    if (a_type != 0 && strchr ("*ipr", a_type) != 0) {
       a_queue->q_head     = NULL;
       a_queue->q_tail     = NULL;
-      a_queue->q_first    =    0;
       a_queue->q_count    =    0;
+      a_queue->q_first    =   -1;
+      a_queue->q_last     =   -1;
+      a_queue->q_curr     =    0;
    }
    /*---(complete)-----------------------*/
    return 1;
@@ -162,10 +164,16 @@ yparse_queue__defense   (tQUEUE *a_queue, char a_action)
    }
    /*---(queue action)-------------------*/
    DEBUG_YPARSE  yLOG_spoint  (a_action);
-   --rce;  if (a_action == 0 || strchr ("<>", a_action) == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("queue action not understood, <=in or >=out only");
+   --rce;  if (a_action == 0 || strchr ("<>´", a_action) == NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("queue action not understood, <=in, >=out, or ´=neither only");
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
+   }
+   /*---(quick-out)----------------*/
+   if (a_action == '´') {
+      DEBUG_YPARSE  yLOG_snote   ("just a simple check");
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+      return 0;
    }
    /*---(check direction)----------*/
    DEBUG_YPARSE  yLOG_schar   (a_queue->q_dir);
@@ -383,29 +391,45 @@ yparse_queue_close      (tQUEUE *a_queue)
 /*====================------------------------------------====================*/
 static void      o___PRIMATIVE_______________o (void) {;};
 
-char         /*-> add item to end of queue -----------[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
-yparse_enqueue          (tQUEUE *a_queue, char *a_item)
+char
+yparse_queue_enqueue    (tQUEUE *a_queue, char *a_item)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
+   char        rc          =    0;
    tNODE      *x_new       = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
    /*---(defense)------------------------*/
+   rc = yparse_queue__defense   (a_queue, '´');
+   DEBUG_YPARSE  yLOG_sint    (rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_spoint  (a_item);
    --rce;  if (a_item   == NULL) {
       DEBUG_YPARSE  yLOG_snote   ("nothing to save");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YPARSE  yLOG_snote   (a_item);
+   /*---(full queue)---------------------*/
+   DEBUG_YPARSE  yLOG_spoint  (a_queue->q_last);
+   --rce;  if (a_queue->q_last >= MAX_NODE)  {
+      DEBUG_YPARSE  yLOG_snote   ("already full");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(create)-------------------------*/
    x_new = (tNODE *) malloc (sizeof (tNODE));
    DEBUG_YPARSE  yLOG_spoint  (x_new);
    --rce;  if (x_new == NULL) {
       DEBUG_YPARSE  yLOG_snote   ("malloc failed");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   /*---(saving)-------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("saving");
-   x_new->n_ref  = a_queue->q_count;
-   x_new->n_item = strdup (a_item);
+   /*---(ground pointers)----------------*/
    x_new->n_next = NULL;
    x_new->n_prev = NULL;
    /*---(attatch)------------------------*/
@@ -419,37 +443,57 @@ yparse_enqueue          (tQUEUE *a_queue, char *a_item)
       x_new->n_prev           = a_queue->q_tail;
       a_queue->q_tail         = x_new;
    }
+   /*---(update counters)----------------*/
    ++a_queue->q_count;
-   /*---(report)-------------------------*/
-   DEBUG_YPARSE  yLOG_sint    (a_queue->q_first);
    DEBUG_YPARSE  yLOG_sint    (a_queue->q_count);
+   ++a_queue->q_last;
+   DEBUG_YPARSE  yLOG_sint    (a_queue->q_last);
+   if (a_queue->q_first <  0) a_queue->q_first = 0;
+   if (a_queue->q_count == 1) a_queue->q_first = a_queue->q_last;
+   DEBUG_YPARSE  yLOG_sint    (a_queue->q_first);
+   /*---(populate)-----------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("saving");
+   x_new->n_ref  = a_queue->q_last;
+   x_new->n_item = strdup (a_item);
    /*---(complete)-----------------------*/
-   return 0;
+   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   return 1;
 }
 
 char         /*-> remove item from front of queue ----[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
-yparse_dequeue          (tQUEUE *a_queue, char *a_item)
+yparse_queue_dequeue    (tQUEUE *a_queue, char *r_item)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
+   char        rc          =    0;
    tNODE      *x_save      = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_item != NULL)  strcpy (r_item, "");
    /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("dequeue");
-   DEBUG_YPARSE  yLOG_spoint  (a_queue);
-   --rce;  if (a_queue == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("null queue");
+   rc = yparse_queue__defense   (a_queue, '´');
+   DEBUG_YPARSE  yLOG_sint    (rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YPARSE  yLOG_spoint  (a_item);
-   if (a_item != NULL)  ystrlcpy (a_item, "", LEN_RECD);
-   /*---(no entries)---------------------*/
+   /*---(empty queue)--------------------*/
+   DEBUG_YPARSE  yLOG_spoint  (a_queue->q_count);
+   --rce;  if (a_queue->q_count <= 0) {
+      DEBUG_YPARSE  yLOG_snote   ("empty, nothing to do");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(empty queue)--------------------*/
    DEBUG_YPARSE  yLOG_spoint  (a_queue->q_head);
    --rce;  if (a_queue->q_head == NULL)  {
       DEBUG_YPARSE  yLOG_snote   ("empty queue");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    /*---(copy and clear)-----------------*/
-   if (a_item != NULL)  ystrlcpy (a_item, a_queue->q_head->n_item, LEN_RECD);
+   if (r_item != NULL)  ystrlcpy (r_item, a_queue->q_head->n_item, LEN_RECD);
    if (a_queue->q_head->n_item != NULL) {
       DEBUG_YPARSE  yLOG_snote   ("free item");
       free (a_queue->q_head->n_item);
@@ -468,219 +512,167 @@ yparse_dequeue          (tQUEUE *a_queue, char *a_item)
       free (a_queue->q_head);
       a_queue->q_head  = x_save;
    }
-   ++a_queue->q_first;
-   /*---(report)-------------------------*/
-   DEBUG_YPARSE  yLOG_sint    (a_queue->q_first);
-   DEBUG_YPARSE  yLOG_sint    (a_queue->q_count);
-   /*---(complete)-----------------------*/
-   return 0;
-}
-
-char         /*-> look at item in front of queue -----[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
-yparse_topqueue         (tQUEUE *a_queue, char *a_item)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   tNODE      *x_save      = NULL;
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (a_queue);
-   --rce;  if (a_queue == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("null queue");
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_spoint  (a_item);
-   if (a_item != NULL)  ystrlcpy (a_item, "", LEN_RECD);
-   /*---(no entries)---------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (a_queue->q_head);
-   --rce;  if (a_queue->q_head == NULL)  {
-      DEBUG_YPARSE  yLOG_snote   ("empty queue");
-      return rce;
-   }
-   /*---(copy)---------------------------*/
-   if (a_item != NULL)  ystrlcpy (a_item, a_queue->q_head->n_item, LEN_RECD);
-   /*---(complete)-----------------------*/
-   return 0;
-}
-
-char         /*-> remove item from front of queue ----[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
-yparse_queue_tail       (tQUEUE *a_queue)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   tNODE      *x_save      = NULL;
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (a_queue);
-   --rce;  if (a_queue == NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("null queue");
-      return rce;
-   }
-   /*---(no entries)---------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (a_queue->q_tail);
-   --rce;  if (a_queue->q_tail == NULL)  {
-      DEBUG_YPARSE  yLOG_snote   ("empty queue");
-      return rce;
-   }
-   /*---(check for empty)----------------*/
-   if (a_queue->q_tail->n_item != NULL && strlen (a_queue->q_tail->n_item) > 0) {
-      DEBUG_YPARSE  yLOG_snote   ("real item at tail, done");
-      return 0;
-   }
-   /*---(clear)--------------------------*/
-   if (a_queue->q_tail->n_item != NULL) {
-      DEBUG_YPARSE  yLOG_snote   ("free item");
-      free (a_queue->q_tail->n_item);
-   }
-   /*---(single entry)-------------------*/
-   if (a_queue->q_head == a_queue->q_tail) {
-      DEBUG_YPARSE  yLOG_snote   ("single item");
-      free (a_queue->q_head);
-      a_queue->q_head  = a_queue->q_tail = NULL;
-   }
-   /*---(multi entry)--------------------*/
-   else {
-      DEBUG_YPARSE  yLOG_snote   ("multiple items");
-      x_save  = a_queue->q_tail->n_prev;
-      x_save->n_next = NULL;
-      free (a_queue->q_tail);
-      a_queue->q_tail  = x_save;
-   }
+   /*---(update counters)----------------*/
    --a_queue->q_count;
-   /*---(report)-------------------------*/
-   DEBUG_YPARSE  yLOG_sint    (a_queue->q_first);
    DEBUG_YPARSE  yLOG_sint    (a_queue->q_count);
+   DEBUG_YPARSE  yLOG_sint    (a_queue->q_last);
+   if (a_queue->q_count > 0)  ++a_queue->q_first;
+   DEBUG_YPARSE  yLOG_sint    (a_queue->q_first);
    /*---(complete)-----------------------*/
-   return 0;
+   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   return 1;
 }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                         searching methods                    ----===*/
+/*====================------------------------------------====================*/
+static void      o___SEARCH__________________o (void) {;};
 
 char
-yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item)
+yparse_queue_count      (tQUEUE *a_queue)
 {
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   tNODE      *x_curr      = NULL;
-   /*---(defense)------------------------*/
-   --rce;  if (a_item == NULL)  return rce;
-   /*---(defense)------------------------*/
-   ystrlcpy (a_item, "", LEN_LABEL);
-   /*---(search)-------------------------*/
-   x_curr = a_queue->q_head;
-   while (x_curr != NULL) {
-      if (x_curr->n_ref == a_ref) {
-         ystrlcpy (a_item, x_curr->n_item, LEN_RECD);
-         return 0;
-      }
-      x_curr = x_curr->n_next;
-   }
-   /*---(complete)-----------------------*/
-   return -1;
+   char        rc          =    0;
+   rc = yparse_queue__defense   (a_queue, '´');
+   if (rc < 0)  return rc;
+   return a_queue->q_count;
 }
 
-
-/*> char yPARSE_push  (char *a_item) { return yparse__enqueue (a_item); }             <*/
-
-
-
-/*====================------------------------------------====================*/
-/*===----                         unit testing                         ----===*/
-/*====================------------------------------------====================*/
-static void      o___UNITTEST________________o (void) {;};
-
-char yPARSE__unit_answer [ LEN_STR  ];
-
-char         /*--> write the heartbeat ---------------------------------------*/
-yparse_queue__line      (int n, char *a_recd)
+char 
+yparse_queue_by_cursor  (tQUEUE *a_queue, char a_dir, char a_seq, tNODE **r_node, char r_item [LEN_RECD], char d_entry [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   char        rc          =    0;
-   FILE       *f           = NULL;
-   char        x_recd      [LEN_RECD]  = "";
-   int         x_len       =    0;
-   int         c           =    0;
+   char        rc          =    1;
+   char        n           =    0;
+   char        c           =    0;
+   char        x_prev      [LEN_DESC]  = "´·····························";
+   char        x_curr      [LEN_DESC]  = "´·····························";
+   char        x_next      [LEN_DESC]  = "´·····························";
+   tNODE      *x_node      = NULL;
    /*---(header)-------------------------*/
-   DEBUG_RPTG   yLOG_enter   (__FUNCTION__);
-   /*---(prepre)-------------------------*/
-   if (a_recd != NULL)  ystrlcpy (a_recd, ""    , LEN_RECD);
-   /*---(open)---------------------------*/
-   DEBUG_RPTG   yLOG_info    ("file"      , s_qout.q_loc);
-   if (strcmp (s_qout.q_loc, "") != 0)  f = fopen (s_qout.q_loc, "rt");
-   else                                 f = fopen ("/tmp/yPARSE_out.txt", "rt");
-   DEBUG_RPTG   yLOG_point   ("f"         , f);
+   DEBUG_YDLST  yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_node  != NULL)  *r_node  = NULL;
+   if (r_item  != NULL)  strcpy (r_item , "");
+   if (d_entry != NULL)  strcpy (d_entry, "");
+   /*---(defense)------------------------*/
+   rc = yparse_queue__defense   (a_queue, '´');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    --rce;  if (rc < 0) {
-      DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
+      if (d_entry != NULL)  strcpy (d_entry, "(run yPARSE_config and yparse_queue_init first)");
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(write)--------------------------*/
-   --rce;  while (1) {
-      fgets (x_recd, LEN_RECD, f);
-      if (feof (f)) {
-         DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
+   /*---(quick-out)----------------------*/
+   if (a_dir == 'T') {
+      if (d_entry != NULL)  strcpy (d_entry, "seq  ref  ---curr-----------------------  ---prev-----------------------  ---next-----------------------  Ï");
+      DEBUG_YDLST   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   if (d_entry != NULL)  strcpy (d_entry, "··-  ··-  ´·····························  ´·····························  ´·····························  Ï");
+   /*---(quick-out)----------------------*/
+   DEBUG_YPARSE  yLOG_value   ("q_count"   , a_queue->q_count);
+   --rce;  if (a_queue->q_count == 0) {
+      if (d_entry != NULL)  strcpy (d_entry, "(empty)");
+      DEBUG_YDLST   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(preparse)-----------------------*/
+   n = a_queue->q_curr;
+   DEBUG_YDLST  yLOG_value   ("n"         , n);
+   /*---(handle cursor)------------------*/
+   DEBUG_YDLST  yLOG_char    ("a_dir"     , a_dir);
+   DEBUG_YDLST  yLOG_value   ("a_seq"     , a_seq);
+   --rce;  if (a_dir >  0) {
+      DEBUG_YDLST  yLOG_note    ("requested cursoring");
+      --rce;  switch (a_dir) {
+      case YDLST_HEAD : case YDLST_DHEAD :
+         n = 0;
+         break;
+      case YDLST_PREV : case YDLST_DPREV :
+         --n;
+         break;
+      case YDLST_CURR : case YDLST_DCURR :
+         n = n;
+         break;
+      case YDLST_NEXT : case YDLST_DNEXT :
+         ++n;
+         break;
+      case YDLST_TAIL : case YDLST_DTAIL :
+         n = a_queue->q_count - 1;
+         break;
+      default         :
+         DEBUG_YDLST  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      if (c >= n)  break;
-      ++c;
    }
-   /*---(close)--------------------------*/
-   rc = fclose (f);
-   DEBUG_RPTG   yLOG_value   ("close"     , rc);
-   --rce;  if (rc < 0) {
-      DEBUG_RPTG   yLOG_exitr   (__FUNCTION__, rce);
+   /*---(handle index)-------------------*/
+   else if (a_seq >= 0) {
+      DEBUG_YDLST  yLOG_note    ("requesed indexing");
+      n = a_seq;
+   }
+   /*---(handle trouble)-----------------*/
+   else {
+      DEBUG_YDLST   yLOG_note    ("neither cursor or index");
+      DEBUG_YDLST   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(fix-up)-------------------------*/
-   x_len = strlen (x_recd);
-   if (x_recd [x_len - 1] == '\n')  x_recd [--x_len] = '\0';
-   ystrlencode (x_recd, ySTR_NORM, LEN_RECD);
-   /*---(save back)----------------------*/
-   if (a_recd != NULL)  ystrlcpy (a_recd, x_recd, LEN_RECD);
+   /*---(handle endpoints)---------------*/
+   DEBUG_YDLST  yLOG_value   ("n"         , n);
+   --rce;  if (n < 0) {
+      if (d_entry != NULL)  strcpy (d_entry, "(under)");
+      a_queue->q_curr = 0;
+      DEBUG_YDLST   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   --rce;  if (n >= MAX_NODE) {
+      if (d_entry != NULL)  strcpy (d_entry, "(over)");
+      a_queue->q_curr = a_queue->q_count - 1;
+      DEBUG_YDLST   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(find)---------------------------*/
+   x_node = a_queue->q_head;
+   while (x_node != NULL) {
+      DEBUG_YDLST  yLOG_info    ("n_item"    , x_node->n_item);
+      if (c == n) {
+         DEBUG_YDLST  yLOG_note    ("found it");
+         break;
+      }
+      ++c;
+      x_node = x_node->n_next;
+   }
+   if (x_node == NULL) {
+      if (d_entry != NULL)  strcpy (d_entry, "(n/a)");
+      DEBUG_YDLST  yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(save-back)----------------------*/
+   a_queue->q_curr = n;
+   if (r_node  != NULL)  *r_node  = x_node;
+   if (r_item  != NULL)  ystrlcpy (r_item , x_node->n_item, LEN_RECD);
+   /*---(output)-------------------------*/
+   if (d_entry != NULL) {
+      DEBUG_YDLST  yLOG_note    ("requested d_entry");
+      if (x_node->n_prev != NULL) {
+         if (x_node->n_prev->n_item != NULL) snprintf (x_prev, 31, "%s······························", x_node->n_prev->n_item);
+         else                                strcpy   (x_prev, "(null)························");
+      }
+      if (x_node->n_item != NULL) snprintf (x_curr, 31, "%s······························", x_node->n_item);
+      if (x_node->n_next != NULL) {
+         if (x_node->n_next->n_item != NULL) snprintf (x_next, 31, "%s······························", x_node->n_next->n_item);
+         else                                strcpy   (x_next, "(null)························");
+      }
+      sprintf (d_entry, "%3d  %3d  %-30.30s  %-30.30s  %-30.30s  Ï", n, x_node->n_ref, x_curr, x_prev, x_next);
+   }
    /*---(complete)-----------------------*/
-   DEBUG_RPTG   yLOG_exit    (__FUNCTION__);
-   return 0;
+   DEBUG_YDLST  yLOG_exit    (__FUNCTION__);
+   return 1;
 }
 
-char*      /*----: unit testing accessor for clean validation interface ------*/
-yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rc          =    0;
-   char        t           [LEN_RECD];
-   /*---(preprare)-----------------------*/
-   ystrlcpy  (yPARSE__unit_answer, "QUEUE unit       : question not understood", LEN_STR);
-   if (a_queue == NULL) {
-      ystrlcpy  (yPARSE__unit_answer, "QUEUE unit       : queue not specified", LEN_STR);
-   }
-   /*---(answer)------------------------------------------*/
-   if      (strcmp (a_question, "verb"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s verb         : %2d[%s]", a_queue->q_label, a_queue->q_iverb, yPARSE_verb (a_queue->q_iverb));
-   }
-   else if (strcmp (a_question, "line"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s line         : total %2d, curr %2d", a_queue->q_label, a_queue->q_nline, a_queue->q_cline);
-   }
-   else if (strcmp (a_question, "field"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s field        : total %2d, curr %2d, good %c", a_queue->q_label, a_queue->q_count, a_queue->q_first, a_queue->q_good);
-   }
-   else if (strcmp (a_question, "record"   ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s record       : %2d[%s]", a_queue->q_label, a_queue->q_len, a_queue->q_recd);
-   }
-   else if (strcmp (a_question, "entry"    ) == 0) {
-      if (a_queue->q_count < 1 || a_num < a_queue->q_first || a_num >= a_queue->q_count) {
-         sprintf (yPARSE__unit_answer, "%-3.3s entry   (%2d) : null", a_queue->q_label, a_num);
-      } else {
-         rc = yparse_peek (a_queue, a_num, t);
-         if (rc < 0) {
-            sprintf (yPARSE__unit_answer, "%-3.3s entry   (%2d) : trouble finding", a_queue->q_label, a_num);
-         } else {
-            sprintf (yPARSE__unit_answer, "%-3.3s entry   (%2d) : %2d[%s]", a_queue->q_label, a_num, strlen (t), t);
-         }
-      }
-   }
-   else if (strcmp (a_question, "verb"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "%-3.3s verb         : %2d[%s]", a_queue->q_label, strlen (myPARSE.y_verb), myPARSE.y_verb);
-   }
-   else if (strcmp (a_question, "written"  ) == 0) {
-      yparse_queue__line (a_num, t);
-      sprintf (yPARSE__unit_answer, "%-3.3s written (%2d) : %2d[%s]", a_queue->q_label, a_num, strlen (t), t);
-   }
-   /*---(complete)----------------------------------------*/
-   return yPARSE__unit_answer;
-}
+char* yparse_queue_entry     (tQUEUE *a_queue, char a_dir)                         { yparse_queue_by_cursor (a_queue, a_dir, -1, NULL, NULL, yparse_print); return yparse_print; }
+char  yparse_queue_top       (tQUEUE *a_queue, char r_item [LEN_RECD])             { return yparse_queue_by_cursor (a_queue, '[', -1, NULL, r_item, NULL); }
+char  yparse_queue_peek      (tQUEUE *a_queue, char a_seq, char r_item [LEN_RECD]) { return yparse_queue_by_cursor (a_queue, -1, a_seq, NULL, r_item, NULL); }
+

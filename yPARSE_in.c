@@ -124,7 +124,7 @@ yPARSE_toss             (void)
       return rc;
    }
    /*---(check)--------------------------*/
-   rc = yparse_dequeue (&s_qin, NULL);
+   rc = yparse_queue_dequeue (&s_qin, NULL);
    if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
@@ -165,7 +165,7 @@ yPARSE_popstr           (char *a_item)
       return rce;
    }
    /*---(dequeue)------------------------*/
-   rc = yparse_dequeue (&s_qin, a_item);
+   rc = yparse_queue_dequeue (&s_qin, a_item);
    DEBUG_YPARSE  yLOG_sint    (rc);
    DEBUG_YPARSE  yLOG_snote   (a_item);
    --rce;  if (rc < 0) {
@@ -180,13 +180,13 @@ yPARSE_popstr           (char *a_item)
 char
 yPARSE_top              (char *a_item)
 {
-   return yparse_topqueue (&s_qin, a_item);
+   return yparse_queue_top (&s_qin, a_item);
 }
 
 char
 yparse_peek_in          (const int a_ref, char *a_item)
 {
-   return yparse_peek   (&s_qin, a_ref, a_item);
+   return yparse_queue_peek   (&s_qin, a_ref, a_item);
 }
 
 char
@@ -397,7 +397,7 @@ yPARSE_popval           (double a_old, double *a_new)
       return rce;
    }
    /*---(check)--------------------------*/
-   rc = yparse_dequeue (&s_qin, x_item);
+   rc = yparse_queue_dequeue (&s_qin, x_item);
    --rce;  if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -596,26 +596,6 @@ yparse_reusable         (char a_masked)
 /*====================------------------------------------====================*/
 static void      o___PARSING_________________o (void) {;};
 
-char
-yparse__comments        (char *a_recd)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        x_eof       =  '-';
-   /*---(defense)------------------------*/
-   if (a_recd == NULL) return 0;
-   /*---(filtering)----------------------*/
-   if      (strncmp (a_recd, "# END-OF-FILE" , 12) == 0)         x_eof = 'y';
-   else if (strncmp (a_recd, "# end-of-file" , 12) == 0)         x_eof = 'y';
-   else if (strncmp (a_recd, "# done, finito", 12) == 0)         x_eof = 'y';
-   /*---(trouble)------------------------*/
-   if (x_eof == 'y') {
-      DEBUG_YPARSE   yLOG_snote   ("end-of-file");
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, 1);
-      return 1;
-   }
-   /*---(complete)-----------------------*/
-   return 0;
-}
 
 char         /*--> pull script record from stdin ---------[ ------ [ ------ ]-*/
 yparse__infile          (void)
@@ -662,7 +642,7 @@ yparse__infile          (void)
       /*---(filter)----------------------*/
       if (s_qin.q_recd [0] == '#') {
          DEBUG_YPARSE  yLOG_snote    ("# comment");
-         rc = yparse__comments (s_qin.q_recd);
+         rc = yparse_read_skip (s_qin.q_recd);
          x_bad = 'y';
       }
       else if (s_qin.q_recd [0] == '\0') {
@@ -848,7 +828,7 @@ yparse__main            (char *a_func, int *t, int *n, int *c, int a_line, char 
    /*---(load the queue)-----------------*/
    strcpy (myPARSE.y_recd, s_qin.q_recd);
    ystrldchg (myPARSE.y_recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
-   rc = yparse_recd  (s_qin.q_recd);
+   rc = yparse_read_parse (myPARSE.y_recd, myPARSE.y_dellist, myPARSE.y_fill, &(myPARSE.y_nfield));
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
    --rce;  if (rc < 0) {
       yparse__main_rollback (a_line);
@@ -1191,7 +1171,7 @@ static void      o___UNITTEST________________o (void) {;};
 char*      /*----: unit testing accessor for clean validation interface ------*/
 yparse__unit_in         (char *a_question, int a_num)
 {
-   return yparse__unit_queue (&s_qin, a_question, a_num);
+   /*> return yparse__unit_queue (&s_qin, a_question, a_num);                         <*/
 }
 
 char*      /*----: unit testing accessor for clean validation interface ------*/
@@ -1201,31 +1181,31 @@ yparse__unit_line       (char *a_question, int a_num)
    char        rc          =    0;
    char        t           [LEN_RECD];
    /*---(preprare)-----------------------*/
-   ystrlcpy  (yPARSE__unit_answer, "LINE unit        : question not understood", LEN_STR);
+   ystrlcpy  (yparse_print, "LINE unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "stats"    ) == 0) {
-      /*> sprintf (yPARSE__unit_answer, "LINE stats     : nline %2d, cline %2d, total %2d", s_qin.q_nline, s_qin.q_cline, s_count);   <*/
+      /*> sprintf (yparse_print, "LINE stats     : nline %2d, cline %2d, total %2d", s_qin.q_nline, s_qin.q_cline, s_count);   <*/
    }
    /*> else if (strcmp (a_question, "entry"    ) == 0) {                                            <* 
     *>    if (s_count < 1 || a_num >  s_qin.q_nline) {                                              <* 
-    *>       sprintf (yPARSE__unit_answer, "LINE entry  %2d : null", a_num);                        <* 
+    *>       sprintf (yparse_print, "LINE entry  %2d : null", a_num);                        <* 
     *>    } else {                                                                                  <* 
     *>       rc = yparse_line_get (a_num, t);                                                       <* 
     *>       if (rc < 0) {                                                                          <* 
-    *>          sprintf (yPARSE__unit_answer, "LINE entry  %2d : not reusable", a_num);             <* 
+    *>          sprintf (yparse_print, "LINE entry  %2d : not reusable", a_num);             <* 
     *>       } else {                                                                               <* 
-    *>          sprintf (yPARSE__unit_answer, "LINE entry  %2d : %2d[%s]", a_num, strlen (t), t);   <* 
+    *>          sprintf (yparse_print, "LINE entry  %2d : %2d[%s]", a_num, strlen (t), t);   <* 
     *>       }                                                                                      <* 
     *>    }                                                                                         <* 
     *> }                                                                                            <*/
    /*---(complete)----------------------------------------*/
-   return yPARSE__unit_answer;
+   return yparse_print;
 }
 
 
 char         /*-> add item to end of queue -----------[ leaf   [fe.A43.223.40]*/ /*-[11.0000.020.!]-*/ /*-[--.---.---.--]-*/
 yparse_enqueue_in       (char *a_item)
 {
-   return yparse_enqueue (&s_qin, a_item);
+   return yparse_queue_enqueue (&s_qin, a_item);
 }
 

@@ -753,44 +753,44 @@ yparse__unit_verb       (char *a_question, char *a_verb, int a_seq)
    int         n           =    0;
    char        t           [LEN_RECD]  = "";
    /*---(preprare)-----------------------*/
-   ystrlcpy  (yPARSE__unit_answer, "VERB unit        : question not understood", LEN_STR);
+   ystrlcpy  (yparse_print, "VERB unit        : question not understood", LEN_STR);
    /*---(check existing)-----------------*/
    if      (strcmp (a_question, "count"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "VERB count       : %d", s_nverb);
+      sprintf (yparse_print, "VERB count       : %d", s_nverb);
    }
    else if (strcmp (a_question, "entry"    ) == 0) {
       n = a_seq;
-      if (n < 0 || n >= MAX_VERBS)       sprintf (yPARSE__unit_answer, "VERB entry  (--) : out of range");
-      else if (s_verbs [n].verb [0] == '\0') sprintf (yPARSE__unit_answer, "VERB entry  (%2d) : verb slot not used", n);
-      else sprintf (yPARSE__unit_answer, "VERB entry  (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs, (s_verbs [n].reader != NULL) ? 'y' : '-', (s_verbs [n].writer != NULL) ? 'y' : '-', s_verbs [n].seq, s_verbs [n].mask, s_verbs [n].labels, s_verbs [n].desc);
+      if (n < 0 || n >= MAX_VERBS)       sprintf (yparse_print, "VERB entry  (--) : out of range");
+      else if (s_verbs [n].verb [0] == '£') sprintf (yparse_print, "VERB entry  (%2d) : verb slot not used", n);
+      else sprintf (yparse_print, "VERB entry  (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs, (s_verbs [n].reader != NULL) ? 'y' : '-', (s_verbs [n].writer != NULL) ? 'y' : '-', s_verbs [n].seq, s_verbs [n].mask, s_verbs [n].labels, s_verbs [n].desc);
    }
    /*---(answer)------------------------------------------*/
    else if (strcmp (a_question, "by_name"  ) == 0) {
       if (a_verb == NULL || a_verb [0] == '\0') {
-         sprintf (yPARSE__unit_answer, "VERB name   (--) : verb not given");
+         sprintf (yparse_print, "VERB name   (--) : verb not given");
       } else {
          n = yparse_verb_find (NULL, a_verb);
-         if (n < 0) sprintf (yPARSE__unit_answer, "VERB name   (--) : %s is unknown", a_verb);
-         else       sprintf (yPARSE__unit_answer, "VERB name   (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs, (s_verbs [n].reader != NULL) ? 'y' : '-', (s_verbs [n].writer != NULL) ? 'y' : '-', s_verbs [n].seq, s_verbs [n].mask, s_verbs [n].labels, s_verbs [n].desc);
+         if (n < 0) sprintf (yparse_print, "VERB name   (--) : %s is unknown", a_verb);
+         else       sprintf (yparse_print, "VERB name   (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, s_verbs [n].mode, s_verbs [n].verb, s_verbs [n].specs, (s_verbs [n].reader != NULL) ? 'y' : '-', (s_verbs [n].writer != NULL) ? 'y' : '-', s_verbs [n].seq, s_verbs [n].mask, s_verbs [n].labels, s_verbs [n].desc);
       }
    }
    else if (strcmp (a_question, "section"  ) == 0) {
       ystrlcpy    (t, s_sect, LEN_RECD);
       ystrlencode (t, ySTR_NORM, LEN_RECD);
-      sprintf (yPARSE__unit_answer, "VERB section     : %2d[%s]", strlen (t), t);
+      sprintf (yparse_print, "VERB section     : %2d[%s]", strlen (t), t);
    }
    else if (strcmp (a_question, "divider"  ) == 0) {
       ystrlcpy    (t, s_div, LEN_RECD);
       ystrlencode (t, ySTR_NORM, LEN_RECD);
-      sprintf (yPARSE__unit_answer, "VERB divider     : %2d[%s]", strlen (t), t);
+      sprintf (yparse_print, "VERB divider     : %2d[%s]", strlen (t), t);
    }
    else if (strcmp (a_question, "footer"   ) == 0) {
       ystrlcpy    (t, s_foot, LEN_RECD);
       ystrlencode (t, ySTR_NORM, LEN_RECD);
-      sprintf (yPARSE__unit_answer, "VERB footer      : %2d[%s]", strlen (t), t);
+      sprintf (yparse_print, "VERB footer      : %2d[%s]", strlen (t), t);
    }
    /*---(complete)----------------------------------------*/
-   return yPARSE__unit_answer;
+   return yparse_print;
 }
 
 

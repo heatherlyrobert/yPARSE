@@ -36,13 +36,87 @@
 
 
 
+char
+yparse_read_skip        (char a_recd [LEN_RECD])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        x_pre       [LEN_LABEL] = "";
+   char        x_eof       =  '-';
+   int         l           =    0;
+   char        x_skip      =  '-';
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_spoint  (a_recd);
+   --rce;  if (a_recd == NULL) {
+      DEBUG_YPARSE  yLOG_snote   ("null record found");
+      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(prepare)------------------------*/
+   ystrlcpy (x_pre, a_recd, LEN_LABEL);
+   DEBUG_YPARSE  yLOG_snote   (x_pre);
+   l = strlen (x_pre);
+   DEBUG_YPARSE  yLOG_sint    (l);
+   /*---(check for bottom)---------------*/
+   if      (strncmp (a_recd, "# END-OF-FILE"   , 12) == 0)   x_eof  = 'y';
+   else if (strncmp (a_recd, "## END-OF-FILE"  , 12) == 0)   x_eof  = 'y';
+   else if (strncmp (a_recd, "# end-of-file"   , 12) == 0)   x_eof  = 'y';
+   else if (strncmp (a_recd, "## end-of-file"  , 12) == 0)   x_eof  = 'y';
+   else if (strncmp (a_recd, "# done, finito"  , 12) == 0)   x_eof  = 'y';
+   else if (strncmp (a_recd, "## done, finito" , 12) == 0)   x_eof  = 'y';
+   if (x_eof == 'y') {
+      DEBUG_YPARSE  yLOG_snote   ("end of content found");
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+      return 1;
+   }
+   /*---(trouble)------------------------*/
+   if (a_recd [0] == '#')  {
+      switch (a_recd [1]) {
+      case '>' :
+         DEBUG_YPARSE  yLOG_snote   ("savec macro, skip");
+         x_skip = 'y';
+         break;
+      case '@' :
+         DEBUG_YPARSE  yLOG_snote   ("file control, retain");
+         break;
+      case '#' :
+         DEBUG_YPARSE  yLOG_snote   ("double comment, skip ");
+         x_skip = 'y';
+         break;
+      default  :
+         DEBUG_YPARSE  yLOG_snote   ("normal comment, skip");
+         x_skip = 'y';
+         break;
+      }
+   }
+   if (a_recd [0] == '\0') {
+      DEBUG_YPARSE  yLOG_snote   ("empty record found");
+      x_skip = 'y';
+   }
+   if (l < 5) {
+      DEBUG_YPARSE  yLOG_snote   ("line too short (<5 char)");
+      x_skip = 'y';
+   }
+   if (x_skip == 'y') {
+      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+      return 2;
+   }
+   /*---(default)------------------------*/
+   DEBUG_YPARSE  yLOG_snote   ("realistic line found");
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   return 0;
+}
 
-char         /*--> parse incomming record ----------------[ ------ [ ------ ]-*/
-yparse_recd             (uchar *a_recd)
+char
+yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], char a_fill, char *r_nfield)
 {
    /*---(locals)-----------+-----------+-*/
    char        rce         =  -10;               /* return code for errors    */
    char        rc          =    0;               /* generic return code       */
+   char        x_recd      [LEN_RECD]  = "";
    int         x_len       =    0;
    int         c           =    0;
    char       *p           = NULL;
@@ -51,22 +125,34 @@ yparse_recd             (uchar *a_recd)
    char       *s           =  "·";
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(prepare)------------------------*/
+   /*---(default)------------------------*/
+   if (r_nfield != NULL)  *r_nfield = 0;
+   /*---(defense)------------------------*/
    DEBUG_YPARSE yLOG_point   ("a_recd"    , a_recd);
    --rce;  if (a_recd == NULL) {
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_YPARSE yLOG_info    ("a_recd"    , a_recd);
-   x_len = ystrllen   (a_recd, LEN_RECD);
+   DEBUG_YPARSE yLOG_point   ("a_dellist" , a_dellist);
+   --rce;  if (a_dellist == NULL) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE yLOG_info    ("a_dellist" , a_dellist);
+   /*---(prepare recd)-------------------*/
+   ystrlcpy (x_recd, a_recd, LEN_RECD);
+   x_len = ystrllen   (x_recd, LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
-   DEBUG_YPARSE yLOG_info    ("delimit"   , myPARSE.y_dellist);
-   x_len = ystrllen   (myPARSE.y_dellist, LEN_RECD);
-   for (i = c = 0; i < x_len; ++i)   c += ystrldcnt (a_recd, myPARSE.y_dellist [i], LEN_RECD);
+   /*---(prepare field count)------------*/
+   x_len = ystrllen   (a_dellist, LEN_RECD);
+   for (i = c = 0; i < x_len; ++i) {
+      c += ystrldcnt (x_recd, a_dellist [i], LEN_RECD);
+   }
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
-   myPARSE.y_nfield = c;
+   if (r_nfield != NULL)  *r_nfield = c;
    /*---(get first)----------------------*/
-   p     = strtok_r (a_recd, myPARSE.y_dellist, &r);
+   p     = strtok_r (x_recd, a_dellist, &r);
    DEBUG_YPARSE yLOG_point   ("p"         , p);
    c     = 0;
    /*---(read fields)--------------------*/
@@ -74,23 +160,25 @@ yparse_recd             (uchar *a_recd)
       /*---(clean it up)-----------------*/
       ystrltrim (p, ySTR_BOTH, LEN_RECD);
       x_len = ystrllen (p, LEN_RECD);
-      if (x_len == 0 && myPARSE.y_fill == YPARSE_FILL)  p = s;
-      else                                            ystrlunstore (p, x_len);
+      if (x_len == 0 && a_fill == YPARSE_FILL)  p = s;
+      else                                      ystrlunstore (p, x_len);
       DEBUG_YPARSE yLOG_info    ("field"     , p);
       DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
       /*---(enqueue it)------------------*/
-      rc = yparse_enqueue (&s_qin, p);
+      rc = yparse_queue_enqueue (&s_qin, p);
       DEBUG_YPARSE yLOG_value   ("enqueue"   , rc);
       ++c;
       /*---(get next)--------------------*/
-      p = strtok_r (NULL  , myPARSE.y_dellist, &r);
+      p = strtok_r (NULL  , a_dellist, &r);
       DEBUG_YPARSE yLOG_point   ("p"         , p);
       /*---(done)------------------------*/
    }
-   /*---(check tail)---------------------*/
-   rc = yparse_queue_tail (&s_qin);
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
+   /*---(check tail)---------------------*/
+   /*> rc = yparse_queue_tail (&s_qin);                                               <*/
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 0;
+   return c;
 }
+
+

@@ -45,6 +45,8 @@ tACCESSOR   myPARSE = {
 
 static      char        yPARSE_ver  [200] = "";
 
+char yparse_print [LEN_RECD];
+
 
 
 /*====================------------------------------------====================*/
@@ -123,90 +125,6 @@ yPARSE_force            (void)
    return 0;
 }
 
-
-
-/*====================------------------------------------====================*/
-/*===----                         unit testing                         ----===*/
-/*====================------------------------------------====================*/
-static void      o___UNITTEST________________o (void) {;}
-
-tMOCK       g_mocks     [10];
-int         g_nmock     = 0;
-
-char
-yparse__unit_verber     (void)
-{
-   char       *x_masking   = " ik_pure ik_from fk_pure fk_from ";
-   char        t           [LEN_LABEL];
-   yPARSE_toss ();
-   sprintf (t, " %s ", myPARSE.y_verb);
-   /*> if (strstr (x_masking, t) != NULL)  return 1;                                  <*/
-   return 0;
-}
-
-char
-yparse_mock__clear      (void)
-{
-   int         i           =    0;
-   for (i = 0; i < 10; ++i) {
-      strcpy (g_mocks [i].recd, "");
-      g_mocks [i].x_ch    = '·';
-      g_mocks [i].x_int   = -1;
-      strcpy (g_mocks [i].x_str , "-");
-      g_mocks [i].x_float = -1.1;
-      strcpy (g_mocks [i].x_str2, "-");
-   }
-   g_nmock = 0;
-   return 0;
-}
-
-char
-yparse_mock__writer     (void)
-{
-   yPARSE_vprintf   (-1, "macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
-   yPARSE_vprintf   (-1, "macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
-   yPARSE_vprintf   (-1, "macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
-   return 0;
-}
-
-char
-yparse_mock__reader     (void)
-{
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   DEBUG_YPARSE  yLOG_value   ("g_nmock"   , g_nmock);
-   yPARSE_vscanf    ("macro", &(g_mocks[g_nmock].x_ch), &(g_mocks[g_nmock].x_int), &(g_mocks[g_nmock].x_str), &(g_mocks[g_nmock].x_float), &(g_mocks[g_nmock].x_str2));
-   DEBUG_YPARSE  yLOG_info    ("recd"      , myPARSE.y_recd);
-   strcpy (g_mocks [g_nmock++].recd, myPARSE.y_recd);
-   DEBUG_YPARSE  yLOG_value   ("g_nmock"   , g_nmock);
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 1;
-}
-
-char*      /*----: unit testing accessor for clean validation interface ------*/
-yparse_mock__unit       (char *a_question, int a_num)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rc          =    0;
-   char        t           [LEN_RECD];
-   /*---(preprare)-----------------------*/
-   ystrlcpy  (yPARSE__unit_answer, "MOCK unit        : question not understood", LEN_STR);
-   /*---(answer)------------------------------------------*/
-   if      (strcmp (a_question, "count"    ) == 0) {
-      sprintf (yPARSE__unit_answer, "MOCK count     : %2d", g_nmock);
-   }
-   else if (strcmp (a_question, "recd"     ) == 0) {
-      sprintf (yPARSE__unit_answer, "MOCK recd   %2d : %2d[%s]", a_num, strlen (g_mocks [a_num].recd), g_mocks [a_num].recd);
-   }
-   else if (strcmp (a_question, "detail"   ) == 0) {
-      sprintf (yPARSE__unit_answer, "MOCK detail %2d : %c %5d %-20.20s %11.5f %s", a_num, g_mocks [a_num].x_ch, g_mocks [a_num].x_int, g_mocks [a_num].x_str, g_mocks [a_num].x_float, g_mocks [a_num].x_str2);
-   }
-   /*---(complete)----------------------------------------*/
-   return yPARSE__unit_answer;
-}
-
 char*      /*----: unit testing accessor for clean validation interface ------*/
 yparse_base__unit       (char *a_question, int a_num)
 {
@@ -217,7 +135,7 @@ yparse_base__unit       (char *a_question, int a_num)
    char        x_del       [LEN_TERSE];
    char        x_ver       [LEN_TERSE];
    /*---(preprare)-----------------------*/
-   ystrlcpy  (yPARSE__unit_answer, "BASE unit        : question not understood", LEN_STR);
+   ystrlcpy  (yparse_print, "BASE unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "ready"    ) == 0) {
       yPARSE_qin_info   (NULL, x_in , NULL, NULL);
@@ -229,10 +147,10 @@ yparse_base__unit       (char *a_question, int a_num)
       else                                                  strcpy (x_del, "custom");
       if      (myPARSE.y_verber != NULL)  strcpy (x_ver, "SET");
       else                                strcpy (x_ver, "···");
-      sprintf (yPARSE__unit_answer, "BASE ready     : %c  %c  %-3.3s  %c   å%-20.20sæ  å%-20.20sæ  %s", myPARSE.y_ready, myPARSE.y_verbs, x_ver, myPARSE.y_reusing, x_in, x_out, x_del);
+      sprintf (yparse_print, "BASE ready     : %c  %c  %-3.3s  %c   å%-20.20sæ  å%-20.20sæ  %s", myPARSE.y_ready, myPARSE.y_verbs, x_ver, myPARSE.y_reusing, x_in, x_out, x_del);
    }
    /*---(complete)----------------------------------------*/
-   return yPARSE__unit_answer;
+   return yparse_print;
 }
 
 

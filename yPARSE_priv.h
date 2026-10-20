@@ -42,42 +42,59 @@
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-*/
 
 /*===[[ ONE_LINERS ]]=========================================================*/
-
+/*                      ´·········1·········2·········3·········4·········5·········6·········7*/
+/*--------- 12345678901 ´123456789-123456789-123456789-123456789-123456789-123456789-123456789-*/
+/*········· ··········· ´·····························´········································*/
 #define     P_FOCUS     "RS (run-time support)"
 #define     P_NICHE     "fp (file parsing)"
 #define     P_SUBJECT   "automated file parsing"
 #define     P_PURPOSE   "text file parsing and aggregating library"
-
+/*········· ··········· ´·····························´········································*/
 #define     P_NAMESAKE  "jupiter-terminus (boundaries)"
+#define     P_PRONOUNCE "·"
 #define     P_HERITAGE  "roman god of boundaries, division, and boundary markers"
+#define     P_BRIEFLY   "god to boundaries"
 #define     P_IMAGERY   "head and torso of a man, connected to a boundary stone as a base"
-#define     P_REASON    ""
-
+#define     P_REASON    "records are the ultimate boundary layouts"
+/*········· ··········· ´·····························´········································*/
 #define     P_ONELINE   P_NAMESAKE " " P_SUBJECT
-
-#define     P_BASENAME  ""
-#define     P_FULLPATH  ""
-#define     P_SUFFIX    ""
-#define     P_CONTENT   ""
-
+/*········· ··········· ´·····························´········································*/
+#define     P_BASENAME  "yPARSE"
+#define     P_HOMEDIR   "/home/system/yPARSE.record_parsing"
+#define     P_FULLPATH  "/usr/local/lib64/libyPARSE.so"
+#define     P_SUFFIX    "´"
+#define     P_CONTENT   "´"
+/*········· ··········· ´·····························´········································*/
 #define     P_SYSTEM    "gnu/linux   (powerful, ubiquitous, technical, and hackable)"
 #define     P_LANGUAGE  "ansi-c      (wicked, limitless, universal, and everlasting)"
 #define     P_CODESIZE  "small       (appoximately 10,000 slocl)"
 #define     P_DEPENDS   "none"
-
+/*········· ··········· ´·····························´········································*/
+#define     P_DEPSTDC   "stdio,stdlib,string,stdarg,errno,error,time"
+#define     P_DEPPOSIX  "unistd,sys/stat,termios"
+#define     P_DEPSECURE "pwd,grp"
+#define     P_DEPEXTEND "openssl/sha"
+#define     P_DEPCORE   "yLOG,yURG,ySTR,yENV"
+#define     P_DEPVIKEY  "´"
+#define     P_DEPGRAPH  "´"
+#define     P_DEPOTHER  "´"
+#define     P_DEPSOLO   "yCOLOR_solo"
+#define     P_DEPALIEN  "´"
+/*········· ··········· ´·····························´········································*/
 #define     P_AUTHOR    "heatherlyrobert"
 #define     P_CREATED   "2018-01"
-
+/*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5b"
-#define     P_VERTXT    "yPARSE_config isolated, cleaned-up, and unit-tested"
-
+#define     P_VERNUM    "0.5c"
+#define     P_VERTXT    "yPARSE_queue now has searching and magnificent unit-testing ;)"
+/*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
 #define     P_REMINDER  "there are many better options, but i *own* every byte of this one"
-
-/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-*/
+/*········· ··········· ´·····························´········································*/
+/*--------- 12345678901 ´123456789-123456789-123456789-123456789-123456789-123456789-123456789-*/
+/*                      ´·········1·········2·········3·········4·········5·········6·········7*/
 /*===[[ END_HEADER ]]=========================================================*/
 
 
@@ -104,6 +121,7 @@
 #include    <ySTR.h>                /* CUSTOM heatherly string handling       */
 #include    <yENV.h>                /* CUSTOM heatherly string handling       */
 #include    <yCOLOR_solo.h>
+#include    <yDLST_solo.h>
 
 
 
@@ -118,7 +136,7 @@
 typedef struct tm        tTIME;
 
 
-extern char yPARSE__unit_answer [ LEN_STR  ];
+extern char yparse_print [LEN_RECD];  /* generic/debugging output holder */
 
 
 
@@ -139,11 +157,12 @@ struct cACCESSOR {
    char        y_recd        [LEN_RECD];
    char        y_verb        [LEN_LABEL];
    char        y_good;
-   int         y_nfield;
+   char        y_nfield;
    /*---(done)--------------*/
 };
 extern   tACCESSOR  myPARSE;
 
+#define   MAX_NODE      20
 typedef     struct      cNODE       tNODE;
 struct      cNODE {
    int         n_ref;
@@ -177,25 +196,15 @@ struct      cQUEUE {
    /*---(fields)------------*/
    tNODE      *q_head;
    tNODE      *q_tail;
-   int         q_first;
-   int         q_count;
+   /*---(stats)-------------*/
+   char        q_count;
+   char        q_first;
+   char        q_last;
+   char        q_curr;
    /*---(done)--------------*/
 };
 extern     tQUEUE      s_qin;
 extern     tQUEUE      s_qout;
-
-/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-typedef     struct      cMOCK       tMOCK;
-struct cMOCK {
-   char        recd        [LEN_RECD];
-   char        x_ch;
-   int         x_int;
-   char        x_str       [LEN_LABEL];
-   float       x_float;
-   char        x_str2      [LEN_LABEL];
-};
-extern      tMOCK       g_mocks     [10];
-extern      int         g_nmock;
 
 
 
@@ -215,8 +224,9 @@ char        yparse_config           (char a_1st, char a_auto, void *a_verber, ch
 char        yPARSE_delimiters       (char a_delim, char a_fill);
 char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
 char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
-char        yparse_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+char        yPARSE_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 /*········´ ´················DONE·´ ´·········································*/
+
 
 
 /*===[[ yPARSE_queue.c ]]=====================================================*/
@@ -229,7 +239,23 @@ char        yparse_queue_init       (tQUEUE *a_queue, char a_dir, char a_label [
 char        yparse_queue__defense   (tQUEUE *a_queue, char a_action);
 char        yparse_queue_open       (tQUEUE *a_queue, char a_name [LEN_PATH]);
 char        yparse_queue_close      (tQUEUE *a_queue);
+/*········´ ´·············fieilds·´ ´·········································*/
+char        yparse_queue_enqueue    (tQUEUE *a_queue, char *a_item);
+char        yparse_queue_dequeue    (tQUEUE *a_queue, char *a_item);
+/*········´ ´··············search·´ ´·········································*/
+char        yparse_queue_count      (tQUEUE *a_queue);
+char        yparse_queue_by_cursor  (tQUEUE *a_queue, char a_dir, char a_seq, tNODE **r_node, char r_item [LEN_RECD], char d_entry [LEN_RECD]);
+char*       yparse_queue_entry      (tQUEUE *a_queue, char a_dir);
+char        yparse_queue_top        (tQUEUE *a_queue, char r_item [LEN_RECD]);
+char        yparse_queue_peek       (tQUEUE *a_queue, char a_seq, char r_item [LEN_RECD]);
 /*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_read.c ]]======================================================*/
+/*········´ ´·············support·´ ´·········································*/
+char        yparse_read_skip        (char a_recd [LEN_RECD]);
+char        yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], char a_fill, char *r_nfield);
 
 
 
@@ -257,7 +283,7 @@ char        yparse_init_types       (void);
 
 
 char        yparse_good_in          (void);
-char        yparse_queue_tail       (tQUEUE *a_queue);
+/*> char        yparse_queue_tail       (tQUEUE *a_queue);                            <*/
 
 
 char        yparse_verb_find        (tQUEUE *a_queue, char *a_verb);
@@ -266,17 +292,12 @@ char        yparse_verb_init        (void);
 char        yparse__verb_divider    (int a_iverb);
 char*       yparse__unit_verb       (char *a_question, char *a_verb, int a_seq);
 
-char        yparse_enqueue          (tQUEUE *a_queue, char *a_item);
-char        yparse_dequeue          (tQUEUE *a_queue, char *a_item);
-char        yparse_topqueue         (tQUEUE *a_queue, char *a_item);
-char        yparse_peek             (tQUEUE *a_queue, const int a_ref, char *a_item);
 char        yparse_peek_verb        (int *a_index, char *a_verb);
 
 char        yparse__main            (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
 char        yparse_reusable         (char a_masked);
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-char        yparse_recd             (uchar *a_recd);
 
 char        yparse_in_fakeready     (void);
 char        yparse_enqueue_in       (char *a_item);
@@ -298,46 +319,20 @@ int         yparse_field_len        (char a_type);
 char        yparse_aggregate        (void);
 char        yparse_verb_goodname    (char *a_verb);
 
-char*       yparse__unit_queue      (tQUEUE *a_queue, char *a_question, int a_num);
 char*       yparse__unit_in         (char *a_question, int a_num);
 char*       yparse__unit_out        (char *a_question, int a_num);
 char*       yparse__unit_line       (char *a_question, int a_num);
-
-char        yparse_mock__clear      (void);
-char        yparse_mock__writer     (void);
-char        yparse_mock__reader     (void);
-char*       yparse_mock__unit       (char *a_question, int a_num);
 
 char        yparse_in__count        (void);
 char        yparse_out__count       (void);
 char        yparse_handler_remove   (char *a_verb);
 
-char        yparse__unit_verber     (void);
 
 
 /*===[[ SIMPLE ]]=========================================*/
 /*---(testing)--------------*/
 char        yparse_autoread_manual  (uchar *a_in, uchar *a_out, void *a_verber);
 char        yparse_planned_manual   (uchar *a_in, uchar *a_out, void *a_verber, uchar a_progname, uchar a_progdesc);
-
-/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yparse__mock_clear      (void);
-char        yparse__mock_external   (char *a_verb, char *a_label, char *a_terse, int *a_int, llong *a_long, float *a_float, double *a_double, char *a_char, double *a_exp, char *a_desc, char *a_str);
-char        yparse__mock_internal   (void);
-char        yparse__mock_verber     (int n, uchar *a_verb, char a_exist, void *a_handler);
-char        yparse__mock_rtiny      (int n, uchar *a_verb);
-char        yparse__mock_wtiny      (int n, uchar *a_verb);
-char        yparse__mock_ftiny      (int n, uchar *a_verb);
-char        yparse__mock_rsmall     (int n, uchar *a_verb);
-char        yparse__mock_wsmall     (int n, uchar *a_verb);
-char        yparse__mock_fsmall     (int n, uchar *a_verb);
-char        yparse__mock_rmedium    (int n, uchar *a_verb);
-char        yparse__mock_wmedium    (int n, uchar *a_verb);
-char        yparse__mock_fmedium    (int n, uchar *a_verb);
-char        yparse__mock_rlarge     (int n, uchar *a_verb);
-char        yparse__mock_wlarge     (int n, uchar *a_verb);
-char        yparse__mock_flarge     (int n, uchar *a_verb);
-char        yparse__mock_header     (void);
 
 
 

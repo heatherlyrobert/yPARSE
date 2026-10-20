@@ -42,11 +42,11 @@
 #define     YPARSE_READALL          'y'
 
 
-/*---(myPARSE.verbs = a_auto)---------*/
-#define     YPARSE_AUTO             'y'
-#define     YPARSE_SIMPLE           's'
+/*---(myPARSE.verbs)------------------*/
 #define     YPARSE_MANUAL           '-'
-#define     YPARSE_VERBS            "ys-"
+#define     YPARSE_SIMPLE           's'
+#define     YPARSE_AUTO             'y'
+#define     YPARSE_VERBS            "-sy"
 
 /*---(myPARSE.reusing)----------------*/
 #define     YPARSE_ONETIME          '-'
@@ -62,9 +62,9 @@
 #define     YPARSE_TRADITIONS       ""
 #define     YPARSE_DELIMS           "-aft"
 /*---(myPARSE.fill)-------------------*/
-#define     YPARSE_FILL             'y'
 #define     YPARSE_NOFILL           '-'
-#define     YPARSE_FILLS            "y-"
+#define     YPARSE_FILL             'y'
+#define     YPARSE_FILLS            "-y"
 
 
 

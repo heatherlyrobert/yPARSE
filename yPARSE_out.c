@@ -301,7 +301,7 @@ yparse__push_string     (uchar *a_str)
       return rc;
    }
    /*---(enqueue)------------------------*/
-   rc = yparse_enqueue (&s_qout, t);
+   rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
@@ -440,7 +440,7 @@ yparse__push_numeric    (double a_val)
       break;
    }
    /*---(enqueue)------------------------*/
-   rc = yparse_enqueue (&s_qout, t);
+   rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
@@ -498,7 +498,7 @@ yPARSE_pushverb         (char *a_verb)
    sprintf (t, "%-12.12s"  , a_verb);
    /*---(enqueue)------------------------*/
    DEBUG_YPARSE  yLOG_snote   ("enqueue");
-   rc = yparse_enqueue (&s_qout, t);
+   rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
       s_qout.q_good = 'n';
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
@@ -554,7 +554,7 @@ yparse__popout           (char *a_item)
       return rce;
    }
    /*---(dequeue)------------------------*/
-   rc = yparse_dequeue (&s_qout, a_item);
+   rc = yparse_queue_dequeue (&s_qout, a_item);
    --rce;  if (rc < 0) {
       DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
@@ -792,6 +792,6 @@ static void      o___UNITTEST________________o (void) {;};
 char*      /*----: unit testing accessor for clean validation interface ------*/
 yparse__unit_out        (char *a_question, int a_num)
 {
-   return yparse__unit_queue (&s_qout, a_question, a_num);
+   /*> return yparse__unit_queue (&s_qout, a_question, a_num);                        <*/
 }
 

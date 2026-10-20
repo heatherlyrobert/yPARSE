@@ -189,6 +189,6 @@ char yPARSE_verber      (char a_auto, void *a_verber, char a_reusing) { return y
 
 char yPARSE_config      (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill) { return yparse_config ('y', a_auto, a_verber, a_reusing, a_delim, a_fill); }
 
-char yparse_reconfig    (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill) { return yparse_config ('-', a_auto, a_verber, a_reusing, a_delim, a_fill); }
+char yPARSE_reconfig    (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill) { return yparse_config ('-', a_auto, a_verber, a_reusing, a_delim, a_fill); }
 
 
