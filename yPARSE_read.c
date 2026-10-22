@@ -118,11 +118,15 @@ yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], cha
    char        rc          =    0;               /* generic return code       */
    char        x_recd      [LEN_RECD]  = "";
    int         x_len       =    0;
-   int         c           =    0;
+   int         l           =    0;
+   char        c           =    0;
+   char        n           =    0;
    char       *p           = NULL;
    char       *r           = NULL;
    int         i           =    0;
    char       *s           =  "·";
+   char       *x_nada      =   "";
+   char       *x_place     =  "¤";
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
@@ -145,37 +149,56 @@ yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], cha
    x_len = ystrllen   (x_recd, LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
    /*---(prepare field count)------------*/
-   x_len = ystrllen   (a_dellist, LEN_RECD);
-   for (i = c = 0; i < x_len; ++i) {
+   l     = ystrllen   (a_dellist, LEN_RECD);
+   for (i = c = 0; i < l; ++i) {
       c += ystrldcnt (x_recd, a_dellist [i], LEN_RECD);
    }
+   DEBUG_YPARSE yLOG_value   ("delimiters", c);
+   ++c;
+   DEBUG_YPARSE yLOG_char    ("x_len - 1" , a_recd [x_len - 1]);
+   if (strchr (a_dellist, a_recd [x_len - 1]) != NULL) --c;
    DEBUG_YPARSE yLOG_value   ("fields"    , c);
-   if (r_nfield != NULL)  *r_nfield = c;
    /*---(get first)----------------------*/
    p     = strtok_r (x_recd, a_dellist, &r);
    DEBUG_YPARSE yLOG_point   ("p"         , p);
-   c     = 0;
    /*---(read fields)--------------------*/
-   while (p != NULL) {
+   --rce;  while (p != NULL) {
       /*---(clean it up)-----------------*/
       ystrltrim (p, ySTR_BOTH, LEN_RECD);
       x_len = ystrllen (p, LEN_RECD);
-      if (x_len == 0 && a_fill == YPARSE_FILL)  p = s;
-      else                                      ystrlunstore (p, x_len);
+      if (x_len == 0) {
+         if (a_fill == YPARSE_FILL)  p = x_place;
+         else                        p = x_nada;
+      }
+      else if (x_len == 1 && strchr ("·´Ï-", p [0]) != NULL) {
+         if (a_fill == YPARSE_PACK)  p = x_nada;
+         else                        p = x_place;
+      }
+      else                           ystrlunstore (p, x_len);
+      x_len = ystrllen (p, LEN_RECD);
       DEBUG_YPARSE yLOG_info    ("field"     , p);
       DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
       /*---(enqueue it)------------------*/
       rc = yparse_queue_enqueue (&s_qin, p);
       DEBUG_YPARSE yLOG_value   ("enqueue"   , rc);
-      ++c;
+      if (rc < 0) {
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      ++n;
       /*---(get next)--------------------*/
       p = strtok_r (NULL  , a_dellist, &r);
       DEBUG_YPARSE yLOG_point   ("p"         , p);
       /*---(done)------------------------*/
    }
-   DEBUG_YPARSE yLOG_value   ("fields"    , c);
-   /*---(check tail)---------------------*/
-   /*> rc = yparse_queue_tail (&s_qin);                                               <*/
+   DEBUG_YPARSE yLOG_value   ("fields"    , n);
+   /*---(trouble)------------------------*/
+   --rce;  if (n != c) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(save-back)----------------------*/
+   if (r_nfield != NULL)  *r_nfield = n;
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return c;

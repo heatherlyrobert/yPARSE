@@ -86,8 +86,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5c"
-#define     P_VERTXT    "yPARSE_queue now has searching and magnificent unit-testing ;)"
+#define     P_VERNUM    "0.5d"
+#define     P_VERTXT    "yPARSE_read updating parsing and its unit-testing"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

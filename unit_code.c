@@ -69,6 +69,7 @@ yparse_config_status    (void)
    else if (strcmp (myPARSE.y_dellist, "")                != 0)  strcpy (x_del, "custom····");
    if      (myPARSE.y_verber != NULL)  strcpy (x_ver , "SET");
    if      (myPARSE.y_fill   == YPARSE_FILL)   strcpy (x_fill, "fill··");
+   else if (myPARSE.y_fill   == YPARSE_PACK)   strcpy (x_fill, "pack··");
    if (strcmp (x_in , "") == 0)   strcpy (x_in  , "····················");
    if (strcmp (x_out, "") == 0)   strcpy (x_out , "····················");
    sprintf (yparse_print, "%c/%-7.7s  %c/%-7.7s  verber %-3.3s  %c/%-7.7s  ·inå%-20.20sæ  outå%-20.20sæ  %c/%-10.10s %c/%-6.6s  Ï",
@@ -126,7 +127,7 @@ yparse_queue_status     (tQUEUE *a_queue)
    if (a_queue == 'T') {
       DEBUG_YPARSE  yLOG_note    ("requested titiles");
       strcpy (yparse_print, "D label vrb had  G H  ---location--------- ptr tot acp cur  len ---record-------------------------------  ---head--- ---tail--- cnt fst lst cur  Ï");
-      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
       return yparse_print;
    }
    DEBUG_YPARSE  yLOG_note    ("requested actual queue");
@@ -146,8 +147,14 @@ yparse_queue_status     (tQUEUE *a_queue)
    if (a_queue->q_loc  [0] != '\0')  snprintf (x_loc  , 21       , "%s········································", a_queue->q_loc);
    if (a_queue->q_file     != NULL)  strcpy   (x_file   , "SET");
    if (a_queue->q_recd [0] != '\0')  snprintf (x_recd , 41       , "%s········································", a_queue->q_recd);
-   if (a_queue->q_head     != NULL)  snprintf (x_head , 11, "%s··········", a_queue->q_head->n_item);
-   if (a_queue->q_tail     != NULL)  snprintf (x_tail , 11, "%s··········", a_queue->q_tail->n_item);
+   if (a_queue->q_head     != NULL) {
+      snprintf (x_head , 11, "%s··········", a_queue->q_head->n_item);
+      if (x_head [ 9] != '·')  x_head [ 9] = '>';
+   }
+   if (a_queue->q_tail     != NULL) {
+      snprintf (x_tail , 11, "%s··········", a_queue->q_tail->n_item);
+      if (x_tail [ 9] != '·')  x_tail [ 9] = '>';
+   }
    sprintf (yparse_print, "%c %-5.5s %3d %-3.3s  %c %c  %-20.20s %-3.3s %3d %3d %3d  %3d %-40.40s  %-10.10s %-10.10s %3d %3d %3d %3d  Ï",
          a_queue->q_dir, x_label, a_queue->q_iverb, x_handler,
          a_queue->q_good, a_queue->q_hidden,
@@ -155,7 +162,7 @@ yparse_queue_status     (tQUEUE *a_queue)
          a_queue->q_len, x_recd,
          x_head, x_tail, a_queue->q_count, a_queue->q_first, a_queue->q_last, a_queue->q_curr);
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return yparse_print;
 }
 

@@ -64,7 +64,8 @@
 /*---(myPARSE.fill)-------------------*/
 #define     YPARSE_NOFILL           '-'
 #define     YPARSE_FILL             'y'
-#define     YPARSE_FILLS            "-y"
+#define     YPARSE_PACK             'p'
+#define     YPARSE_FILLS            "-yp"
 
 
 
