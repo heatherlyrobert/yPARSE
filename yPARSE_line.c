@@ -45,72 +45,82 @@
 
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
-typedef     struct      cLINE       tLINE;
-struct      cLINE {
-   int         line;
-   char       *recd;
-   int         uses;
-   tLINE      *next;
-   tLINE      *prev;
-};
 /*--------- ----------- ----------- ----------- ------------------------------*/
-static      tLINE      *s_head      = NULL;
-static      tLINE      *s_tail      = NULL;
-static      int         s_count     =    0;
+static      tLINE      *S_head      = NULL;
+static      tLINE      *S_tail      = NULL;
+static      int         S_count     =    0;
+static      tLINE      *S_curr      = NULL;
 
 
 
 /*====================------------------------------------====================*/
-/*===----                      incomming lines                         ----===*/
+/*===----                     program support                          ----===*/
 /*====================------------------------------------====================*/
-static void      o___LINES___________________o (void) {;};
+static void      o___PROGRAM_________________o (void) {;};
 
 char
 yparse_line_purge       (void)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   char        i           =    0;
-   tLINE      *x_curr      = NULL;
+   char        rc          =    0;
+   tLINE      *x_old       = NULL;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_senter  (__FUNCTION__);
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(walk-thru)----------------------*/
-   DEBUG_YPARSE   yLOG_sint    (s_count);
-   DEBUG_YPARSE   yLOG_snote   ("walk");
-   x_curr = s_head;
-   while (x_curr != NULL) {
-      DEBUG_YPARSE   yLOG_sint    (x_curr->line);
+   DEBUG_YPARSE   yLOG_value   ("S_count"   , S_count);
+   x_old = S_head;
+   DEBUG_YPARSE   yLOG_point   ("x_old"     , x_old);
+   while (x_old != NULL) {
+      DEBUG_YPARSE   yLOG_value   ("l_line"    , x_old->l_line);
       /*---(list integrity)--------------*/
-      if (x_curr->next == NULL) {
-         s_head             = NULL;
-         s_tail             = NULL;
-         s_count            = 0;
+      if (x_old->l_next == NULL) {
+         S_head  = NULL;
+         S_tail  = NULL;
       } else {
-         s_head             = x_curr->next;
-         x_curr->next->prev = NULL;
-         --s_count;
+         S_head                = x_old->l_next;
+         x_old->l_next->l_prev = NULL;
       }
       /*---(free line)-------------------*/
-      if (x_curr->recd != NULL)  free (x_curr->recd);
-      free (x_curr);
-      x_curr = s_head;
+      rc = yENV_free ("line", &x_old, &S_count);
+      /*---(go to next)------------------*/
+      x_old = S_head;
+      DEBUG_YPARSE   yLOG_point   ("x_old"     , x_old);
       /*---(done)------------------------*/
    }
-   DEBUG_YPARSE   yLOG_snote   ("done");
+   DEBUG_YPARSE   yLOG_value   ("S_count"   , S_count);
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
-   return 0;
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
 }
 
 char
 yparse_line_init        (void)
 {
    /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_senter  (__FUNCTION__);
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(purge)--------------------------*/
    yparse_line_purge ();
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                    creation and use                          ----===*/
+/*====================------------------------------------====================*/
+static void      o___CREATE__________________o (void) {;};
+
+char
+yparse_line__wipe       (tLINE *a_line)
+{
+   a_line->l_line =    0;
+   strcpy (a_line->l_recd, "");
+   a_line->l_next = NULL;
+   a_line->l_prev = NULL;
+   a_line->l_uses =    0;
    return 0;
 }
 
@@ -119,86 +129,191 @@ yparse_line_add         (int a_line, char a_recd [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   char        i           =    0;
-   tLINE      *x_curr      = NULL;
+   char        rc          =    0;
+   tLINE      *x_new       = NULL;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_senter  (__FUNCTION__);
-   DEBUG_YPARSE   yLOG_sint    (a_line);
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE   yLOG_value   ("a_line"    , a_line);
    /*---(defense)------------------------*/
-   DEBUG_YPARSE   yLOG_spoint  (a_recd);
-   --rce;  if (a_recd == NULL) {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+   DEBUG_YPARSE   yLOG_point   ("a_recd"    , a_recd);
+   --rce;  if (a_recd == NULL || a_recd [0] == '\0') {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YPARSE   yLOG_info    ("a_recd"    , a_recd);
    /*---(create)-------------------------*/
-   x_curr = (tLINE *) malloc (sizeof (tLINE));
-   DEBUG_YPARSE   yLOG_spoint  (x_curr);
-   --rce;  if (x_curr == NULL) {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+   rc = yENV_new ("line", sizeof (tLINE), &x_new, &S_count, '-', yparse_line__wipe);
+   DEBUG_YPARSE   yLOG_value   ("new"       , rc);
+   DEBUG_YPARSE   yLOG_point   ("x_new"     , x_new);
+   --rce;  if (rc < 0 || x_new == NULL) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(defaults)-----------------------*/
-   DEBUG_YPARSE   yLOG_snote   ("defaults");
-   x_curr->line = a_line;
-   x_curr->recd = strdup (a_recd);
-   x_curr->next = NULL;
-   x_curr->prev = NULL;
-   x_curr->uses =    0;
+   /*---(populate)-----------------------*/
+   DEBUG_YPARSE   yLOG_note    ("populate fields");
+   x_new->l_line = a_line;
+   strlcpy (x_new->l_recd, a_recd, LEN_RECD);
    /*---(attatch)------------------------*/
-   if (s_head == NULL) {
-      DEBUG_YPARSE   yLOG_snote   ("first");
-      s_head  = x_curr;
-      s_tail  = x_curr;
-      s_count = 1;
+   if (S_head == NULL) {
+      DEBUG_YPARSE   yLOG_note    ("add as first");
+      S_head  = x_new;
+      S_tail  = x_new;
    } else  {
-      DEBUG_YPARSE   yLOG_snote   ("append");
-      s_tail->next = x_curr;
-      x_curr->prev = s_tail;
-      s_tail       = x_curr;
-      ++s_count;
+      DEBUG_YPARSE   yLOG_note    ("append to end");
+      S_tail->l_next = x_new;
+      x_new->l_prev  = S_tail;
+      S_tail         = x_new;
    }
-   DEBUG_YPARSE   yLOG_sint    (s_count);
+   DEBUG_YPARSE   yLOG_value   ("S_count"   , S_count);
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
-   return 0;
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
 }
 
-char
-yparse_line_get         (int a_line, char r_recd [LEN_RECD])
+
+
+/*====================------------------------------------====================*/
+/*===----                      searching for lines                     ----===*/
+/*====================------------------------------------====================*/
+static void      o___SEARCH__________________o (void) {;};
+
+int yparse_line_count  (void)  { return S_count; }
+
+char 
+yparse_line_by_cursor   (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   char        i           =    0;
-   tLINE      *x_curr      = NULL;
+   char        rc          =    1;
+   char        n           =   -1;
+   char        x_exact     =   -1;
+   char        c           =    0;
+   char        x_prev      [LEN_DESC]  = "´·····························";
+   char        x_curr      [LEN_DESC]  = "´·····························";
+   char        x_next      [LEN_DESC]  = "´·····························";
+   tLINE      *x_line      = NULL;
+   int         i           =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_senter  (__FUNCTION__);
-   DEBUG_YPARSE   yLOG_sint    (a_line);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE   yLOG_spoint  (r_recd);
-   --rce;  if (r_recd == NULL) {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+   DEBUG_YPARSE yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_line  != NULL)  *r_line  = NULL;
+   if (r_recd  != NULL)  strcpy (r_recd , "");
+   if (r_uses  != NULL)  *r_uses  = 0;
+   if (d_entry != NULL)  strcpy (d_entry, "");
+   /*---(quick-out)----------------------*/
+   if (a_dir == 'T') {
+      if (d_entry != NULL)  strcpy (d_entry, "seq  ---curr-----------------------  use  ---prev-----------------------  ---next-----------------------  Ï");
+      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   if (d_entry != NULL)  strcpy (d_entry, "··-  ´·····························  ··-  ´·····························  ´·····························  Ï");
+   /*---(quick-out)----------------------*/
+   DEBUG_YPARSE  yLOG_value   ("S_count"   , S_count);
+   if (S_count == 0) {
+      if (d_entry != NULL)  strcpy (d_entry, "(empty)");
+      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(handle cursor)------------------*/
+   DEBUG_YPARSE yLOG_char    ("a_dir"     , a_dir);
+   DEBUG_YPARSE yLOG_value   ("a_line"    , a_line);
+   --rce;  if (a_dir >  0) {
+      DEBUG_YPARSE yLOG_note    ("requested cursoring");
+      /*---(prepare)---------------------*/
+      n = S_curr;
+      DEBUG_YPARSE yLOG_value   ("n"         , n);
+      /*---(update)----------------------*/
+      --rce;  switch (a_dir) {
+      case YDLST_HEAD : case YDLST_DHEAD :
+         n = 0;
+         break;
+      case YDLST_PREV : case YDLST_DPREV :
+         --n;
+         break;
+      case YDLST_CURR : case YDLST_DCURR :
+         n = n;
+         break;
+      case YDLST_NEXT : case YDLST_DNEXT :
+         ++n;
+         break;
+      case YDLST_TAIL : case YDLST_DTAIL :
+         n = S_count - 1;
+         break;
+      default         :
+         DEBUG_YPARSE yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      DEBUG_YPARSE yLOG_value   ("n"         , n);
+   }
+   /*---(handle index)-------------------*/
+   else if (a_line >= 0) {
+      DEBUG_YPARSE yLOG_note    ("requesed indexing");
+      x_exact = a_line;
+   }
+   /*---(handle trouble)-----------------*/
+   else {
+      DEBUG_YPARSE  yLOG_note    ("neither cursor or line number");
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(prepare)------------------------*/
-   DEBUG_YPARSE   yLOG_snote   ("prepare");
-   ystrlcpy (r_recd, "", LEN_RECD);
-   x_curr = s_tail;
-   /*---(find)---------------------------*/
-   while (x_curr != NULL) {
-      if (a_line == x_curr->line) {
-         ++(x_curr->uses);
-         ystrlcpy (r_recd, x_curr->recd, LEN_RECD);
-         DEBUG_YPARSE   yLOG_snote   ("found");
-         DEBUG_YPARSE   yLOG_sexit   (__FUNCTION__);
-         return 0;
-      }
-      x_curr = x_curr->prev;
+   /*---(handle endpoints)---------------*/
+   DEBUG_YPARSE yLOG_value   ("n"         , n);
+   --rce;  if (a_dir > 0 && n < 0) {
+      if (d_entry != NULL)  strcpy (d_entry, "(under)");
+      S_curr = 0;
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
    }
+   --rce;  if (a_dir > 0 && n >= S_count) {
+      if (d_entry != NULL)  strcpy (d_entry, "(over)");
+      S_curr = S_count - 1;
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(find)---------------------------*/
+   x_line = S_head;
+   DEBUG_YPARSE yLOG_point   ("S_head"    , S_head);
+   while (x_line != NULL) {
+      DEBUG_YPARSE yLOG_complex ("loop"      , "%3dn, %3dc, %3de, %3d#", n, c, x_exact, x_line->l_line);
+      if (n >= 0 && c == n) {
+         DEBUG_YPARSE yLOG_note    ("found it by cursor");
+         break;
+      }
+      if (x_exact >= 0 && x_line->l_line == x_exact) {
+         DEBUG_YPARSE yLOG_note    ("found it by line number");
+         break;
+      }
+      ++c;
+      x_line = x_line->l_next;
+      DEBUG_YPARSE yLOG_point   ("x_line"    , x_line);
+   }
+   /*---(not found)----------------------*/
+   if (x_line == NULL) {
+      if (d_entry != NULL)  strcpy (d_entry, "(n/a)");
+      DEBUG_YPARSE yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(save-back)----------------------*/
+   S_curr = c;
+   if (r_line  != NULL)  *r_line  = x_line;
+   if (r_recd  != NULL)  ystrlcpy (r_recd , x_line->l_recd, LEN_RECD);
+   if (r_uses  != NULL)  *r_uses  = x_line->l_uses;
+   /*---(output)-------------------------*/
+   if (d_entry != NULL) {
+      DEBUG_YPARSE yLOG_note    ("requested d_entry");
+      if (x_line->l_prev != NULL)  ystrldisplay (x_line->l_prev->l_recd, LEN_TITLE, x_prev);
+      ystrldisplay (x_line->l_recd, LEN_TITLE, x_curr);
+      if (x_line->l_next != NULL)  ystrldisplay (x_line->l_next->l_recd, LEN_TITLE, x_next);
+      sprintf (d_entry, "%3d  %-30.30s  %3d  %-30.30s  %-30.30s  Ï", n, x_curr, x_line->l_uses, x_prev, x_next);
+   }
+   /*---(update uses)--------------------*/
+   if (a_action == 'g')  ++(x_line->l_uses);
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_snote   ("not found");
-   DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-   return -1;
+   DEBUG_YPARSE yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
 }
 
+char   yparse_line_get    (int a_line, char r_recd [LEN_RECD]) { return yparse_line_by_cursor ('g', -1, a_line, NULL, r_recd, NULL, NULL); }
+char*  yparse_line_entry  (char a_dir) { yparse_line_by_cursor ('e', a_dir, -1, NULL, NULL, NULL, yparse_print);  return yparse_print; }
 
 

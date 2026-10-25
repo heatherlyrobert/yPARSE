@@ -86,8 +86,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5d"
-#define     P_VERTXT    "yPARSE_read updating parsing and its unit-testing"
+#define     P_VERNUM    "0.5e"
+#define     P_VERTXT    "basic yPARSE_line split-out, updated, modernized, and unit-tested"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -207,6 +207,15 @@ extern     tQUEUE      s_qin;
 extern     tQUEUE      s_qout;
 
 
+typedef     struct      cLINE       tLINE;
+struct      cLINE {
+   int         l_line;
+   char        l_recd        [LEN_RECD];
+   int         l_uses;
+   tLINE      *l_next;
+   tLINE      *l_prev;
+};
+
 
 /*===[[ yPARSE_base.c ]]======================================================*/
 /*········´ ´·····················´ ´·········································*/
@@ -253,18 +262,31 @@ char        yparse_queue_peek       (tQUEUE *a_queue, char a_seq, char r_item [L
 
 
 /*===[[ yPARSE_read.c ]]======================================================*/
-/*········´ ´·············support·´ ´·········································*/
+/*········´ ´·············parsing·´ ´·········································*/
 char        yparse_read_skip        (char a_recd [LEN_RECD]);
+char        yparse_read_next        (FILE *a_file, int *b_tline, char r_recd [LEN_RECD], int *r_len);
 char        yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], char a_fill, char *r_nfield);
+/*········´ ´············handling·´ ´·········································*/
+char        yparse_read_lineno      (int a_line, int *b_nline, int *b_cline, char *r_hidden);
+char        yparse_read_existing    (int a_line, char a_label [LEN_HUND]);
+char        yparse_read_rollback    (int a_line);
+char        yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *b_tline, char r_recd [LEN_RECD], int *r_len);
+char        yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
 
 
 
 /*===[[ yPARSE_line.c ]]======================================================*/
-/*········´ ´·····················´ ´·········································*/
+/*········´ ´·············program·´ ´·········································*/
 char        yparse_line_purge       (void);
 char        yparse_line_init        (void);
+/*········´ ´··············create·´ ´·········································*/
+char        yparse_line__wipe       (tLINE *a_line);
 char        yparse_line_add         (int a_line, char a_recd [LEN_RECD]);
+/*········´ ´··············search·´ ´·········································*/
+int         yparse_line_count       (void);
+char        yparse_line_by_cursor   (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD]);
 char        yparse_line_get         (int a_line, char r_recd [LEN_RECD]);
+char       *yparse_line_entry       (char a_dir);
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -294,7 +316,6 @@ char*       yparse__unit_verb       (char *a_question, char *a_verb, int a_seq);
 
 char        yparse_peek_verb        (int *a_index, char *a_verb);
 
-char        yparse__main            (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
 char        yparse_reusable         (char a_masked);
 
 /*--------- ----------- ----------- ----------- ------------------------------*/
