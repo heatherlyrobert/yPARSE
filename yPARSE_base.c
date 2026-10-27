@@ -112,7 +112,7 @@ yPARSE_wrap             (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
-   yparse_line_purge ();
+   yparse_line_init ();
    yparse_config_clear ();
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;

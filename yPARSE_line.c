@@ -43,7 +43,6 @@
  */
 
 
-
 /*--------- ----------- ----------- ----------- ------------------------------*/
 /*--------- ----------- ----------- ----------- ------------------------------*/
 static      tLINE      *S_head      = NULL;
@@ -59,7 +58,7 @@ static      tLINE      *S_curr      = NULL;
 static void      o___PROGRAM_________________o (void) {;};
 
 char
-yparse_line_purge       (void)
+yparse_line__purge      (void)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -100,7 +99,7 @@ yparse_line_init        (void)
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(purge)--------------------------*/
-   yparse_line_purge ();
+   yparse_line__purge ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -177,10 +176,10 @@ yparse_line_add         (int a_line, char a_recd [LEN_RECD])
 /*====================------------------------------------====================*/
 static void      o___SEARCH__________________o (void) {;};
 
-int yparse_line_count  (void)  { return S_count; }
+int yparse_line__count  (void)  { return S_count; }
 
 char 
-yparse_line_by_cursor   (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD])
+yparse_line__by_cursor  (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -313,7 +312,223 @@ yparse_line_by_cursor   (char a_action, char a_dir, char a_line, tLINE **r_line,
    return RC_POSITIVE;
 }
 
-char   yparse_line_get    (int a_line, char r_recd [LEN_RECD]) { return yparse_line_by_cursor ('g', -1, a_line, NULL, r_recd, NULL, NULL); }
-char*  yparse_line_entry  (char a_dir) { yparse_line_by_cursor ('e', a_dir, -1, NULL, NULL, NULL, yparse_print);  return yparse_print; }
+char*  yparse_line__entry  (char a_dir) { yparse_line__by_cursor ('e', a_dir, -1, NULL, NULL, NULL, yparse_print);  return yparse_print; }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                        main driver                           ----===*/
+/*====================------------------------------------====================*/
+static void      o___DRIVER__________________o (void) {;};
+
+char   yparse_line__get   (int a_line, char r_recd [LEN_RECD]) { return yparse_line__by_cursor ('g', -1, a_line, NULL, r_recd, NULL, NULL); }
+
+char
+yparse_line_existing    (int a_line, char a_label [LEN_HUND], char r_recd [LEN_RECD], int *r_len)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   int         x_len       =    0;
+   char       *p           = NULL;
+   char        x_recd      [LEN_RECD];
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(default)------------------------*/
+   if (r_recd  != NULL)  strcpy (r_recd, "");
+   if (r_len   != NULL)  *r_len = 0;
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("r_recd"    , r_recd);
+   --rce;  if (r_recd == NULL) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(retrieve)-----------------------*/
+   rc = yparse_line__get (a_line, x_recd);
+   DEBUG_YPARSE   yLOG_value   ("getline"   , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_point   ("x_recd"    , x_recd);
+   /*---(prepare)------------------------*/
+   x_len = strlen (x_recd);
+   DEBUG_YPARSE   yLOG_value   ("x_len"     , x_len);
+   p = strchr (x_recd, '¢');
+   DEBUG_YPARSE   yLOG_point   ("p"         , p);
+   /*---(no marker)----------------------*/
+   --rce;  if (p == NULL) {
+      ystrlcpy (r_recd, x_recd , LEN_RECD);
+   }
+   /*---(marker)-------------------------*/
+   else {
+      /*---(check label)-----------------*/
+      DEBUG_YPARSE   yLOG_point   ("a_label"   , a_label);
+      if (a_label == NULL) {
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      DEBUG_YPARSE   yLOG_info    ("a_label"   , a_label);
+      /*---(save record prefix)----------*/
+      *p       = 0;
+      *(p + 1) = 0;
+      x_len = strlen (x_recd);
+      DEBUG_YPARSE   yLOG_value   ("x_len"     , x_len);
+      ystrlcpy (r_recd, x_recd , LEN_RECD);
+      /*---(add label)-------------------*/
+      ystrlcat (r_recd, a_label, LEN_RECD);
+      /*---(add record suffix)-----------*/
+      DEBUG_YPARSE   yLOG_point   ("p + 2"     , p + 2);
+      x_len = strlen (p + 2);
+      DEBUG_YPARSE   yLOG_value   ("x_len"     , x_len);
+      ystrlcat (r_recd, p + 2  , LEN_RECD);
+      /*---(done)------------------------*/
+   }
+   /*---(report)-------------------------*/
+   DEBUG_YPARSE   yLOG_info    ("r_recd"    , r_recd);
+   /*---(save-back)----------------------*/
+   x_len = strlen (r_recd);
+   DEBUG_YPARSE   yLOG_value   ("x_len"     , x_len);
+   if (r_len   != NULL)  *r_len = x_len;
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                     reusing saved records                    ----===*/
+/*====================------------------------------------====================*/
+static void      o___REUSE___________________o (void) {;};
+
+char
+yPARSE_set_reuse        (void)
+{
+   myPARSE.y_reusing = 'y';
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);
+   return 0;
+}
+
+char
+yparse_line__reformat   (tQUEUE *a_queue, char r_recd [LEN_RECD])
+{
+   /*> /+---(locals)-----------+-----+-----+-+/                                                        <* 
+    *> char        rce         =  -10;                                                                 <* 
+    *> char        rc          =    0;                                                                 <* 
+    *> tNODE      *x_curr      = NULL;                                                                 <* 
+    *> char        x_recd      [LEN_RECD] = "";                                                        <* 
+    *> int         c           =    0;                                                                 <* 
+    *> int         l           =    0;                                                                 <* 
+    *> /+---(header)-------------------------+/                                                        <* 
+    *> DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);                                                      <* 
+    *> /+---(defense)------------------------+/                                                        <* 
+    *> x_curr = s_qin.q_head;                                                                          <* 
+    *> DEBUG_YPARSE  yLOG_point   ("x_curr"    , x_curr);                                              <* 
+    *> --rce;  if (x_curr == NULL) {                                                                   <* 
+    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                                             <* 
+    *>    return rce;                                                                                  <* 
+    *> }                                                                                               <* 
+    *> DEBUG_YPARSE  yLOG_point   ("->n_item"  , x_curr->n_item);                                      <* 
+    *> --rce;  if (x_curr->n_item == NULL) {                                                           <* 
+    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                                             <* 
+    *>    return rce;                                                                                  <* 
+    *> }                                                                                               <* 
+    *> DEBUG_YPARSE  yLOG_info    ("->n_item"  , x_curr->n_item);                                      <* 
+    *> /+---(start with verb)----------------+/                                                        <* 
+    *> sprintf (x_recd, "%s (", x_curr->n_item);                                                       <* 
+    *> DEBUG_YPARSE  yLOG_complex ("reusable"  , "%2d, %-20.20s, %s", c, x_curr->n_item, x_recd);      <* 
+    *> /+---(walk fields)--------------------+/                                                        <* 
+    *> x_curr = x_curr->n_next;                                                                        <* 
+    *> DEBUG_YPARSE  yLOG_point   ("x_curr"    , x_curr->n_item);                                      <* 
+    *> while (x_curr != NULL) {                                                                        <* 
+    *>    ++c;                                                                                         <* 
+    *>    if (a_mask == c)   ystrlcat (x_recd, "¢¢"          , LEN_RECD);                              <* 
+    *>    else               ystrlcat (x_recd, x_curr->n_item, LEN_RECD);                              <* 
+    *>    ystrlcat (x_recd, ","         , LEN_RECD);                                                   <* 
+    *>    DEBUG_YPARSE  yLOG_complex ("reusable"  , "%2d, %-20.20s, %s", c, x_curr->n_item, x_recd);   <* 
+    *>    x_curr = x_curr->n_next;                                                                     <* 
+    *> }                                                                                               <* 
+    *> /+---(fix end)------------------------+/                                                        <* 
+    *> l = strlen (x_recd);                                                                            <* 
+    *> if (x_recd [l - 1] == '(')  ystrlcat (x_recd, ")", LEN_RECD);                                   <* 
+    *> else                        x_recd [l - 1] = ')';                                               <* 
+    *> DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);                                              <* 
+    *> /+---(complete)-----------------------+/                                                        <* 
+    *> DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);                                                      <* 
+    *> return RC_POSITIVE;                                                                             <*/
+}
+
+char
+yparse_reusable         (char a_masked)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_recd      [LEN_RECD] = "";
+   tNODE      *x_curr      = NULL;
+   int         c           =    1;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_value   ("masked"    , a_masked);
+   /*---(short-cut)----------------------*/
+   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);
+   if (myPARSE.y_reusing != YPARSE_REUSING) {
+      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   /*---(defense)------------------------*/
+   rc = yparse_in_defense ();
+   if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
+      return rc;
+   }
+   DEBUG_YPARSE  yLOG_char    ("hidden"    , s_qin.q_hidden);
+   --rce;  if (s_qin.q_hidden  == 'y') {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   --rce;  if (a_masked >= s_qin.q_count) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   if (a_masked < 1)  a_masked = -1;
+   /*> --rce;  if (s_qin.q_count <= 1) {                                                <* 
+    *>    DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);                             <* 
+    *>    return rce;                                                                 <* 
+    *> }                                                                              <*/
+   DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.y_verb);
+   DEBUG_YPARSE  yLOG_value   ("iverb"     , s_qin.q_iverb);
+   --rce;  if (s_qin.q_iverb < 0 || strcmp (myPARSE.y_verb, "") == 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(start)--------------------------*/
+   /*> sprintf (x_recd, "%s (", yPARSE_verb (s_qin.q_iverb));                           <*/
+   sprintf (x_recd, "%s (", myPARSE.y_verb);
+   /*> DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);                             <*/
+   /*---(clear)--------------------------*/
+   x_curr = s_qin.q_head;
+   while (x_curr != NULL) {
+      if (a_masked == c)   ystrlcat (x_recd, "¢¢"          , LEN_RECD);
+      else                 ystrlcat (x_recd, x_curr->n_item, LEN_RECD);
+      ystrlcat (x_recd, ","         , LEN_RECD);
+      DEBUG_YPARSE  yLOG_complex ("reusable"  , "%2d, %20.20s, %s", c, x_curr->n_item, x_recd);
+      x_curr = x_curr->n_next;
+      ++c;
+   }
+   /*---(fix end)------------------------*/
+   if (x_recd [strlen (x_recd) - 1] == '(')  ystrlcat (x_recd, ")", LEN_RECD);
+   else                                      x_recd [strlen (x_recd) - 1] = ')';
+   DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
+   /*---(save)---------------------------*/
+   /*> yparse_line_add (s_qin.q_nline, x_recd);                                          <*/
+   yparse_line_add (s_qin.q_tline, x_recd);
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+
 
 

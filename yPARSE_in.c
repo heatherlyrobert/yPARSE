@@ -511,85 +511,6 @@ yPARSE_popexp           (double *a_new)
 /*====================------------------------------------====================*/
 static void      o___RECORDS_________________o (void) {;};
 
-char
-yPARSE_set_reuse        (void)
-{
-   myPARSE.y_reusing = 'y';
-   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);
-   return 0;
-}
-
-char
-yparse_reusable         (char a_masked)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_recd      [LEN_RECD] = "";
-   tNODE      *x_curr      = NULL;
-   int         c           =    1;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   DEBUG_YPARSE  yLOG_value   ("masked"    , a_masked);
-   /*---(short-cut)----------------------*/
-   DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);
-   if (myPARSE.y_reusing != YPARSE_REUSING) {
-      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-      return 0;
-   }
-   /*---(defense)------------------------*/
-   rc = yparse_in_defense ();
-   if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
-      return rc;
-   }
-   DEBUG_YPARSE  yLOG_char    ("hidden"    , s_qin.q_hidden);
-   --rce;  if (s_qin.q_hidden  == 'y') {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   --rce;  if (a_masked >= s_qin.q_count) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   if (a_masked < 1)  a_masked = -1;
-   /*> --rce;  if (s_qin.q_count <= 1) {                                                <* 
-    *>    DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);                             <* 
-    *>    return rce;                                                                 <* 
-    *> }                                                                              <*/
-   DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.y_verb);
-   DEBUG_YPARSE  yLOG_value   ("iverb"     , s_qin.q_iverb);
-   --rce;  if (s_qin.q_iverb < 0 || strcmp (myPARSE.y_verb, "") == 0) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(start)--------------------------*/
-   /*> sprintf (x_recd, "%s (", yPARSE_verb (s_qin.q_iverb));                           <*/
-   sprintf (x_recd, "%s (", myPARSE.y_verb);
-   /*> DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);                             <*/
-   /*---(clear)--------------------------*/
-   x_curr = s_qin.q_head;
-   while (x_curr != NULL) {
-      if (a_masked == c)   ystrlcat (x_recd, "¢¢"          , LEN_RECD);
-      else                 ystrlcat (x_recd, x_curr->n_item, LEN_RECD);
-      ystrlcat (x_recd, ","         , LEN_RECD);
-      DEBUG_YPARSE  yLOG_complex ("reusable"  , "%2d, %20.20s, %s", c, x_curr->n_item, x_recd);
-      x_curr = x_curr->n_next;
-      ++c;
-   }
-   /*---(fix end)------------------------*/
-   if (x_recd [strlen (x_recd) - 1] == '(')  ystrlcat (x_recd, ")", LEN_RECD);
-   else                                      x_recd [strlen (x_recd) - 1] = ')';
-   DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
-   /*---(save)---------------------------*/
-   /*> yparse_line_add (s_qin.q_nline, x_recd);                                          <*/
-   yparse_line_add (s_qin.q_tline, x_recd);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-
 
 /*====================------------------------------------====================*/
 /*===----                       getting lines                          ----===*/
@@ -894,7 +815,7 @@ yparse__unit_line       (char *a_question, int a_num)
     *>    if (s_count < 1 || a_num >  s_qin.q_nline) {                                              <* 
     *>       sprintf (yparse_print, "LINE entry  %2d : null", a_num);                        <* 
     *>    } else {                                                                                  <* 
-    *>       rc = yparse_line_get (a_num, t);                                                       <* 
+    *>       rc = yparse_line__get (a_num, t);                                                       <* 
     *>       if (rc < 0) {                                                                          <* 
     *>          sprintf (yparse_print, "LINE entry  %2d : not reusable", a_num);             <* 
     *>       } else {                                                                               <* 

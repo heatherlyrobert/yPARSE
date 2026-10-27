@@ -86,8 +86,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5e"
-#define     P_VERTXT    "basic yPARSE_line split-out, updated, modernized, and unit-tested"
+#define     P_VERNUM    "0.5f"
+#define     P_VERTXT    "cleaned_up verb data structure and created much better search/entry function"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -268,7 +268,6 @@ char        yparse_read_next        (FILE *a_file, int *b_tline, char r_recd [LE
 char        yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], char a_fill, char *r_nfield);
 /*········´ ´············handling·´ ´·········································*/
 char        yparse_read_lineno      (int a_line, int *b_nline, int *b_cline, char *r_hidden);
-char        yparse_read_existing    (int a_line, char a_label [LEN_HUND]);
 char        yparse_read_rollback    (int a_line);
 char        yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *b_tline, char r_recd [LEN_RECD], int *r_len);
 char        yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb);
@@ -277,16 +276,36 @@ char        yparse_read             (char *a_func, int *t, int *n, int *c, int a
 
 /*===[[ yPARSE_line.c ]]======================================================*/
 /*········´ ´·············program·´ ´·········································*/
-char        yparse_line_purge       (void);
+char        yparse_line__purge      (void);
 char        yparse_line_init        (void);
-/*········´ ´··············create·´ ´·········································*/
+/*········´ ´··············saving·´ ´·········································*/
 char        yparse_line__wipe       (tLINE *a_line);
 char        yparse_line_add         (int a_line, char a_recd [LEN_RECD]);
 /*········´ ´··············search·´ ´·········································*/
-int         yparse_line_count       (void);
-char        yparse_line_by_cursor   (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD]);
-char        yparse_line_get         (int a_line, char r_recd [LEN_RECD]);
-char       *yparse_line_entry       (char a_dir);
+int         yparse_line__count      (void);
+char        yparse_line__by_cursor  (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD]);
+char       *yparse_line__entry      (char a_dir);
+/*········´ ´·············getting·´ ´·········································*/
+char        yparse_line__get        (int a_line, char r_recd [LEN_RECD]);
+char        yparse_line_existing    (int a_line, char a_label [LEN_HUND], char r_recd [LEN_RECD], int *r_len);
+/*········´ ´·············reusing·´ ´·········································*/
+char        yPARSE_set_reuse        (void);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_verb.c ]]======================================================*/
+/*········´ ´·············program·´ ´·········································*/
+char        yparse_verb__wipe       (char n);
+char        yparse_verb__purge      (void);
+char        yparse_verb_init        (void);
+char        yparse_verb_wrap        (void);
+/*········´ ´···········searching·´ ´·········································*/
+char        yparse_verb_count       (void);
+char        yparse_verb_by_name     (char a_verb [LEN_LABEL]);
+char        yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char r_verb [LEN_LABEL], char r_specs [LEN_LABEL], uchar *r_mode, char *r_mask, void **r_reader, void **r_writer, float *r_seq, char *r_done, char r_flags [LEN_TITLE], char r_labels [LEN_RECD], char r_desc [LEN_DESC], char d_entry [LEN_RECD]);
+char*       yparse_verb_entry       (char a_verb [LEN_LABEL], char a_dir, char a_index);
+/*> char        yparse_verb_data        (char n, char r_verb [LEN_LABEL], char r_specs [LEN_LABEL], uchar *r_mode, char *r_mask, void **r_reader, void **r_writer, float *r_seq, char *r_done, char r_flags [LEN_TITLE], char r_labels [LEN_RECD], char r_desc [LEN_DESC], char d_entry [LEN_RECD]);   <*/
 /*········´ ´················DONE·´ ´·········································*/
 
 

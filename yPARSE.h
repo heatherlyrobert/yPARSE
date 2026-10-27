@@ -194,7 +194,6 @@ char        yPARSE_sect_break       (int c);
 char        yPARSE_sect_end         (int c);
 
 
-char        yPARSE_verb_purge       (void);
 char*       yPARSE_verb             (int a_num);
 char        yPARSE_handler          (uchar *a_verb, char *a_specs, void *a_reader);
 char        yPARSE_handler_plus     (uchar *a_verb, uchar *a_specs, float a_seq, void *a_reader, void *a_writer, uchar *a_labels);
