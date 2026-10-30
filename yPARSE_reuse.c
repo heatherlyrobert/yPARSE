@@ -34,8 +34,10 @@
 /*´´·········1·········2·········3·········4·········5·········6·········7·········8  */
 /*===[[ GNU GENERAL PUBLIC LICENSE (GPL) ]]===================================*/
 
+
+
 /*
- * purpose is to handle saved lines 
+ * purpose is to handle reusable, saved lines.
  *
  *
  *
@@ -43,12 +45,11 @@
  */
 
 
-/*--------- ----------- ----------- ----------- ------------------------------*/
-/*--------- ----------- ----------- ----------- ------------------------------*/
-static      tLINE      *S_head      = NULL;
-static      tLINE      *S_tail      = NULL;
+/*········´ ´·········´ ´·········´ ´·········´ ´·····························*/
+static      tREUSE     *S_head      = NULL;
+static      tREUSE     *S_tail      = NULL;
 static      int         S_count     =    0;
-static      tLINE      *S_curr      = NULL;
+static      tREUSE     *S_curr      = NULL;
 
 
 
@@ -58,12 +59,12 @@ static      tLINE      *S_curr      = NULL;
 static void      o___PROGRAM_________________o (void) {;};
 
 char
-yparse_line__purge      (void)
+yparse_reuse__purge     (void)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   tLINE      *x_old       = NULL;
+   tREUSE     *x_old       = NULL;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(walk-thru)----------------------*/
@@ -94,12 +95,12 @@ yparse_line__purge      (void)
 }
 
 char
-yparse_line_init        (void)
+yparse_reuse_init       (void)
 {
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(purge)--------------------------*/
-   yparse_line__purge ();
+   yparse_reuse__purge ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -113,7 +114,7 @@ yparse_line_init        (void)
 static void      o___CREATE__________________o (void) {;};
 
 char
-yparse_line__wipe       (tLINE *a_line)
+yparse_reuse__wipe      (tREUSE *a_line)
 {
    a_line->l_line =    0;
    strcpy (a_line->l_recd, "");
@@ -124,12 +125,12 @@ yparse_line__wipe       (tLINE *a_line)
 }
 
 char
-yparse_line_add         (int a_line, char a_recd [LEN_RECD])
+yparse_reuse_add        (int a_line, char a_recd [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   tLINE      *x_new       = NULL;
+   tREUSE     *x_new       = NULL;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE   yLOG_value   ("a_line"    , a_line);
@@ -141,7 +142,7 @@ yparse_line_add         (int a_line, char a_recd [LEN_RECD])
    }
    DEBUG_YPARSE   yLOG_info    ("a_recd"    , a_recd);
    /*---(create)-------------------------*/
-   rc = yENV_new ("line", sizeof (tLINE), &x_new, &S_count, '-', yparse_line__wipe);
+   rc = yENV_new ("line", sizeof (tREUSE), &x_new, &S_count, '-', yparse_reuse__wipe);
    DEBUG_YPARSE   yLOG_value   ("new"       , rc);
    DEBUG_YPARSE   yLOG_point   ("x_new"     , x_new);
    --rce;  if (rc < 0 || x_new == NULL) {
@@ -176,10 +177,10 @@ yparse_line_add         (int a_line, char a_recd [LEN_RECD])
 /*====================------------------------------------====================*/
 static void      o___SEARCH__________________o (void) {;};
 
-int yparse_line__count  (void)  { return S_count; }
+int yparse_reuse__count (void)  { return S_count; }
 
 char 
-yparse_line__by_cursor  (char a_action, char a_dir, char a_line, tLINE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD])
+yparse_reuse__by_cursor (char a_action, char a_dir, char a_line, tREUSE **r_line, char r_recd [LEN_RECD], int *r_uses, char d_entry [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -190,7 +191,7 @@ yparse_line__by_cursor  (char a_action, char a_dir, char a_line, tLINE **r_line,
    char        x_prev      [LEN_DESC]  = "´·····························";
    char        x_curr      [LEN_DESC]  = "´·····························";
    char        x_next      [LEN_DESC]  = "´·····························";
-   tLINE      *x_line      = NULL;
+   tREUSE     *x_line      = NULL;
    int         i           =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE yLOG_enter   (__FUNCTION__);
@@ -312,7 +313,7 @@ yparse_line__by_cursor  (char a_action, char a_dir, char a_line, tLINE **r_line,
    return RC_POSITIVE;
 }
 
-char*  yparse_line__entry  (char a_dir) { yparse_line__by_cursor ('e', a_dir, -1, NULL, NULL, NULL, yparse_print);  return yparse_print; }
+char*  yparse_reuse__entry  (char a_dir) { yparse_reuse__by_cursor ('e', a_dir, -1, NULL, NULL, NULL, yparse_print);  return yparse_print; }
 
 
 
@@ -321,10 +322,10 @@ char*  yparse_line__entry  (char a_dir) { yparse_line__by_cursor ('e', a_dir, -1
 /*====================------------------------------------====================*/
 static void      o___DRIVER__________________o (void) {;};
 
-char   yparse_line__get   (int a_line, char r_recd [LEN_RECD]) { return yparse_line__by_cursor ('g', -1, a_line, NULL, r_recd, NULL, NULL); }
+char   yparse_reuse__get   (int a_line, char r_recd [LEN_RECD]) { return yparse_reuse__by_cursor ('g', -1, a_line, NULL, r_recd, NULL, NULL); }
 
 char
-yparse_line_existing    (int a_line, char a_label [LEN_HUND], char r_recd [LEN_RECD], int *r_len)
+yparse_reuse_existing   (int a_line, char a_label [LEN_HUND], char r_recd [LEN_RECD], int *r_len)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -344,7 +345,7 @@ yparse_line_existing    (int a_line, char a_label [LEN_HUND], char r_recd [LEN_R
       return rce;
    }
    /*---(retrieve)-----------------------*/
-   rc = yparse_line__get (a_line, x_recd);
+   rc = yparse_reuse__get (a_line, x_recd);
    DEBUG_YPARSE   yLOG_value   ("getline"   , rc);
    --rce;  if (rc < 0) {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -403,7 +404,7 @@ yparse_line_existing    (int a_line, char a_label [LEN_HUND], char r_recd [LEN_R
 static void      o___REUSE___________________o (void) {;};
 
 char
-yPARSE_set_reuse        (void)
+yPARSE_reuse_set        (void)
 {
    myPARSE.y_reusing = 'y';
    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);
@@ -411,7 +412,7 @@ yPARSE_set_reuse        (void)
 }
 
 char
-yparse_line__reformat   (tQUEUE *a_queue, char r_recd [LEN_RECD])
+yparse_reuse__reformat  (tQUEUE *a_queue, char r_recd [LEN_RECD])
 {
    /*> /+---(locals)-----------+-----+-----+-+/                                                        <* 
     *> char        rce         =  -10;                                                                 <* 
@@ -522,8 +523,8 @@ yparse_reusable         (char a_masked)
    else                                      x_recd [strlen (x_recd) - 1] = ')';
    DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);
    /*---(save)---------------------------*/
-   /*> yparse_line_add (s_qin.q_nline, x_recd);                                          <*/
-   yparse_line_add (s_qin.q_tline, x_recd);
+   /*> yparse_reuse_add (s_qin.q_nused, x_recd);                                          <*/
+   yparse_reuse_add (s_qin.q_nfull, x_recd);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;

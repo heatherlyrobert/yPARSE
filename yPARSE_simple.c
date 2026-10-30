@@ -67,18 +67,20 @@ yparse_opener           (uchar a_auto, uchar *a_in, uchar *a_out, void *a_verber
          rc = rce;
       }
    }
-   if (rc == 0 && a_in  != NULL) {
+   /*---(open in)------------------------*/
+   if (rc == 1 && a_in  != NULL) {
       DEBUG_YPARSE   yLOG_note    ("openning reading file");
       rc = yPARSE_open_in  (a_in);
       DEBUG_YPARSE   yLOG_value   ("open in"   , rc);
    }
-   if (rc == 0 && a_out != NULL) {
+   /*---(open out)-----------------------*/
+   if (rc == 1 && a_out != NULL) {
       DEBUG_YPARSE   yLOG_note    ("openning writing file");
-      rc = yPARSE_open_out (a_out, NULL, NULL);
+      rc = yPARSE_open_out (a_out, NULL);
       DEBUG_YPARSE   yLOG_value   ("open out"  , rc);
    }
    /*---(read all)-----------------------*/
-   if (rc == 0 && a_read == YPARSE_READALL) {
+   if (rc == 1 && a_read == YPARSE_READALL) {
       rc = yPARSE_read_all ();
       DEBUG_YPARSE   yLOG_value   ("read all"  , rc);
    }
@@ -96,7 +98,22 @@ yPARSE_close            (void)
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    yPARSE_close_in  ();
    if (s_count >= 0)  yparse_fancy_end (s_count + 1);
-   yPARSE_close_out ();
+   yPARSE_close_out ('y');
+   yPARSE_wrap ();
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char
+yPARSE_uwrap            (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   yPARSE_close_in  ();
+   yPARSE_close_out ('-');
    yPARSE_wrap ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
@@ -111,13 +128,45 @@ yPARSE_close            (void)
 static void      o___SIMPLE__________________o (void) {;}
 
 char
-yPARSE_simple           (uchar *a_in, uchar *a_out)
+yPARSE_uconfig          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH])
 {
-   return yparse_opener (YPARSE_MANUAL, a_in, a_out, NULL, YPARSE_NOREAD, YPARSE_ONETIME);
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(configure)----------------------*/
+   rc = yPARSE_config (YPARSE_MANUAL, NULL, YPARSE_ONETIME, YPARSE_FIELD, YPARSE_NOFILL);
+   DEBUG_YPARSE   yLOG_value   ("config"    , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(open files)---------------------*/
+   rc = yparse_opener (YPARSE_MANUAL, a_ifile, a_ofile, NULL, YPARSE_NOREAD, YPARSE_ONETIME);
+   DEBUG_YPARSE   yLOG_value   ("opener"    , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   return RC_POSITIVE;
 }
 
 char
-yPARSE_printf           (uchar *a_verb, uchar *a_format, ...)
+yPARSE_simple           (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH])
+{
+   return yparse_opener (YPARSE_MANUAL, a_ifile, a_ofile, NULL, YPARSE_NOREAD, YPARSE_ONETIME);
+}
+
+char
+yPARSE_uread            (int *r_ncurr, char r_verb [LEN_LABEL], char r_recd [LEN_RECD])
+{
+   return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , NULL   , NULL   , r_ncurr, r_verb, r_recd);
+}
+
+char
+yPARSE_uprintf          (char a_verb [LEN_LABEL], uchar *a_format, ...)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -141,7 +190,7 @@ yPARSE_printf           (uchar *a_verb, uchar *a_format, ...)
       return rce;
    }
    /*---(column count)-------------------*/
-   n = yparse_specs_len (&s_qout);
+   n = yparse_spec_len (&s_qout);
    DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
    --rce;  if (n < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -163,7 +212,7 @@ yPARSE_printf           (uchar *a_verb, uchar *a_format, ...)
    /*---(write)--------------------------*/
    rc = yPARSE_write (NULL, NULL);
    DEBUG_YPARSE   yLOG_value   ("write"     , rc);
-   if (rc < 0)  {
+   --rce;  if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
@@ -173,7 +222,7 @@ yPARSE_printf           (uchar *a_verb, uchar *a_format, ...)
 }
 
 char
-yPARSE_scanf            (uchar *a_verb, uchar *a_format, ...)
+yPARSE_uscanf           (char a_verb [LEN_LABEL], uchar *a_format, ...)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -197,7 +246,7 @@ yPARSE_scanf            (uchar *a_verb, uchar *a_format, ...)
    }
    /*> yPARSE_toss ();                                                                <*/
    /*---(column count)-------------------*/
-   n = yparse_specs_len (&s_qin);
+   n = yparse_spec_len (&s_qin);
    DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
    --rce;  if (n < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -253,8 +302,24 @@ yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber)
    return yparse_opener (YPARSE_AUTO, a_in, a_out, a_verber, YPARSE_NOREAD , YPARSE_ONETIME);
 }
 
+/*> #!/usr/local/bin/koios                                                                     <* 
+ *> #   koios-polos (north star) -- customized c unit testing meta-program and mini-language   <* 
+ *> #   program under test  : yPARSE_out                                                       <* 
+ *> #   auto-generated script file converted from a previous script version                    <*/
+
+/*> #!/usr/local/bin/gyges                                                                                         <* 
+ *> ##   writen using yPARSE (0.5f) cleaned_up verb data structure and created much better search/entry function   <* 
+ *> ##   jupiter-terminalis (boundaries) text file parsing and aggregating library                                   <* 
+ *> ##                                                                                                             <* 
+ *> #]  program     gyges                 3.7n   improvements²found²by²vikeys_content.script²demo               <* 
+ *> #]  oneline     gyges-hekatonkheires²(hundred-handed)²wicked²technical²spreadsheet                            <* 
+ *> #]  content     spreadsheet²data                                                                              <* 
+ *> #]  filename    /root/africa.gyges                                                                            <* 
+ *> #]  written     23.12.24.00.14.11.7.51.358  2023-dec-24,²00:14am,²sunday,²51²week,²358²day                   <* 
+ *> ##                                                                                                             <*/
+
 char
-yPARSE_header           (uchar *a_full, uchar *a_vernum, uchar *a_vertxt, uchar *a_oneline, uchar *a_content, void (*a_additional) (void))
+yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], void (*a_additional) (void))
 {
    /*---(locals)-----------+-----+-----+-*/
    char        x_vernum    [LEN_TERSE] = "";
@@ -272,18 +337,18 @@ yPARSE_header           (uchar *a_full, uchar *a_vernum, uchar *a_vertxt, uchar 
          sprintf (t, "#!%s", a_full);
          yparse_fancy__write  (t);
          yPARSE_spacer (1);
-         yPARSE_printf  ("s_program", "LSO", p + 1 , x_vernum, x_vertxt);
+         yPARSE_uprintf  ("#]  program", "LSO", p + 1 , x_vernum, x_vertxt);
       } else {
-         yPARSE_printf  ("s_program", "LSO", a_full, x_vernum, x_vertxt);
+         yPARSE_uprintf  ("#]  program", "LSO", a_full, x_vernum, x_vertxt);
       }
    }
-   if (a_oneline != NULL)  yPARSE_printf  ("s_oneline", "O"  , a_oneline);
-   if (a_content != NULL)  yPARSE_printf  ("s_content", "O"  , a_content);
-   yPARSE_printf ("s_filename", "O"  , s_qout.q_loc);
+   if (a_oneline != NULL)  yPARSE_uprintf  ("#]   oneline", "O"  , a_oneline);
+   if (a_content != NULL)  yPARSE_uprintf  ("#]   content", "O"  , a_content);
+   yPARSE_uprintf ("#]   filename", "O"  , s_qout.q_loc);
    x_time  = time (NULL);
    x_broke = localtime (&x_time);
-   strftime (t, LEN_TITLE, "%y.%m.%d.%H.%M.%S.%u.%W.%j", x_broke);
-   yPARSE_printf ("s_written" , "O"  , t);
+   strftime (t, LEN_TITLE, "%y.%m.%d.%H.%M.%S.%u.%W.%j  %Y-%b-%d, %H:%M%P, %a, week %W, day %y ", x_broke);
+   yPARSE_uprintf ("#]   written" , "O"  , t);
    if (a_additional != NULL)   a_additional ();
    yPARSE_spacer (1);
    return 0;
@@ -328,7 +393,7 @@ yPARSE_vscanf           (uchar *a_verb, ...)
       yPARSE_toss ();
    }
    /*---(column count)-------------------*/
-   n = yparse_specs_len (&s_qin);
+   n = yparse_spec_len (&s_qin);
    DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
    /*---(cycle columns)------------------*/
    va_start (x_vlist, a_verb);
@@ -371,7 +436,7 @@ yPARSE_vprintf        (int c, uchar *a_verb, ...)
       yparse_fancy_break (c);
    }
    /*---(column count)-------------------*/
-   n = yparse_specs_len (&s_qout);
+   n = yparse_spec_len (&s_qout);
    DEBUG_YPARSE   yLOG_value   ("ncol"      , n);
    /*---(call variadic)------------------*/
    va_start (x_vlist, a_verb);

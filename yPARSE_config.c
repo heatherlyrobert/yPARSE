@@ -156,7 +156,7 @@ yparse_config            (char a_1st, char a_auto, void *a_verber, char a_reusin
    /*---(initialize all areas)-----------*/
    if (a_1st == 'y') {
       DEBUG_YPARSE  yLOG_note    ("first time run, intialize data structures");
-      rc = yparse_init_types ();
+      rc = yparse_spec_init  ();
       DEBUG_YPARSE  yLOG_value   ("init_types", rc);
       rc = yparse_verb_init  ();
       DEBUG_YPARSE  yLOG_value   ("verb_init" , rc);
@@ -164,7 +164,7 @@ yparse_config            (char a_1st, char a_auto, void *a_verber, char a_reusin
       DEBUG_YPARSE  yLOG_value   ("init_in"   , rc);
       rc = yparse_init_out   ();
       DEBUG_YPARSE  yLOG_value   ("init_out"  , rc);
-      rc = yparse_line_init  ();
+      rc = yparse_reuse_init ();
       DEBUG_YPARSE  yLOG_value   ("initline"  , rc);
    } else {
       DEBUG_YPARSE  yLOG_note    ("reconfig run, do not intialize data structures");

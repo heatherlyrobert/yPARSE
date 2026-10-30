@@ -95,36 +95,6 @@ static char  s_numbers     [LEN_LABEL]  = "";
 static void      o___SHARED__________________o (void) {;};
 
 char
-yparse_init_types       (void)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   int         i           =    0;
-   char        t           [LEN_LABEL];
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   /*---(prepare)------------------------*/
-   s_ntype = 0;
-   ystrlcpy (s_strings, "", LEN_LABEL);
-   ystrlcpy (s_numbers, "", LEN_LABEL);
-   /*---(walk)---------------------------*/
-   for (i = 0; i < MAX_TYPES; ++i) {
-      DEBUG_YPARSE  yLOG_sint    (i);
-      DEBUG_YPARSE  yLOG_snote   (s_types [i].name);
-      if (s_types [i].abbr ==  0 )  break;
-      sprintf (t, "%c", s_types [i].abbr);
-      if (s_types [i].cat  == 's')   ystrlcat (s_strings, t, LEN_LABEL);
-      if (s_types [i].cat  == 'n')   ystrlcat (s_numbers, t, LEN_LABEL);
-      ++s_ntype;
-   }
-   DEBUG_YPARSE  yLOG_snote   (s_strings);
-   DEBUG_YPARSE  yLOG_snote   (s_numbers);
-   DEBUG_YPARSE  yLOG_sint    (s_ntype);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
-
-char
 yparse_out_defense      (void)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -146,31 +116,13 @@ char yparse_init_out         (void) { return yparse_queue_init  (&s_qout, 'O', "
 char yPARSE_purge_out        (void) { return yparse_queue_purge (&s_qout);             }
 char yPARSE_reset_out        (void) { return yparse_queue_reset (&s_qout);             }
 
-int
-yparse_field_len        (char a_type)
-{
-   int         i           =    0;
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   DEBUG_YPARSE  yLOG_schar   (a_type);
-   for (i = 0; i < s_ntype; ++i) {
-      DEBUG_YPARSE  yLOG_schar   (s_types [i].abbr);
-      if (s_types [i].abbr != a_type)  continue;
-      DEBUG_YPARSE  yLOG_snote   ("FOUND");
-      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-      return s_types [i].size;
-   }
-   DEBUG_YPARSE  yLOG_snote   ("nada");
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
-
 char
-yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_total)
+yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_nwrote)
 {
-   if (r_label != NULL)  ystrlcpy (r_label, s_qout.q_label, LEN_SHORT);
-   if (r_loc   != NULL)  ystrlcpy (r_loc  , s_qout.q_loc  , LEN_PATH);
-   if (r_file  != NULL)  *r_file  =  s_qout.q_file;
-   if (r_total != NULL)  *r_total =  s_qout.q_tline;
+   if (r_label  != NULL)  ystrlcpy (r_label, s_qout.q_label, LEN_SHORT);
+   if (r_loc    != NULL)  ystrlcpy (r_loc  , s_qout.q_loc  , LEN_PATH);
+   if (r_file   != NULL)  *r_file   =  s_qout.q_file;
+   if (r_nwrote != NULL)  *r_nwrote =  s_qout.q_nfull;
    return 0;
 }
 
@@ -216,10 +168,11 @@ yparse__push_string     (uchar *a_str)
    ystrlcpy  (s, a_str, LEN_RECD);
    ystrlmark (s, ySTR_HEATH, LEN_RECD);
    /*---(prepare)------------------------*/
-   x_type = yparse_specs_next_write ();
+   x_type = yparse_spec_next_write ();
    DEBUG_YPARSE   yLOG_schar   (x_type);
-   DEBUG_YPARSE   yLOG_snote   (s_strings);
-   --rce;  if (strchr (s_strings, x_type) == NULL) {
+   rc = yparse_spec_string (x_type);
+   DEBUG_YPARSE   yLOG_sint    (rc);
+   --rce;  if (rc < 0) {
       s_qout.q_good = 'n';
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -338,10 +291,11 @@ yparse__push_numeric    (double a_val)
       return rce;
    }
    /*---(prepare)------------------------*/
-   x_type = yparse_specs_next_write ();
+   x_type = yparse_spec_next_write ();
    DEBUG_YPARSE   yLOG_schar   (x_type);
-   DEBUG_YPARSE   yLOG_snote   (s_numbers);
-   --rce;  if (strchr (s_numbers, x_type) == NULL) {
+   rc = yparse_spec_numeric (x_type);
+   DEBUG_YPARSE   yLOG_sint    (rc);
+   --rce;  if (rc < 0) {
       s_qout.q_good = 'n';
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
@@ -591,7 +545,7 @@ yparse_aggregate        (void)
       return rce;
    }
    /*---(defense)------------------------*/
-   n = yparse_specs_len (&s_qout);
+   n = yparse_spec_len (&s_qout);
    DEBUG_YPARSE  yLOG_value   ("cols"      , n);
    DEBUG_YPARSE  yLOG_value   ("count"     , s_qout.q_count);
    --rce;  if (s_qout.q_count != n)  {
@@ -675,11 +629,14 @@ yparse_out_variadic    (va_list a_vlist, int n)
    uchar      *x_str       = NULL;
    int         c           =    0;
    double      x_val       =  0.0;
+   int         x_end       = NULL;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(walk fields)--------------------*/
+   DEBUG_YPARSE  yLOG_value   ("n"         , n);
    --rce;  for (i = 1; i < n; ++i) {
-      x_type = yparse_specs_next_write ();
+      x_type = yparse_spec_next_write ();
+      DEBUG_YPARSE  yLOG_complex ("loop"      , "%2d %c", i, x_type);
       switch (x_type) {
       case 'c' :
          x_char    = va_arg (a_vlist, int);
@@ -710,7 +667,8 @@ yparse_out_variadic    (va_list a_vlist, int n)
          break;
       default  :
          DEBUG_YPARSE   yLOG_complex ("unknown"   , "%d, %c, ---, -", i, x_type);
-         rc = -1;
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
          break;
       }
       if (rc < 0)  {
@@ -719,6 +677,15 @@ yparse_out_variadic    (va_list a_vlist, int n)
       }
       ++c;
    }
+   /*---(check for end)------------------*/
+   DEBUG_YPARSE   yLOG_value   ("c"         , c);
+   /*> x_end = va_arg (a_vlist, int);                                                 <* 
+    *> DEBUG_YPARSE  yLOG_value   ("x_end"     , x_end);                              <* 
+    *> if (x_end != NULL) {                                                           <* 
+    *>    DEBUG_YPARSE   yLOG_note    ("trailing argument beyond expected count");    <* 
+    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                            <* 
+    *>    return rce;                                                                 <* 
+    *> }                                                                              <*/
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return c;
@@ -734,40 +701,61 @@ static void      o___FILES___________________o (void) {;};
 char yPARSE_stdout     (void)          { return yparse_queue_open  (&s_qout, "stdout"); }
 char yPARSE_tmpout     (void)          { return yparse_queue_open  (&s_qout, "/tmp/yparse.txt"); }
 
+/*> #!/usr/local/bin/gyges                                                                                         <* 
+ *> ##   writen using yPARSE (0.5f) cleaned_up verb data structure and created much better search/entry function   <* 
+ *> ##   jupiter-terminalis (boundaries) text file parsing and aggregating library                                   <* 
+ *> ##                                                                                                             <* 
+ *> #] program     gyges                 3.7n   improvements²found²by²vikeys_content.script²demo               <* 
+ *> #] oneline     gyges-hekatonkheires²(hundred-handed)²wicked²technical²spreadsheet                            <* 
+ *> #] content     spreadsheet²data                                                                              <* 
+ *> #] filename    /root/africa.gyges                                                                            <* 
+ *> #] written     23.12.24.00.14.11.7.51.358  2023-dec-24,²00:14am,²sunday,²51²week,²358²day                   <* 
+ *> ##                                                                                                             <*/
+
 char
-yPARSE_open_out         (char *a_name, char *a_prog, char *a_desc)
+yPARSE_open_out         (char a_name [LEN_PATH], char a_prog [LEN_PATH])
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
    char        rc          =    0;
    char        x_spacer    =  '-';
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(open)---------------------------*/
+   /*---(open file)----------------------*/
    rc = yparse_queue_open  (&s_qout, a_name);
-   if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
-      return rc;
+   DEBUG_YPARSE  yLOG_value   ("open"      , rc);
+   --rce;  if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
    }
    /*---(shebang)------------------------*/
-   /*> if (a_prog != NULL)  fprintf  (s_qout.q_file, "#!%s\n", a_prog);                   <* 
-    *> if (a_desc != NULL)  fprintf  (s_qout.q_file, "#   generated by %s\n", a_desc);    <* 
-    *> if (a_prog != NULL)  fprintf  (s_qout.q_file, "#   using the yPARSE library\n");   <*/
+   DEBUG_YPARSE  yLOG_point   ("a_prog"    , a_prog);
+   if (a_prog != NULL) {
+      DEBUG_YPARSE  yLOG_note    ("header block requested");
+      fprintf  (s_qout.q_file, "#!%s\n", a_prog);
+      fprintf  (s_qout.q_file, "##   written using %s (%s) %s\n" P_BASENAME, P_VERNUM, P_VERTXT);
+      fprintf  (s_qout.q_file, "##   %s\n" P_ONELINE);
+      fprintf  (s_qout.q_file, "##\n");
+   }
+   /*---(make sure written)--------------*/
    fflush   (s_qout.q_file);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 0;
+   return RC_POSITIVE;
 }
 
 char
-yPARSE_close_out  (void)
+yPARSE_close_out  (char a_fancy)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rc          =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(footer)-------------------------*/
-   yPARSE_spacer  (3);
-   if (s_qout.q_file != NULL)   fprintf (s_qout.q_file, "# end-of-file.  done, finito, completare, whimper [Ï´···\n");
+   if (a_fancy == 'y') {
+      yPARSE_spacer  (3);
+      if (s_qout.q_file != NULL)   fprintf (s_qout.q_file, "# end-of-file.  done, finito, completare, whimper [Ï´···\n");
+   }
    /*---(close)--------------------------*/
    rc = yparse_queue_close (&s_qout);
    if (rc < 0)  {

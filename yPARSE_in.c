@@ -94,12 +94,14 @@ yPARSE_ready            (int *a_count)
 }
 
 char
-yPARSE_qin_info          (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_total)
+yPARSE_qin_info          (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_nfull, int *r_nused, int *r_ncurr)
 {
    if (r_label != NULL)  ystrlcpy (r_label, s_qin.q_label, LEN_SHORT);
    if (r_loc   != NULL)  ystrlcpy (r_loc  , s_qin.q_loc  , LEN_PATH);
    if (r_file  != NULL)  *r_file  =  s_qin.q_file;
-   if (r_total != NULL)  *r_total =  s_qin.q_tline;
+   if (r_nfull != NULL)  *r_nfull =  s_qin.q_nfull;
+   if (r_nused != NULL)  *r_nused =  s_qin.q_nused;
+   if (r_ncurr != NULL)  *r_ncurr =  s_qin.q_ncurr;
    return 0;
 }
 
@@ -517,15 +519,11 @@ static void      o___RECORDS_________________o (void) {;};
 /*====================------------------------------------====================*/
 static void      o___PARSING_________________o (void) {;};
 
-
-
-
-char yPARSE_read        (int *t, int *n, int *c, uchar *a_verb)     { return yparse_read (__FUNCTION__, t, n, c, -1, NULL, NULL, a_verb); }
-char yPARSE_read_one    (int *n, uchar *a_verb)                     { return yparse_read (__FUNCTION__, NULL, n, NULL, -1, NULL, NULL, a_verb); }
-char yPARSE_load        (int *n, int *c, char *a_recd)              { return yparse_read (__FUNCTION__, NULL, n, c, -1, a_recd, NULL, NULL); }
-char yPARSE_reload      (int *n, int *c, int a_line, char *a_label) { return yparse_read (__FUNCTION__, NULL, n, c, a_line, NULL, a_label, NULL); }
-char yPARSE_hidden      (int *n, int *c, char *a_recd)              { return yparse_read (__FUNCTION__, NULL, n, c,  0, a_recd, NULL, NULL); }
-int  yPARSE_recdno      (void)  { return s_qin.q_tline; }
+char yPARSE_read        (int *r_nfull, int *r_nused, int *r_ncurr, char r_verb [LEN_LABEL]) { return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , r_nfull, r_nused, r_ncurr, r_verb, NULL); }
+char yPARSE_read_one    (int *r_nused, char r_verb [LEN_LABEL])                             { return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , NULL   , r_nused, NULL   , r_verb, NULL); }
+char yPARSE_load        (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD])                { return yparse_read (__FUNCTION__, -1    , a_recd, NULL   , NULL   , r_nused, r_ncurr, NULL  , NULL); }
+char yPARSE_reload      (int *r_nused, int *r_ncurr, int a_line, char a_label [LEN_HUND])   { return yparse_read (__FUNCTION__, a_line, NULL  , a_label, NULL   , r_nused, r_ncurr, NULL  , NULL); }
+char yPARSE_hidden      (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD])                { return yparse_read (__FUNCTION__, -1    , a_recd, NULL   , NULL   , r_nused, r_ncurr, NULL  , NULL); }
 
 char yPARSE_inrecd      (char a_recd [LEN_RECD]) { ystrlcpy (a_recd, myPARSE.y_recd, LEN_RECD); }
 
@@ -536,10 +534,10 @@ char yPARSE_inrecd      (char a_recd [LEN_RECD]) { ystrlcpy (a_recd, myPARSE.y_r
 /*====================------------------------------------====================*/
 static void      o___FILES___________________o (void) {;};
 
-char yPARSE_stdin      (void)          { return yparse_queue_open  (&s_qin, "stdin"); }
-char yPARSE_tmpin      (void)          { return yparse_queue_open  (&s_qin, "/tmp/yparse.txt"); };
-char yPARSE_open_in    (char *a_name)  { return yparse_queue_open  (&s_qin, a_name);  }
-char yPARSE_close_in   (void)          { return yparse_queue_close (&s_qin);          }
+char yPARSE_stdin      (void)                    { return yparse_queue_open  (&s_qin, "stdin"); }
+char yPARSE_tmpin      (void)                    { return yparse_queue_open  (&s_qin, "/tmp/yparse.txt"); };
+char yPARSE_open_in    (char a_name [LEN_PATH])  { return yparse_queue_open  (&s_qin, a_name);  }
+char yPARSE_close_in   (void)                    { return yparse_queue_close (&s_qin);          }
 
 char         /*===[[ read a node ]]=======================[ ------ [ ------ ]=*/
 yPARSE_stdin_peek       (void)
@@ -627,7 +625,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
    if (s_qin.q_first == 0)   yPARSE_toss ();
    /*---(walk fields)--------------------*/
    --rce;  for (i = 1; i < n; ++i) {
-      x_type = yparse_specs_next_read ();
+      x_type = yparse_spec_next_read ();
       yparse_peek_in (i, &t);
       DEBUG_YPARSE   yLOG_complex ("FIELD"     , "%2d, %c, %2d, %s", i, x_type, s_qin.q_first, t);
       switch (x_type) {
@@ -809,10 +807,10 @@ yparse__unit_line       (char *a_question, int a_num)
    ystrlcpy  (yparse_print, "LINE unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "stats"    ) == 0) {
-      /*> sprintf (yparse_print, "LINE stats     : nline %2d, cline %2d, total %2d", s_qin.q_nline, s_qin.q_cline, s_count);   <*/
+      /*> sprintf (yparse_print, "LINE stats     : nline %2d, cline %2d, total %2d", s_qin.q_nused, s_qin.q_ncurr, s_count);   <*/
    }
    /*> else if (strcmp (a_question, "entry"    ) == 0) {                                            <* 
-    *>    if (s_count < 1 || a_num >  s_qin.q_nline) {                                              <* 
+    *>    if (s_count < 1 || a_num >  s_qin.q_nused) {                                              <* 
     *>       sprintf (yparse_print, "LINE entry  %2d : null", a_num);                        <* 
     *>    } else {                                                                                  <* 
     *>       rc = yparse_line__get (a_num, t);                                                       <* 

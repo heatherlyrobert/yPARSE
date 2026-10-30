@@ -45,35 +45,31 @@
  */
 
 
-#define     MAX_COLS      29
-#define     MAX_VERBS     50
-struct {
-   /*---(master)------------*/
-   char        v_verb      [LEN_LABEL];     /* verb name as used in files     */
-   uchar       v_specs     [LEN_TITLE];     /* field specifications           */
-   uchar       v_mode;                      /* one char yvikeys mode id       */
-   char        v_mask;                      /* field for reload/change        */
-   /*---(handlers)----------*/
-   int         (*v_reader)   (int n, char *a_verb);
-   int         (*v_writer)   (int n, char *a_verb);
-   float       v_seq;                       /* writing sequence               */
-   char        v_done;                      /* written (y/n)                  */
-   /*---(descriptive)-------*/
-   char        v_flags     [LEN_TITLE];     /* flags for use by program       */
-   uchar       v_labels    [LEN_RECD];      /* field labels for headers       */
-   uchar       v_desc      [LEN_DESC ];     /* long verb description          */
-   /*---(done)--------------*/
-}  static   S_verbs   [MAX_VERBS];
-static int  S_count   = 0;
-static int  S_curr    = 0;
+/*> #define     MAX_COLS      29                                                       <* 
+ *> #define     MAX_VERBS     50                                                       <* 
+ *> struct {                                                                           <* 
+ *>    /+---(master)------------+/                                                     <* 
+ *>    char        v_verb      [LEN_LABEL];     /+ verb name as used in files     +/   <* 
+ *>    uchar       v_specs     [LEN_TITLE];     /+ field specifications           +/   <* 
+ *>    uchar       v_mode;                      /+ one char yvikeys mode id       +/   <* 
+ *>    char        v_mask;                      /+ field for reload/change        +/   <* 
+ *>    /+---(handlers)----------+/                                                     <* 
+ *>    int         (*v_reader)   (int n, char *a_verb);                                <* 
+ *>    int         (*v_writer)   (int n, char *a_verb);                                <* 
+ *>    float       v_seq;                       /+ writing sequence               +/   <* 
+ *>    char        v_done;                      /+ written (y/n)                  +/   <* 
+ *>    /+---(descriptive)-------+/                                                     <* 
+ *>    char        v_flags     [LEN_TITLE];     /+ flags for use by program       +/   <* 
+ *>    uchar       v_labels    [LEN_RECD];      /+ field labels for headers       +/   <* 
+ *>    uchar       v_desc      [LEN_DESC ];     /+ long verb description          +/   <* 
+ *>    /+---(done)--------------+/                                                     <* 
+ *> }  static   G_verbs   [MAX_VERBS];                                                 <*/
+tVERBS      G_verbs   [MAX_VERBS];
+int         G_nverb   = 0;
+int         G_cverb   = 0;
+char       *G_nada    = "";
 
-static char *s_nada = "";
 
-
-
-static char s_sect  [LEN_RECD]  = "";
-static char s_div   [LEN_RECD]  = "";
-static char s_foot  [LEN_RECD]  = "";
 
 
 
@@ -90,19 +86,19 @@ yparse_verb__wipe       (char n)
    --rce;  if (n < 0)           return rce;
    --rce;  if (n >= MAX_VERBS)  return rce;
    /*---(master)------------*/
-   ystrlcpy (S_verbs [n].v_verb   , "", LEN_LABEL);
-   ystrlcpy (S_verbs [n].v_specs  , "", LEN_TITLE);
-   S_verbs [n].v_mode    =  '·';
-   S_verbs [n].v_mask    =   -1;
+   ystrlcpy (G_verbs [n].v_verb   , "", LEN_LABEL);
+   ystrlcpy (G_verbs [n].v_specs  , "", LEN_TITLE);
+   G_verbs [n].v_mode    =  '·';
+   G_verbs [n].v_mask    =   -1;
    /*---(handlers)----------*/
-   S_verbs [n].v_reader  = NULL;
-   S_verbs [n].v_writer  = NULL;
-   S_verbs [n].v_seq     =  0.0;
-   S_verbs [n].v_done    =  '-';
+   G_verbs [n].v_reader  = NULL;
+   G_verbs [n].v_writer  = NULL;
+   G_verbs [n].v_seq     =  0.0;
+   G_verbs [n].v_done    =  '-';
    /*---(descriptive)-------*/
-   ystrlcpy (S_verbs [n].v_flags  , "", LEN_TITLE);
-   ystrlcpy (S_verbs [n].v_labels , "", LEN_RECD);
-   ystrlcpy (S_verbs [n].v_desc   , "", LEN_DESC);
+   ystrlcpy (G_verbs [n].v_flags  , "", LEN_TITLE);
+   ystrlcpy (G_verbs [n].v_labels , "", LEN_RECD);
+   ystrlcpy (G_verbs [n].v_desc   , "", LEN_DESC);
    /*---(complete)----------*/
    return 0;
 }
@@ -118,7 +114,7 @@ yparse_verb__purge      (void)
    for (i = 0; i < MAX_VERBS; ++i) {
       yparse_verb__wipe (i);
    }
-   S_count = 0;
+   G_nverb = 0;
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -166,7 +162,7 @@ static void      o___SEARCH__________________o (void) {;};
  *>       return RC_POSITIVE;                                                                                                                                                                                                                                                             <* 
  *>    }                                                                                                                                                                                                                                                                                  <* 
  *>    /+---(range trouble)------------------+/                                                                                                                                                                                                                                           <* 
- *>    --rce;  if (S_count == 0) {                                                                                                                                                                                                                                                        <* 
+ *>    --rce;  if (G_nverb == 0) {                                                                                                                                                                                                                                                        <* 
  *>       if (d_entry  != NULL)  strcpy (d_entry, "(empty)");                                                                                                                                                                                                                             <* 
  *>       return rce;                                                                                                                                                                                                                                                                     <* 
  *>    }                                                                                                                                                                                                                                                                                  <* 
@@ -174,41 +170,41 @@ static void      o___SEARCH__________________o (void) {;};
  *>       if (d_entry != NULL)  strcpy (d_entry, "(under)");                                                                                                                                                                                                                              <* 
  *>       return rce;                                                                                                                                                                                                                                                                     <* 
  *>    }                                                                                                                                                                                                                                                                                  <* 
- *>    --rce;  if (n >= S_count) {                                                                                                                                                                                                                                                        <* 
+ *>    --rce;  if (n >= G_nverb) {                                                                                                                                                                                                                                                        <* 
  *>       if (d_entry != NULL)  strcpy (d_entry, "(over)");                                                                                                                                                                                                                               <* 
  *>       return rce;                                                                                                                                                                                                                                                                     <* 
  *>    }                                                                                                                                                                                                                                                                                  <* 
  *>    /+---(create entry)-------------------+/                                                                                                                                                                                                                                           <* 
  *>    if (d_entry  != NULL) {                                                                                                                                                                                                                                                            <* 
- *>       ystrldisplay (S_verbs [n].v_verb  , 12, x_verb);                                                                                                                                                                                                                                <* 
- *>       ystrldisplay (S_verbs [n].v_specs , 12, x_specs);                                                                                                                                                                                                                               <* 
- *>       if (S_verbs [n].v_reader != NULL)  strcpy (x_reader, "SET");                                                                                                                                                                                                                    <* 
- *>       if (S_verbs [n].v_writer != NULL)  strcpy (x_writer, "SET");                                                                                                                                                                                                                    <* 
- *>       ystrldisplay (S_verbs [n].v_flags , 12, x_flags);                                                                                                                                                                                                                               <* 
- *>       ystrldisplay (S_verbs [n].v_labels, 50, x_labels);                                                                                                                                                                                                                              <* 
- *>       ystrldisplay (S_verbs [n].v_desc  , 30, x_desc);                                                                                                                                                                                                                                <* 
+ *>       ystrldisplay (G_verbs [n].v_verb  , 12, x_verb);                                                                                                                                                                                                                                <* 
+ *>       ystrldisplay (G_verbs [n].v_specs , 12, x_specs);                                                                                                                                                                                                                               <* 
+ *>       if (G_verbs [n].v_reader != NULL)  strcpy (x_reader, "SET");                                                                                                                                                                                                                    <* 
+ *>       if (G_verbs [n].v_writer != NULL)  strcpy (x_writer, "SET");                                                                                                                                                                                                                    <* 
+ *>       ystrldisplay (G_verbs [n].v_flags , 12, x_flags);                                                                                                                                                                                                                               <* 
+ *>       ystrldisplay (G_verbs [n].v_labels, 50, x_labels);                                                                                                                                                                                                                              <* 
+ *>       ystrldisplay (G_verbs [n].v_desc  , 30, x_desc);                                                                                                                                                                                                                                <* 
  *>       sprintf (d_entry, "%2d  %-12.12s  %-12.12s  %c  %c  %-3.3s %-3.3s  %3.1f  %c  %-12.12s  %-50.50s  %-30.30s  Ï",                                                                                                                                                                 <* 
- *>             n, x_verb, S_verbs [n].v_mode, S_verbs [n].v_mask,                                                                                                                                                                                                                        <* 
- *>             x_reader, x_writer, S_verbs [n].v_seq, S_verbs [n].v_done,                                                                                                                                                                                                                <* 
+ *>             n, x_verb, G_verbs [n].v_mode, G_verbs [n].v_mask,                                                                                                                                                                                                                        <* 
+ *>             x_reader, x_writer, G_verbs [n].v_seq, G_verbs [n].v_done,                                                                                                                                                                                                                <* 
  *>             x_flags, x_label, x_desc);                                                                                                                                                                                                                                                <* 
  *>    }                                                                                                                                                                                                                                                                                  <* 
  *>    /+---(save-back)----------------------+/                                                                                                                                                                                                                                           <* 
- *>    if (r_verb   != NULL)  ystrlcpy (r_verb   , S_verbs [n].v_verb  , LEN_LABEL);                                                                                                                                                                                                      <* 
- *>    if (r_specs  != NULL)  ystrlcpy (r_specs  , S_verbs [n].v_specs , LEN_TITLE);                                                                                                                                                                                                      <* 
- *>    if (r_mode   != NULL)  *r_mode   =  S_verbs [n].v_mode;                                                                                                                                                                                                                            <* 
- *>    if (r_mask   != NULL)  *r_mask   =  S_verbs [n].v_mask;                                                                                                                                                                                                                            <* 
- *>    if (r_reader != NULL)  *r_reader =  S_verbs [n].v_reader;                                                                                                                                                                                                                          <* 
- *>    if (r_writer != NULL)  *r_writer =  S_verbs [n].v_writer;                                                                                                                                                                                                                          <* 
- *>    if (r_seq    != NULL)  *r_seq    =  S_verbs [n].v_seq;                                                                                                                                                                                                                             <* 
- *>    if (r_done   != NULL)  *r_done   =  S_verbs [n].v_done;                                                                                                                                                                                                                            <* 
- *>    if (r_flags  != NULL)  ystrlcpy (r_flags  , S_verbs [n].v_flags , LEN_TITLE);                                                                                                                                                                                                      <* 
- *>    if (r_labels != NULL)  ystrlcpy (r_labels , S_verbs [n].v_labels, LEN_RECD);                                                                                                                                                                                                       <* 
- *>    if (r_desc   != NULL)  ystrlcpy (r_desc   , S_verbs [n].v_desc  , LEN_DESC);                                                                                                                                                                                                       <* 
+ *>    if (r_verb   != NULL)  ystrlcpy (r_verb   , G_verbs [n].v_verb  , LEN_LABEL);                                                                                                                                                                                                      <* 
+ *>    if (r_specs  != NULL)  ystrlcpy (r_specs  , G_verbs [n].v_specs , LEN_TITLE);                                                                                                                                                                                                      <* 
+ *>    if (r_mode   != NULL)  *r_mode   =  G_verbs [n].v_mode;                                                                                                                                                                                                                            <* 
+ *>    if (r_mask   != NULL)  *r_mask   =  G_verbs [n].v_mask;                                                                                                                                                                                                                            <* 
+ *>    if (r_reader != NULL)  *r_reader =  G_verbs [n].v_reader;                                                                                                                                                                                                                          <* 
+ *>    if (r_writer != NULL)  *r_writer =  G_verbs [n].v_writer;                                                                                                                                                                                                                          <* 
+ *>    if (r_seq    != NULL)  *r_seq    =  G_verbs [n].v_seq;                                                                                                                                                                                                                             <* 
+ *>    if (r_done   != NULL)  *r_done   =  G_verbs [n].v_done;                                                                                                                                                                                                                            <* 
+ *>    if (r_flags  != NULL)  ystrlcpy (r_flags  , G_verbs [n].v_flags , LEN_TITLE);                                                                                                                                                                                                      <* 
+ *>    if (r_labels != NULL)  ystrlcpy (r_labels , G_verbs [n].v_labels, LEN_RECD);                                                                                                                                                                                                       <* 
+ *>    if (r_desc   != NULL)  ystrlcpy (r_desc   , G_verbs [n].v_desc  , LEN_DESC);                                                                                                                                                                                                       <* 
  *>    /+---(complete)-----------------------+/                                                                                                                                                                                                                                           <* 
  *>    return n;                                                                                                                                                                                                                                                                          <* 
- *> }                                                                                                                                                                                                                                                                                     <*/
+*> }                                                                                                                                                                                                                                                                                     <*/
 
-char yparse_verb_count  (void)  { return S_count; }
+char yparse_verb_count  (void)  { return G_nverb; }
 
 char
 yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char r_verb [LEN_LABEL], char r_specs [LEN_LABEL], uchar *r_mode, char *r_mask, void **r_reader, void **r_writer, float *r_seq, char *r_done, char r_flags [LEN_TITLE], char r_labels [LEN_RECD], char r_desc [LEN_DESC], char d_entry [LEN_RECD])
@@ -247,8 +243,8 @@ yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char
       return RC_ACK;
    }
    /*---(quick-out)----------------------*/
-   DEBUG_YPARSE  yLOG_value   ("S_count"   , S_count);
-   --rce;  if (S_count == 0) {
+   DEBUG_YPARSE  yLOG_value   ("G_nverb"   , G_nverb);
+   --rce;  if (G_nverb == 0) {
       if (d_entry  != NULL)  strcpy (d_entry, "(empty)");
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
@@ -259,9 +255,9 @@ yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char
    /*---(handlen verb)-------------------*/
    --rce;  if (a_verb != NULL) {
       DEBUG_YPARSE yLOG_note    ("requested name search");
-      for (i = 0; i < S_count; ++i) {
-         if (S_verbs [i].v_verb [0] != a_verb [0])      continue;
-         if (strcmp (S_verbs [i].v_verb, a_verb) != 0)  continue;
+      for (i = 0; i < G_nverb; ++i) {
+         if (G_verbs [i].v_verb [0] != a_verb [0])      continue;
+         if (strcmp (G_verbs [i].v_verb, a_verb) != 0)  continue;
          DEBUG_YPARSE   yLOG_note    ("FOUND");
          n = i;
          x_found = 'y';
@@ -272,7 +268,7 @@ yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char
    else if (a_dir >  0) {
       DEBUG_YPARSE yLOG_note    ("requested cursoring");
       /*---(prepare)---------------------*/
-      n = S_curr;
+      n = G_cverb;
       DEBUG_YPARSE yLOG_value   ("n"         , n);
       /*---(update)----------------------*/
       --rce;  switch (a_dir) {
@@ -289,7 +285,7 @@ yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char
          ++n;
          break;
       case YDLST_TAIL : case YDLST_DTAIL :
-         n = S_count - 1;
+         n = G_nverb - 1;
          break;
       default         :
          DEBUG_YPARSE yLOG_exitr   (__FUNCTION__, rce);
@@ -312,20 +308,20 @@ yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char
    DEBUG_YPARSE yLOG_value   ("n"         , n);
    --rce;  if (n <  0) {
       if (d_entry != NULL)  strcpy (d_entry, "(under)");
-      S_curr = 0;
+      G_cverb = 0;
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   --rce;  if (n >= S_count) {
+   --rce;  if (n >= G_nverb) {
       if (d_entry != NULL)  strcpy (d_entry, "(over)");
-      S_curr = S_count - 1;
+      G_cverb = G_nverb - 1;
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(find)---------------------------*/
    if (a_verb == NULL) {
-      for (i = 0; i < S_count; ++i) {
-         DEBUG_YPARSE yLOG_complex ("loop"      , "%2d#, %2dn, %s", i, n, S_verbs [i].v_verb);
+      for (i = 0; i < G_nverb; ++i) {
+         DEBUG_YPARSE yLOG_complex ("loop"      , "%2d#, %2dn, %s", i, n, G_verbs [i].v_verb);
          if (i == n) {
             DEBUG_YPARSE yLOG_note    ("found it");
             x_found = 'y';
@@ -342,32 +338,33 @@ yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char
    }
    /*---(create entry)-------------------*/
    if (d_entry  != NULL) {
-      ystrldisplay (S_verbs [n].v_verb  , 12, x_verb);
-      ystrldisplay (S_verbs [n].v_specs , 12, x_specs);
-      if (S_verbs [n].v_reader != NULL)  strcpy (x_reader, "SET");
-      if (S_verbs [n].v_writer != NULL)  strcpy (x_writer, "SET");
-      ystrldisplay (S_verbs [n].v_flags , 12, x_flags);
-      ystrldisplay (S_verbs [n].v_labels, 50, x_labels);
-      ystrldisplay (S_verbs [n].v_desc  , 30, x_desc);
+      ystrldisplay (G_verbs [n].v_verb  , 12, x_verb);
+      ystrldisplay (G_verbs [n].v_specs , 12, x_specs);
+      if (G_verbs [n].v_reader != NULL)  strcpy (x_reader, "SET");
+      if (G_verbs [n].v_writer != NULL)  strcpy (x_writer, "SET");
+      ystrldisplay (G_verbs [n].v_flags , 12, x_flags);
+      ystrldisplay (G_verbs [n].v_labels, 50, x_labels);
+      ystrldisplay (G_verbs [n].v_desc  , 30, x_desc);
       sprintf (d_entry, "%2d  %-12.12s  %-12.12s  %c  %2d  %-3.3s %-3.3s  %3.1f  %c  %-12.12s  %-50.50s  %-30.30s  Ï",
-            n, x_verb, x_specs, S_verbs [n].v_mode, S_verbs [n].v_mask,
-            x_reader, x_writer, S_verbs [n].v_seq, S_verbs [n].v_done,
+            n, x_verb, x_specs, G_verbs [n].v_mode, G_verbs [n].v_mask,
+            x_reader, x_writer, G_verbs [n].v_seq, G_verbs [n].v_done,
             x_flags, x_labels, x_desc);
    }
    /*---(save-back)----------------------*/
-   S_curr = n;
-   if (r_verb   != NULL)  ystrlcpy (r_verb   , S_verbs [n].v_verb  , LEN_LABEL);
-   if (r_specs  != NULL)  ystrlcpy (r_specs  , S_verbs [n].v_specs , LEN_TITLE);
-   if (r_mode   != NULL)  *r_mode   =  S_verbs [n].v_mode;
-   if (r_mask   != NULL)  *r_mask   =  S_verbs [n].v_mask;
-   if (r_reader != NULL)  *r_reader =  S_verbs [n].v_reader;
-   if (r_writer != NULL)  *r_writer =  S_verbs [n].v_writer;
-   if (r_seq    != NULL)  *r_seq    =  S_verbs [n].v_seq;
-   if (r_done   != NULL)  *r_done   =  S_verbs [n].v_done;
-   if (r_flags  != NULL)  ystrlcpy (r_flags  , S_verbs [n].v_flags , LEN_TITLE);
-   if (r_labels != NULL)  ystrlcpy (r_labels , S_verbs [n].v_labels, LEN_RECD);
-   if (r_desc   != NULL)  ystrlcpy (r_desc   , S_verbs [n].v_desc  , LEN_DESC);
+   G_cverb = n;
+   if (r_verb   != NULL)  ystrlcpy (r_verb   , G_verbs [n].v_verb  , LEN_LABEL);
+   if (r_specs  != NULL)  ystrlcpy (r_specs  , G_verbs [n].v_specs , LEN_TITLE);
+   if (r_mode   != NULL)  *r_mode   =  G_verbs [n].v_mode;
+   if (r_mask   != NULL)  *r_mask   =  G_verbs [n].v_mask;
+   if (r_reader != NULL)  *r_reader =  G_verbs [n].v_reader;
+   if (r_writer != NULL)  *r_writer =  G_verbs [n].v_writer;
+   if (r_seq    != NULL)  *r_seq    =  G_verbs [n].v_seq;
+   if (r_done   != NULL)  *r_done   =  G_verbs [n].v_done;
+   if (r_flags  != NULL)  ystrlcpy (r_flags  , G_verbs [n].v_flags , LEN_TITLE);
+   if (r_labels != NULL)  ystrlcpy (r_labels , G_verbs [n].v_labels, LEN_RECD);
+   if (r_desc   != NULL)  ystrlcpy (r_desc   , G_verbs [n].v_desc  , LEN_DESC);
    /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return n;
 }
 
@@ -389,9 +386,9 @@ yparse_verb_by_name     (char a_verb [LEN_LABEL])
    }
    DEBUG_YPARSE   yLOG_snote   (a_verb);
    /*---(walk entries)-------------------*/
-   for (i = 0; i < S_count; ++i) {
-      if (S_verbs [i].v_verb [0] != a_verb [0])      continue;
-      if (strcmp (S_verbs [i].v_verb, a_verb) != 0)  continue;
+   for (i = 0; i < G_nverb; ++i) {
+      if (G_verbs [i].v_verb [0] != a_verb [0])      continue;
+      if (strcmp (G_verbs [i].v_verb, a_verb) != 0)  continue;
       DEBUG_YPARSE   yLOG_snote   ("FOUND");
       return i;
    }
@@ -433,15 +430,15 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
     *>    return n;                                                                   <* 
     *> }                                                                              <*/
    /*---(find entry)---------------------*/
-   DEBUG_YPARSE   yLOG_sint    (S_count);
-   --rce;  if (S_count <= 0) {
+   DEBUG_YPARSE   yLOG_sint    (G_nverb);
+   --rce;  if (G_nverb <= 0) {
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    n = -1;
-   for (i = 0; i < S_count; ++i) {
-      if (S_verbs [i].v_verb [0] != a_verb [0])      continue;
-      if (strcmp (S_verbs [i].v_verb, a_verb) != 0)  continue;
+   for (i = 0; i < G_nverb; ++i) {
+      if (G_verbs [i].v_verb [0] != a_verb [0])      continue;
+      if (strcmp (G_verbs [i].v_verb, a_verb) != 0)  continue;
       DEBUG_YPARSE   yLOG_snote   ("FOUND");
       n = i;
       break;
@@ -451,8 +448,8 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
    if (a_queue != NULL) {
       a_queue->q_iverb   = n;
       if (n >= 0) {
-         if (a_queue == &s_qin)  a_queue->q_handler = S_verbs [n].v_reader;
-         else                    a_queue->q_handler = S_verbs [n].v_writer;
+         if (a_queue == &s_qin)  a_queue->q_handler = G_verbs [n].v_reader;
+         else                    a_queue->q_handler = G_verbs [n].v_writer;
       } else {
          a_queue->q_handler = NULL;
       }
@@ -464,41 +461,41 @@ yparse_verb_find        (tQUEUE *a_queue, char *a_verb)
    return n;
 }
 
-char yparse_verb_mask        (int n) { return S_verbs [n].v_mask; }
+char yparse_verb_mask        (int n) { return G_verbs [n].v_mask; }
 
-char
-yparse_specs_next_write  (void)
-{
-   if (s_qout.q_iverb <  0       )  return -2;
-   if (s_qout.q_count <  0       )  return -3;
-   if (s_qout.q_count >= MAX_COLS)  return -4;
-   return S_verbs [s_qout.q_iverb].v_specs [s_qout.q_count - 1];
-}
+/*> char                                                                              <* 
+ *> yparse_specs_next_write  (void)                                                   <* 
+ *> {                                                                                 <* 
+ *>    if (s_qout.q_iverb <  0       )  return -2;                                    <* 
+ *>    if (s_qout.q_count <  0       )  return -3;                                    <* 
+ *>    if (s_qout.q_count >= MAX_COLS)  return -4;                                    <* 
+ *>    return G_verbs [s_qout.q_iverb].v_specs [s_qout.q_count - 1];                  <* 
+ *> }                                                                                 <*/
 
-char
-yparse_specs_next_read  (void)
-{
-   if (s_qin.q_iverb <  0       )  return -2;
-   if (s_qin.q_first <  0       )  return -3;
-   if (s_qin.q_first >= MAX_COLS)  return -4;
-   return S_verbs [s_qin.q_iverb].v_specs [s_qin.q_first - 1];
-}
+/*> char                                                                              <* 
+ *> yparse_specs_next_read  (void)                                                    <* 
+ *> {                                                                                 <* 
+ *>    if (s_qin.q_iverb <  0       )  return -2;                                     <* 
+ *>    if (s_qin.q_first <  0       )  return -3;                                     <* 
+ *>    if (s_qin.q_first >= MAX_COLS)  return -4;                                     <* 
+ *>    return G_verbs [s_qin.q_iverb].v_specs [s_qin.q_first - 1];                    <* 
+ *> }                                                                                 <*/
 
-char
-yparse_specs_len        (tQUEUE *a_queue)
-{
-   int         i           =    0;
-   int         n           =    1;   /* start with one for verb  */
-   if (a_queue        == NULL)  return -1;
-   if (a_queue->q_iverb <  0   )  return -2;
-   /*> DEBUG_YPARSE   yLOG_info    ("spec"      , S_verbs [a_queue->q_iverb].v_specs);    <*/
-   for (i = 0; i < MAX_COLS; ++i) {
-      if (S_verbs [a_queue->q_iverb].v_specs [i] == '\0')   break;
-      /*> if (S_verbs [a_queue->q_iverb].v_specs [i] == '-')    break;                    <*/
-      ++n;
-   }
-   return n;
-}
+/*> char                                                                                            <* 
+ *> yparse_specs_len        (tQUEUE *a_queue)                                                       <* 
+ *> {                                                                                               <* 
+ *>    int         i           =    0;                                                              <* 
+ *>    int         n           =    1;   /+ start with one for verb  +/                             <* 
+ *>    if (a_queue        == NULL)  return -1;                                                      <* 
+ *>    if (a_queue->q_iverb <  0   )  return -2;                                                    <* 
+ *>    /+> DEBUG_YPARSE   yLOG_info    ("spec"      , G_verbs [a_queue->q_iverb].v_specs);    <+/   <* 
+ *>    for (i = 0; i < MAX_COLS; ++i) {                                                             <* 
+ *>       if (G_verbs [a_queue->q_iverb].v_specs [i] == '£')   break;                               <* 
+ *>       /+> if (G_verbs [a_queue->q_iverb].v_specs [i] == '-')    break;                    <+/   <* 
+ *>       ++n;                                                                                      <* 
+ *>    }                                                                                            <* 
+ *>    return n;                                                                                    <* 
+ *> }                                                                                               <*/
 
 char
 yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc)
@@ -511,28 +508,43 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
    int         n           =    0;
    char        x_specs     [LEN_TITLE] = "";
    int         l           =    0;
-   /*---(defense)------------------------*/
-   if (myPARSE.y_ready != 'y')  return -1;
-   if (a_verb == NULL)          return -2;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE   yLOG_char    ("y_ready"   , myPARSE.y_ready);
+   --rce;  if (myPARSE.y_ready != 'y') {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_point   ("a_verb"    , a_verb);
+   --rce;  if (a_verb  == NULL || a_verb  [0] == '\0') {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_info    ("a_verb"    , a_verb);
+   DEBUG_YPARSE   yLOG_point   ("a_specs"   , a_specs);
+   --rce;  if (a_specs == NULL || a_specs [0] == '\0') {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_info    ("a_specs"   , a_specs);
    /*---(note)---------------------------*/
    if (a_desc != NULL) {
       DEBUG_YPARSE   yLOG_info    ("a_desc"    , a_desc);
    }
    /*---(check verb)---------------------*/
-   if (myPARSE.y_verbs  != YPARSE_MANUAL) {
+   --rce;  if (myPARSE.y_verbs  != YPARSE_MANUAL) {
       rc = ystrlgood (a_verb, ySTR_ALNUM, LEN_USER);
-      --rce;  if (rc < 0) {
+      if (rc < 0) {
          DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
    }
    /*---(check existing)-----------------*/
    n = x_found = yparse_verb_find (NULL, a_verb);
-   DEBUG_YPARSE   yLOG_value   ("S_count"   , S_count);
+   DEBUG_YPARSE   yLOG_value   ("G_nverb"   , G_nverb);
    DEBUG_YPARSE   yLOG_value   ("find"      , n);
-   if (n < 0)  n = S_count;
+   if (n < 0)  n = G_nverb;
    DEBUG_YPARSE   yLOG_value   ("n"         , n);
    /*---(defense)------------------------*/
    DEBUG_YPARSE   yLOG_point   ("a_specs"   , a_specs);
@@ -543,7 +555,7 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
    /*> ystrlddel (x_specs, '-', LEN_TITLE);                                           <*/
    DEBUG_YPARSE   yLOG_info    ("x_specs"   , x_specs);
    --rce;  for (i = 0; i < strlen (x_specs); ++i) {
-      l = yparse_field_len (x_specs [i]);
+      l = yparse_spec_size (x_specs [i]);
       DEBUG_YPARSE   yLOG_complex ("entry"     , "%2d, %c, %d", i, x_specs [i], l);
       if (l > 0)  continue;
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -556,18 +568,18 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
     *>    return rce;                                                                 <* 
     *> }                                                                              <*/
    /*---(copy values)--------------------*/
-   if (a_mode   != 0   )  S_verbs [n].v_mode    = a_mode;
-   ystrlcpy (S_verbs [n].v_verb  , a_verb  , LEN_LABEL);
-   if (a_seq    >  0.0 )  S_verbs [n].v_seq     = a_seq;
-   ystrlcpy (S_verbs [n].v_specs , x_specs , LEN_TITLE);
-   S_verbs [n].v_mask    = a_mask;
-   if (a_reader != NULL)  S_verbs [n].v_reader  = a_reader;
-   if (a_writer != NULL)  S_verbs [n].v_writer  = a_writer;
-   if (a_flags  != NULL)  ystrlcpy (S_verbs [n].v_flags , a_flags , LEN_TITLE);
-   if (a_labels != NULL)  ystrlcpy (S_verbs [n].v_labels, a_labels, LEN_RECD);
-   if (a_desc   != NULL)  ystrlcpy (S_verbs [n].v_desc  , a_desc  , LEN_DESC);
+   if (a_mode   != 0   )  G_verbs [n].v_mode    = a_mode;
+   ystrlcpy (G_verbs [n].v_verb  , a_verb  , LEN_LABEL);
+   if (a_seq    >  0.0 )  G_verbs [n].v_seq     = a_seq;
+   ystrlcpy (G_verbs [n].v_specs , x_specs , LEN_TITLE);
+   G_verbs [n].v_mask    = a_mask;
+   if (a_reader != NULL)  G_verbs [n].v_reader  = a_reader;
+   if (a_writer != NULL)  G_verbs [n].v_writer  = a_writer;
+   if (a_flags  != NULL)  ystrlcpy (G_verbs [n].v_flags , a_flags , LEN_TITLE);
+   if (a_labels != NULL)  ystrlcpy (G_verbs [n].v_labels, a_labels, LEN_RECD);
+   if (a_desc   != NULL)  ystrlcpy (G_verbs [n].v_desc  , a_desc  , LEN_DESC);
    /*---(update)-------------------------*/
-   if (x_found < 0)  ++S_count;
+   if (x_found < 0)  ++G_nverb;
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return 0;
@@ -578,9 +590,9 @@ yparse_handler_remove   (char *a_verb)
 {
    int         i           =    0;
    int         n           =   -1;
-   for (i = 0; i < S_count; ++i) {
-      if (S_verbs [i].v_verb [0] != a_verb [0])      continue;
-      if (strcmp (S_verbs [i].v_verb, a_verb) != 0)  continue;
+   for (i = 0; i < G_nverb; ++i) {
+      if (G_verbs [i].v_verb [0] != a_verb [0])      continue;
+      if (strcmp (G_verbs [i].v_verb, a_verb) != 0)  continue;
       DEBUG_YPARSE   yLOG_snote   ("FOUND");
       n = i;
       break;
@@ -592,340 +604,11 @@ yparse_handler_remove   (char *a_verb)
 char*
 yPARSE_verb             (int a_num)
 {
-   if (a_num <  0      )   return s_nada;
-   if (a_num >= S_count)   return s_nada;
-   return S_verbs [a_num].v_verb;
+   if (a_num <  0      )   return G_nada;
+   if (a_num >= G_nverb)   return G_nada;
+   return G_verbs [a_num].v_verb;
 }
 
-
-
-/*====================------------------------------------====================*/
-/*===----                     fancy output writing                     ----===*/
-/*====================------------------------------------====================*/
-static void      o___FANCY___________________o (void) {;};
-
-char
-yparse_fancy__write     (uchar *a_line)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
-   --rce;  if (s_qout.q_file == NULL) {
-      DEBUG_YPARSE   yLOG_snote   ("file not open");
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_spoint  (a_line);
-   --rce;  if (a_line == NULL) {
-      DEBUG_YPARSE   yLOG_snote   ("no line to print");
-      return rce;
-   }
-   /*---(print)--------------------------*/
-   fprintf (s_qout.q_file, "%s\n", a_line);
-   /*---(complete)-----------------------*/
-   return 0;
-}
-
-char
-yPARSE_section          (char *a_title)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   int         x_len       =    0;
-   int         x_fill      =    0;
-   char        t           [LEN_RECD] = "";
-   char        x_filler    [LEN_RECD] = "===========================================================================================================";
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(prepare title)------------------*/
-   if (a_title != NULL)  ystrlcpy (t, a_title, LEN_DESC);
-   ystrlupper (t, LEN_RECD);
-   DEBUG_YPARSE   yLOG_info    ("title"     , t);
-   x_len       = strlen (t);
-   if (x_len > 50) {
-      x_len     = 50;
-      t [x_len] = '\0';
-   }
-   /*---(prepare filler)-----------------*/
-   x_fill      = 80 - 12 - x_len;
-   /*---(print title)--------------------*/
-   yPARSE_spacer  (3);
-   sprintf (s_sect, "#===[[ %s ]]%*.*s=#", t, x_fill, x_fill, x_filler);
-   yparse_fancy__write (s_sect);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-yparse_fancy__columns    (uchar *a_specs, uchar *a_labels)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        x_labels    [LEN_RECD]  = "";
-   char        t           [LEN_RECD]  = "";
-   char        u           [LEN_TERSE] = "";
-   int         i           =    0;
-   int         l           =    0;
-   char       *p           = NULL;
-   char       *n           = NULL;
-   char       *p2          = NULL;
-   char       *q           =  ",";
-   char       *r           = NULL;
-   uchar       x_spec      =  '-';
-   int         x_avail     =    0;
-   int         x_len       =    0;
-   int         x_pre       =    0;
-   int         x_mid       =    0;
-   int         x_suf       =    0;
-   char       *x_dashes    = "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
-   /*---(default)------------------------*/
-   ystrlcpy (s_div, "#---verb---- § ", LEN_RECD);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE   yLOG_point   ("a_specs"   , a_specs);
-   if (a_specs == NULL) {
-      DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-      return 0;
-   }
-   DEBUG_YPARSE   yLOG_info    ("a_specs"   , a_specs);
-   /*---(prepare)------------------------*/
-   if (a_labels != NULL)  ystrlcpy (x_labels, a_labels, LEN_RECD);
-   l = strlen (x_labels);
-   p = x_labels;
-   if (p != NULL)  n = strchr (x_labels, ',');
-   if (n != NULL)  n [0] = '\0';
-   DEBUG_YPARSE   yLOG_complex ("next"      , "%p, %d, %p, %d, %p, %d, [%s]", x_labels, l, p, p - x_labels, n, n - x_labels, p);
-   /*---(walk labels)--------------------*/
-   for (i = 0; i < MAX_COLS; ++i) {
-      DEBUG_YPARSE   yLOG_value   ("loop"      , i);
-      /*---(filter)----------------------*/
-      x_spec = a_specs [i];
-      DEBUG_YPARSE   yLOG_char    ("x_spec"    , x_spec);
-      if (x_spec == '-')  break;
-      if (x_spec ==  0 )  break;
-      /*---(get width)-------------------*/
-      x_avail = yparse_field_len (x_spec);
-      DEBUG_YPARSE   yLOG_value   ("x_avail"   , x_avail);
-      DEBUG_YPARSE   yLOG_point   ("p"         , p);
-      /*---(handle empties)--------------*/
-      if (p == NULL || strlen (p) <= 0) {
-         if (x_spec == 'c' || x_spec == 'C')   sprintf (u, "%c", x_spec);
-         else                                  sprintf (u, "(%c)", x_spec);
-         p2 = u;
-      } else {
-         p2 = p;
-      }
-      /*---(handle labels)---------------*/
-      DEBUG_YPARSE   yLOG_info    ("p2"        , p2);
-      x_len   = strlen (p2);
-      x_pre   = x_avail - x_len;
-      if (x_pre < 0)  x_pre = 0;
-      if (x_pre > 3)  x_pre = 3;
-      x_suf   = x_avail - x_pre - x_len;
-      if (x_suf < 0)  x_suf = 0;
-      x_mid   = x_avail - x_pre - x_suf;
-      sprintf (t, "%*.*s%-*.*s%*.*s", x_pre, x_pre, "---", x_mid, x_mid, p2, x_suf, x_suf, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-      DEBUG_YPARSE   yLOG_info    ("t"         , t);
-      /*---(concat)----------------------*/
-      ystrlcat (s_div, t, LEN_RECD);
-      ystrlcat (s_div, " § ", LEN_RECD);
-      DEBUG_YPARSE   yLOG_info    ("s_div"     , s_div);
-      /*---(next)------------------------*/
-      if (n == NULL)  p = NULL;
-      else {
-         p = n + 1;
-         if (p - x_labels + 1 >= l)  p = NULL;
-         n = NULL;
-      }
-      if (p != NULL)  n = strchr (p, ',');
-      if (n != NULL)  n [0] = '\0';
-      DEBUG_YPARSE   yLOG_complex ("next"      , "%p, %d, %p, %d, %p, %d, [%s]", x_labels, l, p, p - x_labels, n, n - x_labels, p);
-      /*---(done)------------------------*/
-   }
-   /*---(decode)-------------------------*/
-   ystrldecode (s_div, LEN_RECD);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-yPARSE_columns          (int c, char *a_specs, char *a_labels)
-{
-   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
-   if (c % 5 == 0) {
-      yparse_fancy__columns (a_specs, a_labels);
-      yparse_fancy__write (s_div);
-   }
-   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-yPARSE_spacer           (char a_lines)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   int         i           =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
-   --rce;  if (s_qout.q_file == NULL) {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_snote   ("open");
-   /*---(print)--------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("print");
-   if (a_lines < 1)  a_lines = 1;
-   if (a_lines > 5)  a_lines = 5;
-   for (i = 0; i < a_lines; ++i)   fprintf  (s_qout.q_file, "\n");
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
-
-char
-yparse_fancy__begin     (uchar *a_verb, uchar *a_specs, uchar *a_labels, uchar *a_desc)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        t           [LEN_DESC ];
-   int         i           =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
-   /*---(prepare)------------------------*/
-   ystrlcpy (s_div,  "", LEN_RECD);
-   ystrlcpy (s_sect, "", LEN_RECD);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE   yLOG_point   ("a_verb"    , a_verb);
-   --rce;  if (a_verb == NULL) {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YPARSE   yLOG_info    ("a_verb"    , a_verb);
-   /*---(call section header)------------*/
-   if (a_desc != NULL && strcmp (a_desc, "") != 0)  ystrlcpy   (t, a_desc, LEN_DESC );
-   else                                             ystrlcpy   (t, a_verb, LEN_DESC );
-   ystrlupper (t, LEN_DESC );
-   DEBUG_YPARSE   yLOG_info    ("t"         , t);
-   yPARSE_section (t);
-   /*---(create divider)-----------------*/
-   yparse_fancy__columns (a_specs, a_labels);
-   /*> yparse_fancy_break    (0);                                                     <*/
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-yparse_fancy_begin       (int n)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(prepare)------------------------*/
-   ystrlcpy (s_div,  "", LEN_RECD);
-   ystrlcpy (s_sect, "", LEN_RECD);
-   /*---(defense)------------------------*/
-   --rce;  if (n < 0 || n >= S_count) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(call)---------------------------*/
-   rc = yparse_fancy__begin (S_verbs [n].v_verb, S_verbs [n].v_specs, S_verbs [n].v_labels, S_verbs [n].v_desc);
-   --rce;  if (rc < 0) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-yparse_fancy_break      (int c)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rc          =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   /*---(print)--------------------------*/
-   DEBUG_YPARSE  yLOG_sint    (c);
-   if (c % 5 != 0) {
-      DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-      return 0;
-   }
-   /*---(print)--------------------------*/
-   rc = yparse_fancy__write (s_div);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
-
-char
-yparse_fancy_end        (int c)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        t           [LEN_DESC];
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   /*---(prepare)------------------------*/
-   ystrlcpy (s_foot, "", LEN_RECD);
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_sint    (c);
-   --rce;  if (c < 0) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(footer)-------------------------*/
-   if      (c == 0)  sprintf (s_foot, "# no records required");
-   else if (c == 1)  sprintf (s_foot, "# wrote a single record");
-   else              sprintf (s_foot, "# wrote %d records", c);
-   yparse_fancy__write (s_foot);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
-
-char
-yPARSE_footer           (int c)
-{
-   return yparse_fancy_end (c);
-}
-
-
-
-/*====================------------------------------------====================*/
-/*===----                     public simplifiers                       ----===*/
-/*====================------------------------------------====================*/
-static void      o___PUBLIC__________________o (void) {;};
-
-char
-yPARSE_sect_begin       (uchar *a_verb)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   int         n           =   -1;
-   int         i           =    0;
-   for (i = 0; i < S_count; ++i) {
-      if (S_verbs [i].v_verb [0] != a_verb [0])      continue;
-      if (strcmp (S_verbs [i].v_verb, a_verb) != 0)  continue;
-      n = i;
-      break;
-   }
-   yparse_fancy_begin (n);
-   return 0;
-}
-
-char yPARSE_sect_break       (int c) { return yparse_fancy_break (c); }
-char yPARSE_sect_end         (int c) { return yparse_fancy_end   (c); }
 
 
 
@@ -946,29 +629,29 @@ yPARSE_write_all        (void)
    int         c           =    0;
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   DEBUG_YPARSE  yLOG_value   ("S_count"   , S_count);
+   DEBUG_YPARSE  yLOG_value   ("G_nverb"   , G_nverb);
    /*---(prepare)------------------------*/
-   for (i = 0; i < S_count; ++i)  S_verbs [i].v_done = '-';
+   for (i = 0; i < G_nverb; ++i)  G_verbs [i].v_done = '-';
    /*---(call writers)-------------------*/
    while (1) {
       /*---(find next)-------------------*/
       x_lowest = 999999.0;
       x_next   = -1;
-      for (i = 0; i < S_count; ++i) {
-         if (S_verbs [i].v_done == 'y'    )   continue;
-         if (S_verbs [i].v_seq >=  x_lowest)  continue;
-         x_lowest = S_verbs [i].v_seq;
+      for (i = 0; i < G_nverb; ++i) {
+         if (G_verbs [i].v_done == 'y'    )   continue;
+         if (G_verbs [i].v_seq >=  x_lowest)  continue;
+         x_lowest = G_verbs [i].v_seq;
          x_next   = i;
       }
       if (x_lowest > 999.0)  break;
       if (x_next   < 0    )  break;
-      S_verbs [x_next].v_done = 'y';
+      G_verbs [x_next].v_done = 'y';
       /*---(filter)----------------------*/
-      DEBUG_INPT  yLOG_info    ("verb"      , S_verbs [x_next].v_verb);
-      DEBUG_INPT  yLOG_point   ("reader"    , S_verbs [x_next].v_writer);
-      if (S_verbs [x_next].v_writer == NULL)  continue;
+      DEBUG_INPT  yLOG_info    ("verb"      , G_verbs [x_next].v_verb);
+      DEBUG_INPT  yLOG_point   ("reader"    , G_verbs [x_next].v_writer);
+      if (G_verbs [x_next].v_writer == NULL)  continue;
       /*---(handle)----------------------*/
-      rc = S_verbs [x_next].v_writer (s_qout.q_tline, S_verbs [x_next].v_verb);
+      rc = G_verbs [x_next].v_writer (s_qout.q_nfull, G_verbs [x_next].v_verb);
       if (rc >= 0)  c += rc;
    }
    /*---(complete)-----------------------*/
@@ -1007,12 +690,12 @@ yPARSE_read_all         (void)
          continue;
       }
       DEBUG_YPARSE  yLOG_info    ("verb"      , x_verb);
-      DEBUG_YPARSE  yLOG_point   ("reader"    , S_verbs [n].v_reader);
-      if (S_verbs [n].v_reader == NULL) {
+      DEBUG_YPARSE  yLOG_point   ("reader"    , G_verbs [n].v_reader);
+      if (G_verbs [n].v_reader == NULL) {
          DEBUG_YPARSE   yLOG_note    ("reader not assigned");
          continue;
       }
-      rc = S_verbs [n].v_reader (s_qin.q_tline, x_verb);
+      rc = G_verbs [n].v_reader (s_qin.q_nfull, x_verb);
       if (rc < 0)  {
          DEBUG_YPARSE   yLOG_note    ("handler not successful");
          continue;
@@ -1045,13 +728,13 @@ yparse__unit_verb       (char *a_question, char *a_verb, int a_seq)
    ystrlcpy  (yparse_print, "VERB unit        : question not understood", LEN_STR);
    /*---(check existing)-----------------*/
    if      (strcmp (a_question, "count"    ) == 0) {
-      sprintf (yparse_print, "VERB count       : %d", S_count);
+      sprintf (yparse_print, "VERB count       : %d", G_nverb);
    }
    else if (strcmp (a_question, "entry"    ) == 0) {
       n = a_seq;
       if (n < 0 || n >= MAX_VERBS)       sprintf (yparse_print, "VERB entry  (--) : out of range");
-      else if (S_verbs [n].v_verb [0] == '£') sprintf (yparse_print, "VERB entry  (%2d) : verb slot not used", n);
-      else sprintf (yparse_print, "VERB entry  (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, S_verbs [n].v_mode, S_verbs [n].v_verb, S_verbs [n].v_specs, (S_verbs [n].v_reader != NULL) ? 'y' : '-', (S_verbs [n].v_writer != NULL) ? 'y' : '-', S_verbs [n].v_seq, S_verbs [n].v_mask, S_verbs [n].v_labels, S_verbs [n].v_desc);
+      else if (G_verbs [n].v_verb [0] == '£') sprintf (yparse_print, "VERB entry  (%2d) : verb slot not used", n);
+      else sprintf (yparse_print, "VERB entry  (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, G_verbs [n].v_mode, G_verbs [n].v_verb, G_verbs [n].v_specs, (G_verbs [n].v_reader != NULL) ? 'y' : '-', (G_verbs [n].v_writer != NULL) ? 'y' : '-', G_verbs [n].v_seq, G_verbs [n].v_mask, G_verbs [n].v_labels, G_verbs [n].v_desc);
    }
    /*---(answer)------------------------------------------*/
    else if (strcmp (a_question, "by_name"  ) == 0) {
@@ -1060,24 +743,24 @@ yparse__unit_verb       (char *a_question, char *a_verb, int a_seq)
       } else {
          n = yparse_verb_find (NULL, a_verb);
          if (n < 0) sprintf (yparse_print, "VERB name   (--) : %s is unknown", a_verb);
-         else       sprintf (yparse_print, "VERB name   (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, S_verbs [n].v_mode, S_verbs [n].v_verb, S_verbs [n].v_specs, (S_verbs [n].v_reader != NULL) ? 'y' : '-', (S_verbs [n].v_writer != NULL) ? 'y' : '-', S_verbs [n].v_seq, S_verbs [n].v_mask, S_verbs [n].v_labels, S_verbs [n].v_desc);
+         else       sprintf (yparse_print, "VERB name   (%2d) : %c, %-12.12s [%-12.12s] %cr %cw %3.1fs %2dm [%-20.20s] [%-10.10s]", n, G_verbs [n].v_mode, G_verbs [n].v_verb, G_verbs [n].v_specs, (G_verbs [n].v_reader != NULL) ? 'y' : '-', (G_verbs [n].v_writer != NULL) ? 'y' : '-', G_verbs [n].v_seq, G_verbs [n].v_mask, G_verbs [n].v_labels, G_verbs [n].v_desc);
       }
    }
-   else if (strcmp (a_question, "section"  ) == 0) {
-      ystrlcpy    (t, s_sect, LEN_RECD);
-      ystrlencode (t, ySTR_NORM, LEN_RECD);
-      sprintf (yparse_print, "VERB section     : %2d[%s]", strlen (t), t);
-   }
-   else if (strcmp (a_question, "divider"  ) == 0) {
-      ystrlcpy    (t, s_div, LEN_RECD);
-      ystrlencode (t, ySTR_NORM, LEN_RECD);
-      sprintf (yparse_print, "VERB divider     : %2d[%s]", strlen (t), t);
-   }
-   else if (strcmp (a_question, "footer"   ) == 0) {
-      ystrlcpy    (t, s_foot, LEN_RECD);
-      ystrlencode (t, ySTR_NORM, LEN_RECD);
-      sprintf (yparse_print, "VERB footer      : %2d[%s]", strlen (t), t);
-   }
+   /*> else if (strcmp (a_question, "section"  ) == 0) {                              <* 
+    *>    ystrlcpy    (t, s_sect, LEN_RECD);                                          <* 
+    *>    ystrlencode (t, ySTR_NORM, LEN_RECD);                                       <* 
+    *>    sprintf (yparse_print, "VERB section     : %2d[%s]", strlen (t), t);        <* 
+    *> }                                                                              <*/
+   /*> else if (strcmp (a_question, "divider"  ) == 0) {                              <* 
+    *>    ystrlcpy    (t, s_div, LEN_RECD);                                           <* 
+    *>    ystrlencode (t, ySTR_NORM, LEN_RECD);                                       <* 
+    *>    sprintf (yparse_print, "VERB divider     : %2d[%s]", strlen (t), t);        <* 
+    *> }                                                                              <*/
+   /*> else if (strcmp (a_question, "footer"   ) == 0) {                              <* 
+    *>    ystrlcpy    (t, s_foot, LEN_RECD);                                          <* 
+    *>    ystrlencode (t, ySTR_NORM, LEN_RECD);                                       <* 
+    *>    sprintf (yparse_print, "VERB footer      : %2d[%s]", strlen (t), t);        <* 
+    *> }                                                                              <*/
    /*---(complete)----------------------------------------*/
    return yparse_print;
 }

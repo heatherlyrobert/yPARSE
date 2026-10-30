@@ -81,9 +81,9 @@ yparse_queue__wipe      (tQUEUE *a_queue, char a_type)
    }
    /*---(statistics)---------------------*/
    if (a_type != 0 && strchr ("*ir" , a_type) != 0) {
-      a_queue->q_tline    =    0;
-      a_queue->q_nline    =    0;
-      a_queue->q_cline    =    0;
+      a_queue->q_nfull    =    0;
+      a_queue->q_nused    =    0;
+      a_queue->q_ncurr    =    0;
    }
    /*---(record)-------------------------*/
    if (a_type != 0 && strchr ("*ipr", a_type) != 0) {
@@ -372,6 +372,12 @@ yparse_queue_close      (tQUEUE *a_queue)
       strcpy (a_queue->q_loc, "");
       DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
       return 4;
+   }
+   /*---(flush)--------------------------*/
+   DEBUG_YPARSE  yLOG_char    ("q_dir"     , a_queue->q_dir);
+   if (a_queue->q_dir == 'O') {
+      DEBUG_YPARSE  yLOG_note    ("flushing output");
+      fflush (a_queue->q_file);
    }
    /*---(close file)---------------------*/
    DEBUG_YPARSE  yLOG_point   ("q_file"    , a_queue->q_file);

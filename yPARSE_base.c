@@ -89,11 +89,11 @@ static void      o___PROGRAM_________________o (void) {;}
  *>    myPARSE.y_ready   = 'y';                                                                   <* 
  *>    myPARSE.y_reusing = a_reusing;                                                             <* 
  *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
- *>    yparse_init_types ();                                                                    <* 
+ *>    yparse_spec_init  ();                                                                    <* 
  *>    yparse_verb_init  ();                                                                    <* 
  *>    yparse_init_in    ();                                                                    <* 
  *>    yparse_init_out   ();                                                                    <* 
- *>    yparse_line_init  ();                                                                    <* 
+ *>    yparse_reuse_init ();                                                                    <* 
  *>    /+> yPARSE_delimiters (YPARSE_FIELD);                                              <+/   <* 
  *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
  *>    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);                                               <* 
@@ -112,7 +112,7 @@ yPARSE_wrap             (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*> yPARSE_close_in  ();                                                           <*/
    /*> yPARSE_close_out ();                                                           <*/
-   yparse_line_init ();
+   yparse_reuse_init   ();
    yparse_config_clear ();
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
@@ -138,7 +138,7 @@ yparse_base__unit       (char *a_question, int a_num)
    ystrlcpy  (yparse_print, "BASE unit        : question not understood", LEN_STR);
    /*---(answer)------------------------------------------*/
    if      (strcmp (a_question, "ready"    ) == 0) {
-      yPARSE_qin_info   (NULL, x_in , NULL, NULL);
+      yPARSE_qin_info   (NULL, x_in , NULL, NULL, NULL, NULL);
       yPARSE_qout_info  (NULL, x_out, NULL, NULL);
       if      (strcmp (myPARSE.y_dellist, "§")    == 0)  strcpy (x_del, "field");
       else if (strcmp (myPARSE.y_dellist, "§(,)") == 0)  strcpy (x_del, "function");

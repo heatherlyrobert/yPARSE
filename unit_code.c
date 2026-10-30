@@ -57,7 +57,7 @@ yparse_config_status    (void)
    char        x_del       [LEN_LABEL] = "´·········";
    char        x_ver       [LEN_TERSE] = "···";
    char        x_fill      [LEN_TERSE] = "´·····";
-   yPARSE_qin_info   (NULL, x_in , NULL, NULL);
+   yPARSE_qin_info   (NULL, x_in , NULL, NULL, NULL, NULL);
    yPARSE_qout_info  (NULL, x_out, NULL, NULL);
    if      (myPARSE.y_ready   == 'y')            strcpy (x_ready , "ready··");
    if      (myPARSE.y_verbs   == YPARSE_AUTO  )  strcpy (x_verbs , "auto···");
@@ -91,9 +91,9 @@ yparse_queue_rando      (tQUEUE *a_queue)
    /*---(file)---------------------------*/
    strcpy (a_queue->q_loc, "test file");
    a_queue->q_file     = 0x03;
-   a_queue->q_tline    =    6;
-   a_queue->q_nline    =    7;
-   a_queue->q_cline    =    8;
+   a_queue->q_nfull    =    6;
+   a_queue->q_nused    =    7;
+   a_queue->q_ncurr    =    8;
    /*---(record)-------------------------*/
    strcpy (a_queue->q_recd , "lots of fields");
    a_queue->q_len      =    9;
@@ -125,8 +125,8 @@ yparse_queue_status     (tQUEUE *a_queue)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(quick-out)----------------------*/
    if (a_queue == 'T') {
-      DEBUG_YPARSE  yLOG_note    ("requested titiles");
-      strcpy (yparse_print, "D label vrb had  G H  ---location--------- ptr tot acp cur  len ---record-------------------------------  ---head--- ---tail--- cnt fst lst cur  Ï");
+      DEBUG_YPARSE  yLOG_note    ("requested titles");
+      strcpy (yparse_print, "D label vrb had  G H  ---location--------- ptr ful use cur  len ---record-------------------------------  ---head--- ---tail--- cnt fst lst cur  Ï");
       DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
       return yparse_print;
    }
@@ -158,7 +158,7 @@ yparse_queue_status     (tQUEUE *a_queue)
    sprintf (yparse_print, "%c %-5.5s %3d %-3.3s  %c %c  %-20.20s %-3.3s %3d %3d %3d  %3d %-40.40s  %-10.10s %-10.10s %3d %3d %3d %3d  Ï",
          a_queue->q_dir, x_label, a_queue->q_iverb, x_handler,
          a_queue->q_good, a_queue->q_hidden,
-         x_loc, x_file, a_queue->q_tline, a_queue->q_nline, a_queue->q_cline,
+         x_loc, x_file, a_queue->q_nfull, a_queue->q_nused, a_queue->q_ncurr,
          a_queue->q_len, x_recd,
          x_head, x_tail, a_queue->q_count, a_queue->q_first, a_queue->q_last, a_queue->q_curr);
    /*---(complete)-----------------------*/
@@ -416,24 +416,24 @@ yparse_mock_handler     (int n, uchar *a_verb, char a_exist, void *a_handler)
    char rc = 0;
    ystrlcpy (s_verb, a_verb, LEN_USER);
    if      (strcmp (a_verb, "tiny"    ) == 0) {
-      rc = yPARSE_scanf  (a_verb, "i"         , s_int);
-      yPARSE_printf ("tiny"     , "i"         , *s_int);
+      rc = yPARSE_uscanf  (a_verb, "i"         , s_int);
+      yPARSE_uprintf ("tiny"     , "i"         , *s_int);
    }
    else if (strcmp (a_verb, "small"   ) == 0) {
-      rc = yPARSE_scanf  (a_verb, "TL"        , s_terse, s_label);
-      yPARSE_printf ("small"    , "TL"        , s_terse, s_label);
+      rc = yPARSE_uscanf  (a_verb, "TL"        , s_terse, s_label);
+      yPARSE_uprintf ("small"    , "TL"        , s_terse, s_label);
    }
    else if (strcmp (a_verb, "medium"  ) == 0) {
-      rc = yPARSE_scanf  (a_verb, "TidcO"     , s_terse, s_int, s_double, s_char, s_string);
-      yPARSE_printf ("medium"   , "TidcO"     , s_terse, *s_int, *s_double, *s_char, s_string);
+      rc = yPARSE_uscanf  (a_verb, "TidcO"     , s_terse, s_int, s_double, s_char, s_string);
+      yPARSE_uprintf ("medium"   , "TidcO"     , s_terse, *s_int, *s_double, *s_char, s_string);
    }
    else if (strcmp (a_verb, "large"   ) == 0) {
-      rc = yPARSE_scanf  (a_verb, "LTfdcileLO", s_label, s_terse, s_float, s_double, s_char, s_int, s_long, s_exp, s_desc, s_string);
-      yPARSE_printf ("large"    , "LTfdcileLO", s_label, s_terse, *s_float, *s_double, *s_char, *s_int, *s_long, *s_exp, s_desc, s_string);
+      rc = yPARSE_uscanf  (a_verb, "LTfdcileLO", s_label, s_terse, s_float, s_double, s_char, s_int, s_long, s_exp, s_desc, s_string);
+      yPARSE_uprintf ("large"    , "LTfdcileLO", s_label, s_terse, *s_float, *s_double, *s_char, *s_int, *s_long, *s_exp, s_desc, s_string);
    }
    else if (strcmp (a_verb, "sample"  ) == 0) {
-      rc = yPARSE_scanf  (a_verb, "LifcO"     , s_label, s_int, s_float, s_char, s_desc);
-      yPARSE_printf ("sample"   , "LifcO"     , s_label, *s_int, *s_float, *s_char, s_desc);
+      rc = yPARSE_uscanf  (a_verb, "LifcO"     , s_label, s_int, s_float, s_char, s_desc);
+      yPARSE_uprintf ("sample"   , "LifcO"     , s_label, *s_int, *s_float, *s_char, s_desc);
    }
    else {
       rc = -100;
@@ -455,8 +455,8 @@ yparse_mock_verber      (void)
 char
 yparse_mock_header      (void)
 {
-   yPARSE_printf  ("s_control", "cSO" , 'y', "0.6w", "testing integration");
-   yPARSE_printf  ("s_format" , "O"  , "mimecat");
+   yPARSE_uprintf  ("s_control", "cSO" , 'y', "0.6w", "testing integration");
+   yPARSE_uprintf  ("s_format" , "O"  , "mimecat");
    return 0;
 }
 

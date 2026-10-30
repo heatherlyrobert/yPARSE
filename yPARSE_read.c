@@ -347,8 +347,8 @@ yparse_read_rollback    (int a_line)
    yPARSE_purge_in ();
    s_qin.q_good = 'n';
    if (a_line < 0) {
-      --s_qin.q_nline;
-      s_qin.q_cline  = s_qin.q_nline;
+      --s_qin.q_nused;
+      s_qin.q_ncurr  = s_qin.q_nused;
    }
    return 0;
 }
@@ -398,7 +398,7 @@ yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char 
    }
    /*---(using eisting record)-----------*/
    else {
-      rc = yparse_line_existing (a_line, a_label, NULL, NULL);
+      rc = yparse_reuse_existing (a_line, a_label, NULL, NULL);
       DEBUG_YPARSE yLOG_value   ("existing"  , rc);
    }
    /*---(handle trouble)-----------------*/
@@ -414,8 +414,8 @@ yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char 
 }
 
 
-char  /*--> parse a full record -------------------[ ------ [ ------ ]-*/
-yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char *a_recd, char *a_label, char *a_verb)
+char
+yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *r_nread, int *r_nused, int *r_ncurr, char r_verb [LEN_LABEL], char r_recd [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;                /* return code for errors    */
@@ -428,9 +428,11 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (a_func);
    /*---(default)------------------------*/
-   if (t != NULL)  *t = 0;
-   if (n != NULL)  *n = 0;
-   if (c != NULL)  *c = 0;
+   if (r_nread != NULL)  *r_nread = 0;
+   if (r_nused != NULL)  *r_nused = 0;
+   if (r_ncurr != NULL)  *r_ncurr = 0;
+   if (r_verb  != NULL)  strcpy (r_verb, "");
+   if (r_recd  != NULL)  strcpy (r_recd, "");
    /*---(defense)------------------------*/
    DEBUG_YPARSE   yLOG_char    ("ready"     , myPARSE.y_ready);
    --rce;  if (myPARSE.y_ready != 'y')  {
@@ -453,7 +455,7 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
     *>    return rce;                                                                 <* 
     *> }                                                                              <*/
    /*---(line number)--------------------*/
-   rc = yparse_read_lineno (a_line, &(s_qin.q_nline), &(s_qin.q_cline), &(s_qin.q_hidden));
+   rc = yparse_read_lineno (a_line, &(s_qin.q_nused), &(s_qin.q_ncurr), &(s_qin.q_hidden));
    DEBUG_YPARSE   yLOG_point   ("lineno"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
@@ -461,23 +463,23 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
    }
    /*> DEBUG_YPARSE   yLOG_value   ("a_line"    , a_line);                            <*/
    /*> if (a_line < 0) {                                                              <* 
-    *>    ++s_qin.q_nline;                                                            <* 
-    *>    s_qin.q_cline  = s_qin.q_nline;                                             <* 
-    *>    DEBUG_YPARSE   yLOG_value   ("new line"  , s_qin.q_cline);                  <* 
+    *>    ++s_qin.q_nused;                                                            <* 
+    *>    s_qin.q_ncurr  = s_qin.q_nused;                                             <* 
+    *>    DEBUG_YPARSE   yLOG_value   ("new line"  , s_qin.q_ncurr);                  <* 
     *>    s_qin.q_hidden = '-';                                                       <* 
     *> } else if (a_line > 0) {                                                       <* 
-    *>    s_qin.q_cline  = a_line;                                                    <* 
-    *>    DEBUG_YPARSE   yLOG_value   ("old line"  , s_qin.q_cline);                  <* 
+    *>    s_qin.q_ncurr  = a_line;                                                    <* 
+    *>    DEBUG_YPARSE   yLOG_value   ("old line"  , s_qin.q_ncurr);                  <* 
     *>    s_qin.q_hidden = '-';                                                       <* 
     *> } else {                                                                       <* 
-    *>    s_qin.q_cline  = -1;                                                        <* 
-    *>    DEBUG_YPARSE   yLOG_value   ("hidden"    , s_qin.q_cline);                  <* 
+    *>    s_qin.q_ncurr  = -1;                                                        <* 
+    *>    DEBUG_YPARSE   yLOG_value   ("hidden"    , s_qin.q_ncurr);                  <* 
     *>    s_qin.q_hidden = 'y';                                                       <* 
     *> }                                                                              <*/
-   if (n != NULL)  *n = s_qin.q_nline;
-   if (c != NULL)  *c = s_qin.q_cline;
+   if (r_nused != NULL)  *r_nused = s_qin.q_nused;
+   if (r_ncurr != NULL)  *r_ncurr = s_qin.q_ncurr;
    /*---(read)---------------------------*/
-   rc = yparse_read_source (s_qin.q_file, a_line, a_recd, a_label, &(s_qin.q_tline), s_qin.q_recd, &(s_qin.q_len));
+   rc = yparse_read_source (s_qin.q_file, a_line, a_recd, a_label, &(s_qin.q_nfull), s_qin.q_recd, &(s_qin.q_len));
    DEBUG_YPARSE   yLOG_point   ("source"    , rc);
    --rce;  if (rc < 0) {
       DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
@@ -490,7 +492,7 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
    /*> DEBUG_YPARSE   yLOG_point   ("a_recd"    , a_recd);                            <*/
    /*> --rce;  if (a_recd == NULL) {                                                                 <* 
     *>    if (a_line < 0) {                                                                          <* 
-    *>       rc = yparse_read_next (s_qin.q_file, &(s_qin.q_tline), s_qin.q_recd, &(s_qin.q_len));   <* 
+    *>       rc = yparse_read_next (s_qin.q_file, &(s_qin.q_nfull), s_qin.q_recd, &(s_qin.q_len));   <* 
     *>       DEBUG_YPARSE  yLOG_value   ("read"      , rc);                                          <* 
     *>       if (rc == 1) {                                                                          <* 
     *>          DEBUG_YPARSE  yLOG_note    ("end-of-file");                                          <* 
@@ -511,7 +513,7 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
     *>    ystrlcpy (s_qin.q_recd, a_recd, LEN_RECD);                                                 <* 
     *>    s_qin.q_len = strlen (s_qin.q_recd);                                                       <* 
     *> }                                                                                             <*/
-   if (t != NULL)  *t = s_qin.q_tline;
+   if (r_nread != NULL)  *r_nread = s_qin.q_nfull;
    /*---(load the queue)-----------------*/
    strcpy (myPARSE.y_recd, s_qin.q_recd);
    ystrldchg (myPARSE.y_recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
@@ -554,7 +556,7 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
    DEBUG_YPARSE  yLOG_point   ("verber"    , myPARSE.y_verber);
    --rce;  if (myPARSE.y_verber != NULL) {
       if (x_index >= 0)  x_exist = 'y';
-      rc = myPARSE.y_verber (s_qin.q_tline, myPARSE.y_verb, x_exist, s_qin.q_handler);
+      rc = myPARSE.y_verber (s_qin.q_nfull, myPARSE.y_verb, x_exist, s_qin.q_handler);
       DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
       if (rc < 0) {
          yparse_read_rollback  (a_line);
@@ -576,7 +578,8 @@ yparse_read             (char *a_func, int *t, int *n, int *c, int a_line, char 
    }
    /*---(result)-------------------------*/
    DEBUG_YPARSE   yLOG_value   ("count"     , s_qin.q_count);
-   if (a_verb != NULL)  ystrlcpy (a_verb, myPARSE.y_verb, LEN_LABEL);
+   if (r_verb  != NULL)  ystrlcpy (r_verb, myPARSE.y_verb, LEN_LABEL);
+   if (r_recd  != NULL)  ystrlcpy (r_verb, myPARSE.y_recd, LEN_RECD);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (a_func);
    return s_qin.q_count;
