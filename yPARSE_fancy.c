@@ -77,6 +77,95 @@ yparse_fancy__write     (char a_line [LEN_RECD])
 
 
 /*====================------------------------------------====================*/
+/*===----                     underlying support                       ----===*/
+/*====================------------------------------------====================*/
+static void      o___HEADER__________________o (void) {;};
+
+/*> #!/usr/local/bin/gyges                                                                                         <* 
+ *> ##   writen using yPARSE (0.5f) cleaned_up verb data structure and created much better search/entry function   <* 
+ *> ##   jupiter-terminalis (boundaries) text file parsing and aggregating library                                   <* 
+ *> ##                                                                                                             <* 
+ *> #]  program     gyges                 3.7n   improvements²found²by²vikeys_content.script²demo               <* 
+ *> #]  oneline     gyges-hekatonkheires²(hundred-handed)²wicked²technical²spreadsheet                            <* 
+ *> #]  content     spreadsheet²data                                                                              <* 
+ *> #]  filename    /root/africa.gyges                                                                            <* 
+ *> #]  written     23.12.24.00.14.11.7.51.358  2023-dec-24,²00:14am,²sunday,²51²week,²358²day                   <* 
+ *> ##                                                                                                             <*/
+
+/*> fprintf (s_output, "#!%s%s\n", a_fullname, a_cmdline);                      <* 
+ *> fprintf (s_output, "\n");                                                   <* 
+ *> fprintf (s_output, "#ö origin···´··å%sæ\n", a_oneline);                     <* 
+ *> fprintf (s_output, "#ý version··´··å%s: %sæ\n", a_vernum, a_vertxt);        <* 
+ *> fprintf (s_output, "#î time·····´··å%sæ\n", yparse__exim_timestamp());      <* 
+ *> fprintf (s_output, "#ó machine··´··å%sæ\n", x_host);                        <* 
+ *> fprintf (s_output, "#÷ process··´··å%dæ\n", getpid ());                     <* 
+ *> fprintf (s_output, "\n");                                                   <* 
+ *> fprintf (s_output, "#ú title····´··å%sæ\n", a_report);                      <*/
+
+
+char
+yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void))
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   char        x_vernum    [LEN_TERSE] = "";
+   char        x_vertxt    [LEN_HUND]  = "";
+   char        s           [LEN_RECD]  = "";
+   char        t           [LEN_RECD]  = "";
+   char       *p           = NULL;
+   time_t      x_time;
+   struct tm  *x_broke     = NULL;
+   char        x_host      [LEN_HUND]  = "";
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(program)------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("a_full"    , a_full);
+   if (a_full != NULL) {
+      DEBUG_YPARSE   yLOG_info    ("a_full"    , a_full);
+      DEBUG_YPARSE   yLOG_point   ("x_vernum"  , x_vernum);
+      if (a_vernum      != NULL)  ystrlcpy (x_vernum, a_vernum, LEN_TERSE);
+      DEBUG_YPARSE   yLOG_info    ("x_vernum"  , x_vernum);
+      DEBUG_YPARSE   yLOG_point   ("x_vertxt"  , x_vertxt);
+      if (a_vertxt      != NULL)  ystrlcpy (x_vertxt, a_vertxt, LEN_HUND);
+      DEBUG_YPARSE   yLOG_info    ("x_vertxt"  , x_vertxt);
+      p = strrchr (a_full, '/');
+      DEBUG_YPARSE   yLOG_point   ("p"         , p);
+      if (p != NULL) {
+         /*> snprintf (t, LEN_RECD, "#!%s", a_full);                                  <*/
+         /*> yparse_fancy__write  (t);                                                <*/
+         /*> yPARSE_spacer (1);                                                       <*/
+         /*> yPARSE_uprintf  ("#]", "LLSO", "program", p + 1 , x_vernum, x_vertxt);   <*/
+      } else {
+         rc = yPARSE_uprintf  ("#]", "LLSO", "program", a_full, x_vernum, x_vertxt);
+      }
+      DEBUG_YPARSE   yLOG_value   ("uprintf"   , rc);
+   }
+   /*> if (a_oneline     != NULL)  yPARSE_uprintf  ("#]", "LO"  , "oneline", a_oneline);   <*/
+   /*---(output file)--------------------*/
+   /*> if (s_qout.q_loc != NULL)   yPARSE_uprintf ("#]", "LO"  , "filename", s_qout.q_loc);   <*/
+   /*> if (a_content    != NULL)   yPARSE_uprintf ("#]", "LO"  , "content" , a_content);   <*/
+   /*---(timestamp)----------------------*/
+   /*> x_time  = time (NULL);                                                         <* 
+    *> x_broke = localtime (&x_time);                                                 <* 
+    *> strftime (s, LEN_HUND, "%y.%m.%d.%H.%M.%S.%u.%W.%j", x_broke);                 <* 
+    *> strftime (t, LEN_HUND, "%Y-%b-%d, %H:%M%P, %a, week %W, day %y", x_broke);     <* 
+    *> yPARSE_uprintf ("#]", "LTO"  , "written"  , s, t);                             <*/
+   /*---(specific)-----------------------*/
+   /*> gethostname (x_host, LEN_HUND);                                                <* 
+    *> yPARSE_uprintf ("#]  machine" , "Oi"  , t, getpid ());                        <* 
+    *> if (a_cmdline != NULL)  yPARSE_uprintf  ("#]  cmdline", "O"  , a_cmdline);    <* 
+    *> yPARSE_spacer (1);                                                             <*/
+   /*---(call for more)------------------*/
+   /*> if (a_additional != NULL)   a_additional ();                                   <* 
+    *> yPARSE_spacer (1);                                                             <*/
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
+}
+
+
+
+/*====================------------------------------------====================*/
 /*===----                     fancy output writing                     ----===*/
 /*====================------------------------------------====================*/
 static void      o___FANCY___________________o (void) {;};

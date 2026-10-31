@@ -625,7 +625,7 @@ yparse_in_variadic      (va_list a_vlist, int n)
    if (s_qin.q_first == 0)   yPARSE_toss ();
    /*---(walk fields)--------------------*/
    --rce;  for (i = 1; i < n; ++i) {
-      x_type = yparse_spec_next_read ();
+      x_type = yparse_spec__in_next  ();
       yparse_peek_in (i, &t);
       DEBUG_YPARSE   yLOG_complex ("FIELD"     , "%2d, %c, %2d, %s", i, x_type, s_qin.q_first, t);
       switch (x_type) {

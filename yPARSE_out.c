@@ -39,53 +39,94 @@
 tQUEUE      s_qout;
 
 
-#define     MAX_TYPES   50
-typedef   struct cTYPES  tTYPES;
-struct cTYPES {
-   cchar       abbr;                        /* unique one char id             */
-   cchar       name        [LEN_LABEL];     /* short name                     */
-   cint        cat;                         /* category -- string, numeric    */
-   cint        size;                        /* width                          */
-   cchar       desc        [LEN_DESC];      /* long description               */
-};
-static tTYPES  s_types [MAX_TYPES] = {
-   { '-', "nothing"            , 'n',    1, "single char     (c)"              },
-   { 'c', "char"               , 'n',    1, "single char     (c)"              },
-   { 's', "short"              , 'n',    3, "short integer   (3d)"             },
-   { 'i', "integer"            , 'n',    6, "normal integer  (6d)"             },
-   { 'l', "long"               , 'n',   10, "long integer    (10d)"            },
-   { 'h', "huge"               , 'n',   16, "long integer    (16ld)"           },
-   { ',', "comma"              , 'n',   10, "comma           (10d)"            },
-   { ';', "hcomma"             , 'n',   19, "long comma      (19ld)"           },
-   { 'k', "ykine"              , 'n',    6, "short float     (6.1f)"           },
-   { 'f', "float"              , 'n',    8, "normal float    (8.2f)"           },
-   { 'd', "double"             , 'n',   10, "double float    (10.3lf)"         },
-   { 't', "technical"          , 'n',   18, "technical       (18.6lf)"         },
-   { 'e', "sml-exp"            , 'n',   10, "tech float      (2.3e)"           },
-   { 'm', "med-exp"            , 'n',   14, "tech float      (2.7e)"           },
-   { 'b', "big-exp"            , 'n',   19, "exponent        (2.12e)"          },
 
-   { 'C', "char"               , 's',    1, "single char     (-1.1s)"          },
-   { 'S', "short"              , 's',    5, "short string    (-5.5s)"          },
-   { 'T', "terse"              , 's',   10, "terse string    (-10.10s)"        },
-   { 'U', "user"               , 's',   12, "user string     (-12.12s)"        },
-   { 'L', "label"              , 's',   20, "label string    (-20.20s)"        },
-   { '3', "thirty"             , 's',   30, "thirty string   (-30.30s)"        },
-   { '4', "forty"              , 's',   40, "forty string    (-40.40s)"        },
-   { 'D', "desc"               , 's',   50, "desc string     (-50.50s)"        },
-   { '6', "sixty"              , 's',   60, "sixty string    (-40.40s)"        },
-   { '7', "seventy"            , 's',   70, "seventy string  (-70.70s)"        },
-   { '8', "eighty"             , 's',   80, "eighty string   (-80.80s)"        },
-   { 'H', "hundred"            , 's',  100, "hundred string  (-100.100s)"      },
-   { 'F', "full"               , 's',  200, "two-hundred     (-200.200s)"      },
-   { 'R', "recd"               , 's', 2000, "two-thousand    (-2000.2000s)"    },
-   { 'O', "open"               , 's',   60, "open string     (s)"              },
+/*====================------------------------------------====================*/
+/*===----                        program level                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___PROGRAM_________________o (void) {;};
 
-   {  0 , "end-of-types"       , '-',    0, ""                                 },
-};
-static int   s_ntype       =    0;
-static char  s_strings     [LEN_LABEL]  = "";
-static char  s_numbers     [LEN_LABEL]  = "";
+char yparse_out_init         (void) { return yparse_queue_init  (&s_qout, 'O', "OUT"); }
+char yPARSE_out_purge        (void) { return yparse_queue_purge (&s_qout);             }
+char yPARSE_out_reset        (void) { return yparse_queue_reset (&s_qout);             }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                      assigning files                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___FILE____________________o (void) {;};
+
+char
+yPARSE_out_open         (char a_name [LEN_PATH], char a_prog [LEN_PATH])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_spacer    =  '-';
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_point   ("q_file"    , s_qout.q_file);
+   --rce;  if (s_qout.q_file != NULL) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_info    ("q_file"    , s_qout.q_file);
+   /*---(open file)----------------------*/
+   rc = yparse_queue_open  (&s_qout, a_name);
+   DEBUG_YPARSE  yLOG_value   ("open"      , rc);
+   --rce;  if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(shebang)------------------------*/
+   DEBUG_YPARSE  yLOG_point   ("a_prog"    , a_prog);
+   if (a_prog != NULL) {
+      DEBUG_YPARSE  yLOG_note    ("header block requested");
+      fprintf  (s_qout.q_file, "#!%s\n", a_prog);
+      fprintf  (s_qout.q_file, "##   written using %s [%s] %s\n", P_BASENAME, P_VERNUM, P_VERTXT);
+      fprintf  (s_qout.q_file, "##   %s\n", P_ONELINE);
+      fprintf  (s_qout.q_file, "##\n");
+   }
+   /*---(make sure written)--------------*/
+   fflush   (s_qout.q_file);
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
+}
+
+char
+yPARSE_out_close  (char a_fancy)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_point   ("q_file"    , s_qout.q_file);
+   --rce;  if (s_qout.q_file == NULL) {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_info    ("q_file"    , s_qout.q_file);
+   /*---(footer)-------------------------*/
+   if (a_fancy == 'y') {
+      yPARSE_spacer  (1);
+      fprintf (s_qout.q_file, "##\n");
+      fprintf (s_qout.q_file, "## end-of-file.  fatto, completare, finito, morto, sepolta, y la signora grassa sta cantando ;)\n");
+   }
+   /*---(close)--------------------------*/
+   rc = yparse_queue_close (&s_qout);
+   DEBUG_YPARSE  yLOG_value   ("close"     , rc);
+   --rce;  if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
+}
 
 
 
@@ -95,90 +136,255 @@ static char  s_numbers     [LEN_LABEL]  = "";
 static void      o___SHARED__________________o (void) {;};
 
 char
-yparse_out_defense      (void)
+yparse_out__defense     (char a_type)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   /*---(defense)------------------------*/
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(major defenses)-----------------*/
+   DEBUG_YPARSE   yLOG_char    ("y_ready"   , myPARSE.y_ready);
    --rce;  if (myPARSE.y_ready != 'y')  {
-      DEBUG_YPARSE   yLOG_snote   ("must call yPARSE_config () first");
+      DEBUG_YPARSE   yLOG_note    ("must call yPARSE_config () first");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   --rce;  if (myPARSE.y_verbs != YPARSE_SIMPLE && strchr ("-y", s_qout.q_good) == NULL)  {
-      DEBUG_YPARSE   yLOG_snote   ("output record has failed");
+   DEBUG_YPARSE   yLOG_char    ("y_verbs"   , myPARSE.y_verbs);
+   --rce;  if (myPARSE.y_verbs == YPARSE_SIMPLE) {
+      DEBUG_YPARSE   yLOG_note    ("dose not handle YPARSE_SIMPLE");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE   yLOG_char    ("q_good"    , s_qout.q_good);
+   --rce;  if (s_qout.q_good == 0 || strchr ("-y", s_qout.q_good) == NULL)  {
+      DEBUG_YPARSE   yLOG_note    ("output queue not marked as good/ready");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(file check)---------------------*/
+   DEBUG_YPARSE  yLOG_point   ("q_file"    , s_qout.q_file);
+   --rce;  if (s_qout.q_file == NULL) {
+      DEBUG_YPARSE   yLOG_note    ("output file not assigned");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(push defense)-------------------*/
+   DEBUG_YPARSE  yLOG_char    ("a_type"    , a_type);
+   DEBUG_YPARSE  yLOG_value   ("q_iverb"   , s_qout.q_iverb);
+   --rce;  if (a_type == 'p' && s_qout.q_iverb < 0) {
+      DEBUG_YPARSE   yLOG_note    ("verb number not assignt to queue");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_value   ("q_count"   , s_qout.q_count);
+   --rce;  if (a_type == 'p' && s_qout.q_count < 1)  {
+      DEBUG_YPARSE   yLOG_note    ("verb not pushed onto queue");
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
-char yparse_init_out         (void) { return yparse_queue_init  (&s_qout, 'O', "OUT"); }
-char yPARSE_purge_out        (void) { return yparse_queue_purge (&s_qout);             }
-char yPARSE_reset_out        (void) { return yparse_queue_reset (&s_qout);             }
+
+
+/*====================------------------------------------====================*/
+/*===----                    formatting verbs                          ----===*/
+/*====================------------------------------------====================*/
+static void      o___VERB____________________o (void) {;};
 
 char
-yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_nwrote)
+yPARSE_pushverb         (char a_verb [LEN_LABEL])
 {
-   if (r_label  != NULL)  ystrlcpy (r_label, s_qout.q_label, LEN_SHORT);
-   if (r_loc    != NULL)  ystrlcpy (r_loc  , s_qout.q_loc  , LEN_PATH);
-   if (r_file   != NULL)  *r_file   =  s_qout.q_file;
-   if (r_nwrote != NULL)  *r_nwrote =  s_qout.q_nfull;
+   char        rce         =  -10;
+   char        rc          =    0;
+   int         n           =    0;
+   char        t           [LEN_RECD];
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(prepare)------------------------*/
+   rc = yPARSE_out_purge   ();
+   DEBUG_YPARSE  yLOG_value   ("purge"     , rc);
+   --rce;  if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(defense)------------------------*/
+   rc = yparse_out__defense ('-');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
+   --rce;  if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(defense)------------------------*/
+   DEBUG_YPARSE  yLOG_point   ("a_verb"    , a_verb);
+   --rce;  if (a_verb == NULL || a_verb [0] == '\0') {
+      s_qout.q_good = 'n';
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YPARSE  yLOG_info    ("a_verb"    , a_verb);
+   /*---(find it)------------------------*/
+   n = yparse_verb_find (&s_qout, a_verb);
+   DEBUG_YPARSE  yLOG_value   ("n"         , n);
+   if (n < 0) {
+      s_qout.q_good = 'n';
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, n);
+      return n;
+   }
+   sprintf (t, "%-12.12s"  , a_verb);
+   /*---(enqueue)------------------------*/
+   rc = yparse_queue_enqueue (&s_qout, t);
+   DEBUG_YPARSE  yLOG_value   ("enqueue"   , rc);
+   if (rc < 0) {
+      s_qout.q_good = 'n';
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      return rc;
+   }
+   /*---(mark good)----------------------*/
+   s_qout.q_good = 'y';
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 
 
 /*====================------------------------------------====================*/
-/*===----                       formatting functions                   ----===*/
+/*===----                   variadic driver                            ----===*/
 /*====================------------------------------------====================*/
-static void      o___FORMAT__________________o (void) {;};
+static void      o___DRIVER__________________o (void) {;};
 
 char
-yparse__push_string     (uchar *a_str)
+yparse_out_variadic    (va_list a_vlist, int n)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   char        x_type      =  '-';
+   int         i           =    0;
+   char        x_spec      =  '-';
+   char        x_char      =    0;
+   int         x_int       =    0;
+   llong       x_long      =    0;
+   float       x_float     =  0.0;
+   double      x_double    =  0.0;
+   uchar      *x_str       = NULL;
+   int         c           =    0;
+   double      x_val       =  0.0;
+   int         x_end       = NULL;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(walk fields)--------------------*/
+   DEBUG_YPARSE  yLOG_value   ("n"         , n);
+   --rce;  for (i = 1; i < n; ++i) {
+      x_spec = yparse_spec__out_next ();
+      DEBUG_YPARSE  yLOG_complex ("loop"      , "%2d %c", i, x_spec);
+      switch (x_spec) {
+      case 'c' :
+         x_char    = va_arg (a_vlist, int);
+         rc = yPARSE_pushchar   (x_char);
+         DEBUG_YPARSE   yLOG_complex ("char"      , "%d, %c, %3d, %c", i, x_spec, rc, x_char);
+         break;
+      case 's' : case 'i' : case ',' :
+         x_int     = va_arg (a_vlist, int);
+         rc = yPARSE_pushint    (x_int);
+         DEBUG_YPARSE   yLOG_complex ("int"       , "%d, %c, %3d, %ld", i, x_spec, rc, x_int);
+         break;
+      case 'l' : case 'h' : case ';' :
+         x_long    = va_arg (a_vlist, llong);
+         rc = yPARSE_pushint    (x_long);
+         DEBUG_YPARSE   yLOG_complex ("long"      , "%d, %c, %3d, %ld", i, x_spec, rc, x_long);
+         break;
+      case 'k' : case 'f' : case 'd' : case 'r' : case 't' : case 'e' :
+         x_double  = va_arg (a_vlist, double);
+         rc = yPARSE_pushfloat  (x_double);
+         DEBUG_YPARSE   yLOG_complex ("double"    , "%d, %c, %3d, %lf", i, x_spec, rc, x_double);
+         break;
+      case 'C' : case 'S' : case 'T' : case 'U' : case 'L' :
+      case '3' : case '4' : case 'D' : case '5' : case '6' :
+      case '7' : case '8' : case 'H' : case 'F' : case 'O' :
+         x_str     = va_arg (a_vlist, char*);
+         rc = yPARSE_pushstr    (x_str);
+         DEBUG_YPARSE   yLOG_complex ("string"    , "%d, %c, %3d, %s", i, x_spec, rc, x_str);
+         break;
+      default  :
+         DEBUG_YPARSE   yLOG_complex ("unknown"   , "%d, %c, ---, -", i, x_spec);
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+         break;
+      }
+      if (rc < 0)  {
+         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      ++c;
+   }
+   /*---(check for end)------------------*/
+   DEBUG_YPARSE   yLOG_value   ("c"         , c);
+   /*> x_end = va_arg (a_vlist, int);                                                 <* 
+    *> DEBUG_YPARSE  yLOG_value   ("x_end"     , x_end);                              <* 
+    *> if (x_end != NULL) {                                                           <* 
+    *>    DEBUG_YPARSE   yLOG_note    ("trailing argument beyond expected count");    <* 
+    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                            <* 
+    *>    return rce;                                                                 <* 
+    *> }                                                                              <*/
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return c;
+}
+
+
+
+/*====================------------------------------------====================*/
+/*===----                       formatting strings                     ----===*/
+/*====================------------------------------------====================*/
+static void      o___STRING__________________o (void) {;};
+
+char
+yparse__push_string     (uchar a_str [LEN_RECD])
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        x_spec      =  '-';
    uchar       s           [LEN_RECD];
    uchar       t           [LEN_RECD];
    int         x_len       =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
-   rc = yparse_out_defense ();
+   rc = yparse_out__defense ('p');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
-   DEBUG_YPARSE  yLOG_sint    (s_qout.q_iverb);
-   DEBUG_YPARSE  yLOG_sint    (s_qout.q_count);
-   --rce;  if (s_qout.q_file == NULL || s_qout.q_iverb < 0 || s_qout.q_count < 1)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (a_str);
+   DEBUG_YPARSE  yLOG_point   ("a_str"     , a_str);
    --rce;  if (a_str == NULL) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   DEBUG_YPARSE  yLOG_info    ("a_str"     , a_str);
+   /*---(prepare field)------------------*/
    x_len = strlen (a_str);
+   DEBUG_YPARSE  yLOG_info    ("x_len"     , x_len);
    ystrlcpy  (s, a_str, LEN_RECD);
    ystrlmark (s, ySTR_HEATH, LEN_RECD);
-   /*---(prepare)------------------------*/
-   x_type = yparse_spec_next_write ();
-   DEBUG_YPARSE   yLOG_schar   (x_type);
-   rc = yparse_spec_string (x_type);
-   DEBUG_YPARSE   yLOG_sint    (rc);
+   DEBUG_YPARSE  yLOG_info    ("s"         , s);
+   /*---(get the spec)-------------------*/
+   x_spec = yparse_spec__out_next ();
+   DEBUG_YPARSE   yLOG_char    ("x_spec"    , x_spec);
+   rc = yparse_spec_string (x_spec);
+   DEBUG_YPARSE   yLOG_value   ("check"     , rc);
    --rce;  if (rc < 0) {
       s_qout.q_good = 'n';
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(format)-------------------------*/
-   --rce;  switch (x_type) {
+   --rce;  switch (x_spec) {
    case  'C' :
       DEBUG_YPARSE   yLOG_snote   ("char");
       if (s [0] == 0)        ystrlcpy (t, "¬"   , 2);
@@ -243,20 +449,20 @@ yparse__push_string     (uchar *a_str)
    default    :
       DEBUG_YPARSE   yLOG_snote   ("unknown");
       s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
       break;
    }
    /*---(encode)-------------------------*/
    rc = ystrlstore (t, x_len);
    if (rc < 0) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
    /*---(enqueue)------------------------*/
    rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
    /*---(complete)-----------------------*/
@@ -264,44 +470,55 @@ yparse__push_string     (uchar *a_str)
    return 0;
 }
 
+char yPARSE_pushempty   (void)          { return yparse__push_string  ("");    }
+char yPARSE_pushstr     (uchar  *a_str) { return yparse__push_string  (a_str); }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                       formatting numerics                    ----===*/
+/*====================------------------------------------====================*/
+static void      o___NUMERIC_________________o (void) {;};
+
 char
 yparse__push_numeric    (double a_val)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
    char        rc          =    0;
-   char        x_type      =  '-';
+   char        x_spec      =  '-';
    char        t           [LEN_RECD];
    char        s           [LEN_RECD];
    llong       v           =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE  yLOG_sdouble (a_val);
    /*---(defense)------------------------*/
-   rc = yparse_out_defense ();
+   rc = yparse_out__defense ('p');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
-   DEBUG_YPARSE  yLOG_sint    (s_qout.q_iverb);
-   DEBUG_YPARSE  yLOG_sint    (s_qout.q_count);
+   DEBUG_YPARSE  yLOG_point   ("q_file"    , s_qout.q_file);
+   DEBUG_YPARSE  yLOG_value   ("q_iverb"   , s_qout.q_iverb);
+   DEBUG_YPARSE  yLOG_value   ("q_count"   , s_qout.q_count);
    --rce;  if (s_qout.q_file == NULL || s_qout.q_iverb < 0 || s_qout.q_count < 1)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(prepare)------------------------*/
-   x_type = yparse_spec_next_write ();
-   DEBUG_YPARSE   yLOG_schar   (x_type);
-   rc = yparse_spec_numeric (x_type);
-   DEBUG_YPARSE   yLOG_sint    (rc);
+   x_spec = yparse_spec__out_next ();
+   DEBUG_YPARSE   yLOG_char    ("x_spec"    , x_spec);
+   rc = yparse_spec_numeric (x_spec);
+   DEBUG_YPARSE   yLOG_value   ("check"     , rc);
    --rce;  if (rc < 0) {
       s_qout.q_good = 'n';
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(format)-------------------------*/
-   --rce;  switch (x_type) {
+   --rce;  switch (x_spec) {
    case  'c' :
       DEBUG_YPARSE   yLOG_snote   ("char");
       if      (a_val < 31)            ystrlcpy (t, "¬", LEN_RECD);
@@ -389,90 +606,20 @@ yparse__push_numeric    (double a_val)
    default    :
       DEBUG_YPARSE   yLOG_snote   ("unknown");
       s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
       break;
    }
    /*---(enqueue)------------------------*/
    rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
    return 0;
 }
-
-char
-yPARSE_pushverb         (char *a_verb)
-{
-   char        rce         =  -10;
-   char        rc          =    0;
-   int         n           =    0;
-   char        t           [LEN_RECD];
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
-   /*---(prepare)------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("purge");
-   rc = yPARSE_purge_out   ();
-   --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("defense");
-   rc = yparse_out_defense ();
-   --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   DEBUG_YPARSE  yLOG_spoint  (s_qout.q_file);
-   --rce;  if (s_qout.q_file == NULL) {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("check");
-   DEBUG_YPARSE  yLOG_spoint  (a_verb);
-   --rce;  if (a_verb == NULL || a_verb [0] == '\0') {
-      s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(find it)------------------------*/
-   DEBUG_YPARSE  yLOG_snote   (a_verb);
-   DEBUG_YPARSE  yLOG_snote   ("find");
-   n = yparse_verb_find (&s_qout, a_verb);
-   if (n < 0) {
-      s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, n);
-      return n;
-   }
-   sprintf (t, "%-12.12s"  , a_verb);
-   /*---(enqueue)------------------------*/
-   DEBUG_YPARSE  yLOG_snote   ("enqueue");
-   rc = yparse_queue_enqueue (&s_qout, t);
-   if (rc < 0) {
-      s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
-      return rc;
-   }
-   s_qout.q_good = 'y';
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
-   return 0;
-}
-
-
-
-/*====================------------------------------------====================*/
-/*===----                    simplifying functions                     ----===*/
-/*====================------------------------------------====================*/
-static void      o___SIMPLIFIERS_____________o (void) {;};
-
-char yPARSE_pushempty   (void)          { return yparse__push_string  ("");    }
-char yPARSE_pushstr     (uchar  *a_str) { return yparse__push_string  (a_str); }
 
 char yPARSE_pushchar    (uchar   a_val) { return yparse__push_numeric ((double) a_val); }
 char yPARSE_pushint     (llong  a_val)  { return yparse__push_numeric ((double) a_val); }
@@ -481,9 +628,9 @@ char yPARSE_pushfloat   (double a_val)  { return yparse__push_numeric (a_val); }
 
 
 /*====================------------------------------------====================*/
-/*===----                    simplifying functions                     ----===*/
+/*===----                    field aggregation                         ----===*/
 /*====================------------------------------------====================*/
-static void      o___RECORDS_________________o (void) {;};
+static void      o___AGGREGRATE______________o (void) {;};
 
 char
 yparse__popout           (char *a_item)
@@ -492,11 +639,12 @@ yparse__popout           (char *a_item)
    char        rce         =  -10;
    char        rc          =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_senter  (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
    if (a_item != NULL)  ystrlcpy (a_item, "", LEN_LABEL);
    /*---(defense)------------------------*/
-   rc = yparse_out_defense ();
+   rc = yparse_out__defense ('-');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
       return rc;
@@ -530,7 +678,7 @@ yparse_aggregate        (void)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
-   rc = yparse_out_defense ();
+   rc = yparse_out__defense ('-');
    DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    --rce;  if (rc < 0)  {
       s_qout.q_good = 'X';
@@ -565,6 +713,13 @@ yparse_aggregate        (void)
    return 0;
 }
 
+
+
+/*====================------------------------------------====================*/
+/*===----                     writing output                           ----===*/
+/*====================------------------------------------====================*/
+static void      o___OUTPUT__________________o (void) {;};
+
 char
 yPARSE_write            (int *n, int *c)
 {
@@ -575,7 +730,8 @@ yPARSE_write            (int *n, int *c)
    /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*---(defense)------------------------*/
-   rc = yparse_out_defense ();
+   rc = yparse_out__defense ('-');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
       return rc;
@@ -604,170 +760,26 @@ yPARSE_write            (int *n, int *c)
    return 0;
 }
 
-char yparse_out__count        (void) { return s_qout.q_count; }
-
 
 
 /*====================------------------------------------====================*/
 /*===----                   variadic interface                         ----===*/
 /*====================------------------------------------====================*/
-static void      o___VARIADIC________________o (void) {;};
+static void      o___STATISTICS______________o (void) {;};
+
+char yparse_out__count        (void) { return s_qout.q_count; }
 
 char
-yparse_out_variadic    (va_list a_vlist, int n)
+yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_PATH], void **r_file, int *r_nwrote)
 {
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   int         i           =    0;
-   char        x_type      =  '-';
-   char        x_char      =    0;
-   int         x_int       =    0;
-   llong       x_long      =    0;
-   float       x_float     =  0.0;
-   double      x_double    =  0.0;
-   uchar      *x_str       = NULL;
-   int         c           =    0;
-   double      x_val       =  0.0;
-   int         x_end       = NULL;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(walk fields)--------------------*/
-   DEBUG_YPARSE  yLOG_value   ("n"         , n);
-   --rce;  for (i = 1; i < n; ++i) {
-      x_type = yparse_spec_next_write ();
-      DEBUG_YPARSE  yLOG_complex ("loop"      , "%2d %c", i, x_type);
-      switch (x_type) {
-      case 'c' :
-         x_char    = va_arg (a_vlist, int);
-         rc = yPARSE_pushchar   (x_char);
-         DEBUG_YPARSE   yLOG_complex ("char"      , "%d, %c, %3d, %c", i, x_type, rc, x_char);
-         break;
-      case 's' : case 'i' : case ',' :
-         x_int     = va_arg (a_vlist, int);
-         rc = yPARSE_pushint    (x_int);
-         DEBUG_YPARSE   yLOG_complex ("int"       , "%d, %c, %3d, %ld", i, x_type, rc, x_int);
-         break;
-      case 'l' : case 'h' : case ';' :
-         x_long    = va_arg (a_vlist, llong);
-         rc = yPARSE_pushint    (x_long);
-         DEBUG_YPARSE   yLOG_complex ("long"      , "%d, %c, %3d, %ld", i, x_type, rc, x_long);
-         break;
-      case 'k' : case 'f' : case 'd' : case 'r' : case 't' : case 'e' :
-         x_double  = va_arg (a_vlist, double);
-         rc = yPARSE_pushfloat  (x_double);
-         DEBUG_YPARSE   yLOG_complex ("double"    , "%d, %c, %3d, %lf", i, x_type, rc, x_double);
-         break;
-      case 'C' : case 'S' : case 'T' : case 'U' : case 'L' :
-      case '3' : case '4' : case 'D' : case '5' : case '6' :
-      case '7' : case '8' : case 'H' : case 'F' : case 'O' :
-         x_str     = va_arg (a_vlist, char*);
-         rc = yPARSE_pushstr    (x_str);
-         DEBUG_YPARSE   yLOG_complex ("string"    , "%d, %c, %3d, %s", i, x_type, rc, x_str);
-         break;
-      default  :
-         DEBUG_YPARSE   yLOG_complex ("unknown"   , "%d, %c, ---, -", i, x_type);
-         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
-         return rce;
-         break;
-      }
-      if (rc < 0)  {
-         DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
-         return rce;
-      }
-      ++c;
-   }
-   /*---(check for end)------------------*/
-   DEBUG_YPARSE   yLOG_value   ("c"         , c);
-   /*> x_end = va_arg (a_vlist, int);                                                 <* 
-    *> DEBUG_YPARSE  yLOG_value   ("x_end"     , x_end);                              <* 
-    *> if (x_end != NULL) {                                                           <* 
-    *>    DEBUG_YPARSE   yLOG_note    ("trailing argument beyond expected count");    <* 
-    *>    DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);                            <* 
-    *>    return rce;                                                                 <* 
-    *> }                                                                              <*/
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return c;
-}
-
-
-
-/*====================------------------------------------====================*/
-/*===----                           file control                       ----===*/
-/*====================------------------------------------====================*/
-static void      o___FILES___________________o (void) {;};
-
-char yPARSE_stdout     (void)          { return yparse_queue_open  (&s_qout, "stdout"); }
-char yPARSE_tmpout     (void)          { return yparse_queue_open  (&s_qout, "/tmp/yparse.txt"); }
-
-/*> #!/usr/local/bin/gyges                                                                                         <* 
- *> ##   writen using yPARSE (0.5f) cleaned_up verb data structure and created much better search/entry function   <* 
- *> ##   jupiter-terminalis (boundaries) text file parsing and aggregating library                                   <* 
- *> ##                                                                                                             <* 
- *> #] program     gyges                 3.7n   improvements²found²by²vikeys_content.script²demo               <* 
- *> #] oneline     gyges-hekatonkheires²(hundred-handed)²wicked²technical²spreadsheet                            <* 
- *> #] content     spreadsheet²data                                                                              <* 
- *> #] filename    /root/africa.gyges                                                                            <* 
- *> #] written     23.12.24.00.14.11.7.51.358  2023-dec-24,²00:14am,²sunday,²51²week,²358²day                   <* 
- *> ##                                                                                                             <*/
-
-char
-yPARSE_open_out         (char a_name [LEN_PATH], char a_prog [LEN_PATH])
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rce         =  -10;
-   char        rc          =    0;
-   char        x_spacer    =  '-';
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(open file)----------------------*/
-   rc = yparse_queue_open  (&s_qout, a_name);
-   DEBUG_YPARSE  yLOG_value   ("open"      , rc);
-   --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
-      return rce;
-   }
-   /*---(shebang)------------------------*/
-   DEBUG_YPARSE  yLOG_point   ("a_prog"    , a_prog);
-   if (a_prog != NULL) {
-      DEBUG_YPARSE  yLOG_note    ("header block requested");
-      fprintf  (s_qout.q_file, "#!%s\n", a_prog);
-      fprintf  (s_qout.q_file, "##   written using %s (%s) %s\n" P_BASENAME, P_VERNUM, P_VERTXT);
-      fprintf  (s_qout.q_file, "##   %s\n" P_ONELINE);
-      fprintf  (s_qout.q_file, "##\n");
-   }
-   /*---(make sure written)--------------*/
-   fflush   (s_qout.q_file);
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return RC_POSITIVE;
-}
-
-char
-yPARSE_close_out  (char a_fancy)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rc          =    0;
-   /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*---(footer)-------------------------*/
-   if (a_fancy == 'y') {
-      yPARSE_spacer  (3);
-      if (s_qout.q_file != NULL)   fprintf (s_qout.q_file, "# end-of-file.  done, finito, completare, whimper [Ï´···\n");
-   }
-   /*---(close)--------------------------*/
-   rc = yparse_queue_close (&s_qout);
-   if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
-      return rc;
-   }
-   /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   if (r_label  != NULL)  ystrlcpy (r_label, s_qout.q_label, LEN_SHORT);
+   if (r_loc    != NULL)  ystrlcpy (r_loc  , s_qout.q_loc  , LEN_PATH);
+   if (r_file   != NULL)  *r_file   =  s_qout.q_file;
+   if (r_nwrote != NULL)  *r_nwrote =  s_qout.q_nfull;
    return 0;
 }
 
-char    yPARSE_outclear         (void) { yPARSE_purge_out   (); return 0; }
+char    yPARSE_outclear         (void) { yPARSE_out_purge   (); return 0; }
 char*   yPARSE_outrecd          (void) { ystrltrim (s_qout.q_recd, ySTR_BOTH, LEN_RECD); return s_qout.q_recd; }
 
 

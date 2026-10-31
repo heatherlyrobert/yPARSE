@@ -92,7 +92,7 @@ static void      o___PROGRAM_________________o (void) {;}
  *>    yparse_spec_init  ();                                                                    <* 
  *>    yparse_verb_init  ();                                                                    <* 
  *>    yparse_init_in    ();                                                                    <* 
- *>    yparse_init_out   ();                                                                    <* 
+ *>    yparse_out_init   ();                                                                    <* 
  *>    yparse_reuse_init ();                                                                    <* 
  *>    /+> yPARSE_delimiters (YPARSE_FIELD);                                              <+/   <* 
  *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
@@ -111,7 +111,7 @@ yPARSE_wrap             (void)
 {
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    /*> yPARSE_close_in  ();                                                           <*/
-   /*> yPARSE_close_out ();                                                           <*/
+   /*> yPARSE_out_close ();                                                           <*/
    yparse_reuse_init   ();
    yparse_config_clear ();
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);

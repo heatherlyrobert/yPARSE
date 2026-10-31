@@ -162,7 +162,7 @@ yparse_config            (char a_1st, char a_auto, void *a_verber, char a_reusin
       DEBUG_YPARSE  yLOG_value   ("verb_init" , rc);
       rc = yparse_init_in    ();
       DEBUG_YPARSE  yLOG_value   ("init_in"   , rc);
-      rc = yparse_init_out   ();
+      rc = yparse_out_init   ();
       DEBUG_YPARSE  yLOG_value   ("init_out"  , rc);
       rc = yparse_reuse_init ();
       DEBUG_YPARSE  yLOG_value   ("initline"  , rc);

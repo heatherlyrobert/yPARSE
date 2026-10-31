@@ -38,32 +38,13 @@
  *  readers and writers must accept two arguments...
  *  1) n       reference number (out is a sequence, in is file line number)
  *  2) a_verb  the string verb name to verify and prepare
- *  these two provide excellent, targeted debugging information
+*  these two provide excellent, targeted debugging information
  *
  *
  *
  */
 
 
-/*> #define     MAX_COLS      29                                                       <* 
- *> #define     MAX_VERBS     50                                                       <* 
- *> struct {                                                                           <* 
- *>    /+---(master)------------+/                                                     <* 
- *>    char        v_verb      [LEN_LABEL];     /+ verb name as used in files     +/   <* 
- *>    uchar       v_specs     [LEN_TITLE];     /+ field specifications           +/   <* 
- *>    uchar       v_mode;                      /+ one char yvikeys mode id       +/   <* 
- *>    char        v_mask;                      /+ field for reload/change        +/   <* 
- *>    /+---(handlers)----------+/                                                     <* 
- *>    int         (*v_reader)   (int n, char *a_verb);                                <* 
- *>    int         (*v_writer)   (int n, char *a_verb);                                <* 
- *>    float       v_seq;                       /+ writing sequence               +/   <* 
- *>    char        v_done;                      /+ written (y/n)                  +/   <* 
- *>    /+---(descriptive)-------+/                                                     <* 
- *>    char        v_flags     [LEN_TITLE];     /+ flags for use by program       +/   <* 
- *>    uchar       v_labels    [LEN_RECD];      /+ field labels for headers       +/   <* 
- *>    uchar       v_desc      [LEN_DESC ];     /+ long verb description          +/   <* 
- *>    /+---(done)--------------+/                                                     <* 
- *> }  static   G_verbs   [MAX_VERBS];                                                 <*/
 tVERBS      G_verbs   [MAX_VERBS];
 int         G_nverb   = 0;
 int         G_cverb   = 0;

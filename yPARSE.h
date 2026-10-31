@@ -113,7 +113,7 @@ char        yPARSE_close            (void);
 char        yPARSE_autoread         (uchar *a_in, uchar *a_out, void *a_verber);
 /*---(planned)--------------*/
 char        yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber);
-char        yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], void (*a_additional) (void));
+char        yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void));
 char        yPARSE_vscanf           (uchar *a_verb, ...);
 char        yPARSE_vprintf          (int c, uchar *a_verb, ...);
 /*---(planned)--------------*/
@@ -128,6 +128,8 @@ char        yPARSE_reuse_set        (void);
 
 
 
+char        yPARSE_out_purge        (void);
+char        yPARSE_out_reset        (void);
 
 
 
@@ -149,10 +151,8 @@ char        yPARSE_stdin_peek       (void);
 char        yPARSE_open_in          (char a_name [LEN_PATH]);
 char        yPARSE_close_in         (void);
 
-char        yPARSE_stdout           (void);
-char        yPARSE_tmpout           (void);
-char        yPARSE_open_out         (char a_name [LEN_PATH], char a_prog [LEN_PATH]);
-char        yPARSE_close_out        (char a_fancy);
+char        yPARSE_out_open         (char a_name [LEN_PATH], char a_prog [LEN_PATH]);
+char        yPARSE_out_close        (char a_fancy);
 char        yPARSE_section          (char *a_title);
 char        yPARSE_columns          (int c, char *a_specs, char *a_labels);
 char        yPARSE_footer           (int c);
@@ -176,8 +176,6 @@ char        yPARSE_inrecd           (char a_recd [LEN_RECD]);
 /*---(yPARSE_queue.c)-------*/
 char        yPARSE_purge_in         (void);
 char        yPARSE_reset_in         (void);
-char        yPARSE_purge_out        (void);
-char        yPARSE_reset_out        (void);
 
 /*---(yPARSE_in.c)----------*/
 char        yPARSE_ready            (int *a_count);
@@ -199,7 +197,7 @@ char        yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_
 
 
 /*---(yPARSE_out.c)---------*/
-char        yPARSE_pushverb         (char  *a_verb);
+char        yPARSE_pushverb         (char a_verb [LEN_LABEL]);
 char        yPARSE_pushempty        (void);
 char        yPARSE_pushval          (double  a_val);
 char        yPARSE_pushstr          (uchar  *a_str);

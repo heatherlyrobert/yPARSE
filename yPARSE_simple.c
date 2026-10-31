@@ -76,7 +76,7 @@ yparse_opener           (uchar a_auto, uchar *a_in, uchar *a_out, void *a_verber
    /*---(open out)-----------------------*/
    if (rc == 1 && a_out != NULL) {
       DEBUG_YPARSE   yLOG_note    ("openning writing file");
-      rc = yPARSE_open_out (a_out, NULL);
+      rc = yPARSE_out_open (a_out, NULL);
       DEBUG_YPARSE   yLOG_value   ("open out"  , rc);
    }
    /*---(read all)-----------------------*/
@@ -98,7 +98,7 @@ yPARSE_close            (void)
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    yPARSE_close_in  ();
    if (s_count >= 0)  yparse_fancy_end (s_count + 1);
-   yPARSE_close_out ('y');
+   yPARSE_out_close ('y');
    yPARSE_wrap ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
@@ -113,7 +113,7 @@ yPARSE_uwrap            (void)
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    yPARSE_close_in  ();
-   yPARSE_close_out ('-');
+   yPARSE_out_close ('-');
    yPARSE_wrap ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
@@ -300,58 +300,6 @@ char
 yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber)
 {
    return yparse_opener (YPARSE_AUTO, a_in, a_out, a_verber, YPARSE_NOREAD , YPARSE_ONETIME);
-}
-
-/*> #!/usr/local/bin/koios                                                                     <* 
- *> #   koios-polos (north star) -- customized c unit testing meta-program and mini-language   <* 
- *> #   program under test  : yPARSE_out                                                       <* 
- *> #   auto-generated script file converted from a previous script version                    <*/
-
-/*> #!/usr/local/bin/gyges                                                                                         <* 
- *> ##   writen using yPARSE (0.5f) cleaned_up verb data structure and created much better search/entry function   <* 
- *> ##   jupiter-terminalis (boundaries) text file parsing and aggregating library                                   <* 
- *> ##                                                                                                             <* 
- *> #]  program     gyges                 3.7n   improvements²found²by²vikeys_content.script²demo               <* 
- *> #]  oneline     gyges-hekatonkheires²(hundred-handed)²wicked²technical²spreadsheet                            <* 
- *> #]  content     spreadsheet²data                                                                              <* 
- *> #]  filename    /root/africa.gyges                                                                            <* 
- *> #]  written     23.12.24.00.14.11.7.51.358  2023-dec-24,²00:14am,²sunday,²51²week,²358²day                   <* 
- *> ##                                                                                                             <*/
-
-char
-yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], void (*a_additional) (void))
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        x_vernum    [LEN_TERSE] = "";
-   char        x_vertxt    [LEN_HUND]  = "";
-   char        t           [LEN_RECD]  = "";
-   char       *p           = NULL;
-   time_t      x_time;
-   struct tm  *x_broke     = NULL;
-   /*---(program)------------------------*/
-   if (a_vernum != NULL)  ystrlcpy (x_vernum, a_vernum, LEN_TERSE);
-   if (a_vertxt != NULL)  ystrlcpy (x_vertxt, a_vertxt, LEN_HUND);
-   if (a_full != NULL) {
-      p = strrchr (a_full, '/');
-      if (p != NULL) {
-         sprintf (t, "#!%s", a_full);
-         yparse_fancy__write  (t);
-         yPARSE_spacer (1);
-         yPARSE_uprintf  ("#]  program", "LSO", p + 1 , x_vernum, x_vertxt);
-      } else {
-         yPARSE_uprintf  ("#]  program", "LSO", a_full, x_vernum, x_vertxt);
-      }
-   }
-   if (a_oneline != NULL)  yPARSE_uprintf  ("#]   oneline", "O"  , a_oneline);
-   if (a_content != NULL)  yPARSE_uprintf  ("#]   content", "O"  , a_content);
-   yPARSE_uprintf ("#]   filename", "O"  , s_qout.q_loc);
-   x_time  = time (NULL);
-   x_broke = localtime (&x_time);
-   strftime (t, LEN_TITLE, "%y.%m.%d.%H.%M.%S.%u.%W.%j  %Y-%b-%d, %H:%M%P, %a, week %W, day %y ", x_broke);
-   yPARSE_uprintf ("#]   written" , "O"  , t);
-   if (a_additional != NULL)   a_additional ();
-   yPARSE_spacer (1);
-   return 0;
 }
 
 char

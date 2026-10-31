@@ -47,17 +47,18 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_FOCUS     "RS (run-time support)"
 #define     P_NICHE     "fp (file parsing)"
-#define     P_SUBJECT   "automated file parsing"
+#define     P_SUBJECT   "ansi-text file record processing library"
 #define     P_PURPOSE   "text file parsing and aggregating library"
 /*········· ··········· ´·····························´········································*/
 #define     P_NAMESAKE  "jupiter-terminalis (boundaries)"
 #define     P_PRONOUNCE "·"
-#define     P_HERITAGE  "roman god of boundaries, division, and boundary markers"
-#define     P_BRIEFLY   "god to boundaries"
+#define     P_HERITAGE  "roman god of boundaries, milestones, division, and boundary markers"
+#define     P_BRIEFLY   "god to boundaries, milestones, and markers"
 #define     P_IMAGERY   "head and torso of a man, connected to a boundary stone as a base"
 #define     P_REASON    "records are the ultimate boundary layouts"
 /*········· ··········· ´·····························´········································*/
 #define     P_ONELINE   P_NAMESAKE " " P_SUBJECT
+#define     P_FORMAL    P_NAMESAKE " " P_BRIEFLY
 /*········· ··········· ´·····························´········································*/
 #define     P_BASENAME  "yPARSE"
 #define     P_HOMEDIR   "/home/system/yPARSE.record_parsing"
@@ -86,8 +87,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5g"
-#define     P_VERTXT    "broke out yPARSE_spec.c, first unit-test run on updated yPARSE_simple.c"
+#define     P_VERNUM    "0.5h"
+#define     P_VERTXT    "updated yPARSE_out_open and yPARSE_out_close with unit-testing"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -331,9 +332,31 @@ int         yparse_spec_size        (char a_spec);
 /*········´ ´············checking·´ ´·········································*/
 char        yparse_spec_string      (char a_spec);
 char        yparse_spec_numeric     (char a_spec);
-char        yparse_spec_next_write  (void);
-char        yparse_spec_next_read   (void);
+char        yparse_spec__in_next    (void);
 char        yparse_spec_len         (tQUEUE *a_queue);
+/*········´ ´···············input·´ ´·········································*/
+char        yparse_spec__in_next    (void);
+/*········´ ´··············output·´ ´·········································*/
+char        yparse_spec__out_next   (void);
+char        yparse_spec_output      (va_list a_vlist, int n);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_out.c ]]=======================================================*/
+/*········´ ´·············program·´ ´·········································*/
+char        yparse_out_init         (void);
+char        yPARSE_out_purge        (void);
+char        yPARSE_out_reset        (void);
+/*········´ ´················file·´ ´·········································*/
+char        yPARSE_out_open         (char a_name [LEN_PATH], char a_prog [LEN_PATH]);
+char        yPARSE_out_close        (char a_fancy);
+/*········´ ´··············shared·´ ´·········································*/
+char        yparse_out__defense     (char a_type);
+/*········´ ´··············string·´ ´·········································*/
+/*········´ ´·············numeric·´ ´·········································*/
+/*········´ ´···········aggregate·´ ´·········································*/
+/*········´ ´··············output·´ ´·········································*/
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -389,7 +412,6 @@ char        yparse_peek_in          (const int a_ref, char *a_item);
 
 char        yparse__popable         (void);
 
-char        yparse_init_out         (void);
 
 
 /*---(saving)---------------*/
