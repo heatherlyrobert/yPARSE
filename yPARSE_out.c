@@ -342,7 +342,7 @@ yparse_out_variadic    (va_list a_vlist, int n)
 static void      o___STRING__________________o (void) {;};
 
 char
-yparse__push_string     (uchar a_str [LEN_RECD])
+yparse__push_string     (char a_func [LEN_TITLE], char a_str [LEN_RECD])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -352,24 +352,24 @@ yparse__push_string     (uchar a_str [LEN_RECD])
    uchar       t           [LEN_RECD];
    int         x_len       =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_enter   (a_func);
    /*---(defense)------------------------*/
    rc = yparse_out__defense ('p');
    DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(defense)------------------------*/
    DEBUG_YPARSE  yLOG_point   ("a_str"     , a_str);
    --rce;  if (a_str == NULL) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rce);
       return rce;
    }
    DEBUG_YPARSE  yLOG_info    ("a_str"     , a_str);
    /*---(prepare field)------------------*/
    x_len = strlen (a_str);
-   DEBUG_YPARSE  yLOG_info    ("x_len"     , x_len);
+   DEBUG_YPARSE  yLOG_value   ("x_len"     , x_len);
    ystrlcpy  (s, a_str, LEN_RECD);
    ystrlmark (s, ySTR_HEATH, LEN_RECD);
    DEBUG_YPARSE  yLOG_info    ("s"         , s);
@@ -380,98 +380,98 @@ yparse__push_string     (uchar a_str [LEN_RECD])
    DEBUG_YPARSE   yLOG_value   ("check"     , rc);
    --rce;  if (rc < 0) {
       s_qout.q_good = 'n';
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(format)-------------------------*/
    --rce;  switch (x_spec) {
    case  'C' :
-      DEBUG_YPARSE   yLOG_snote   ("char");
+      DEBUG_YPARSE   yLOG_note    ("char");
       if (s [0] == 0)        ystrlcpy (t, "¬"   , 2);
       else                   sprintf (t, "%c"  , s [0]);
       break;
    case  'S' :
-      DEBUG_YPARSE   yLOG_snote   ("short string");
+      DEBUG_YPARSE   yLOG_note    ("short string");
       sprintf (t, "%-5.5s"    , s);
       break;
    case  'T' :
-      DEBUG_YPARSE   yLOG_snote   ("terse string");
+      DEBUG_YPARSE   yLOG_note    ("terse string");
       sprintf (t, "%-10.10s"  , s);
       break;
    case  'U' :
-      DEBUG_YPARSE   yLOG_snote   ("user string");
+      DEBUG_YPARSE   yLOG_note    ("user string");
       sprintf (t, "%-12.12s"  , s);
       break;
    case  'L' :
-      DEBUG_YPARSE   yLOG_snote   ("label/address string");
+      DEBUG_YPARSE   yLOG_note    ("label/address string");
       sprintf (t, "%-20.20s"  , s);
       break;
    case  '3' :
-      DEBUG_YPARSE   yLOG_snote   ("thirty string");
+      DEBUG_YPARSE   yLOG_note    ("thirty string");
       sprintf (t, "%-30.30s"  , s);
       break;
    case  '4' :
-      DEBUG_YPARSE   yLOG_snote   ("forty string");
+      DEBUG_YPARSE   yLOG_note    ("forty string");
       sprintf (t, "%-40.40s"  , s);
       break;
    case  'D' :
-      DEBUG_YPARSE   yLOG_snote   ("description string");
+      DEBUG_YPARSE   yLOG_note    ("description string");
       sprintf (t, "%-50.50s"  , s);
       break;
    case  '6' :
-      DEBUG_YPARSE   yLOG_snote   ("sixty string");
+      DEBUG_YPARSE   yLOG_note    ("sixty string");
       sprintf (t, "%-60.60s"  , s);
       break;
    case  '7' :
-      DEBUG_YPARSE   yLOG_snote   ("seventy string");
+      DEBUG_YPARSE   yLOG_note    ("seventy string");
       sprintf (t, "%-70.70s"  , s);
       break;
    case  '8' :
-      DEBUG_YPARSE   yLOG_snote   ("eigthy string");
+      DEBUG_YPARSE   yLOG_note    ("eigthy string");
       sprintf (t, "%-80.80s"  , s);
       break;
    case  'H' :
-      DEBUG_YPARSE   yLOG_snote   ("hundred string");
+      DEBUG_YPARSE   yLOG_note    ("hundred string");
       sprintf (t, "%-100.100s", s);
       break;
    case  'F' :
-      DEBUG_YPARSE   yLOG_snote   ("full string");
+      DEBUG_YPARSE   yLOG_note    ("full string");
       sprintf (t, "%-200.200s", s);
       break;
    case  'R' :
-      DEBUG_YPARSE   yLOG_snote   ("record string");
+      DEBUG_YPARSE   yLOG_note    ("record string");
       sprintf (t, "%-2000.2000s", s);
       break;
    case  'O' :
-      DEBUG_YPARSE   yLOG_snote   ("open string");
+      DEBUG_YPARSE   yLOG_note    ("open string");
       sprintf (t, "%s"        , s);
       break;
    default    :
-      DEBUG_YPARSE   yLOG_snote   ("unknown");
+      DEBUG_YPARSE   yLOG_note    ("unknown");
       s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rce);
       return rce;
       break;
    }
    /*---(encode)-------------------------*/
    rc = ystrlstore (t, x_len);
    if (rc < 0) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
       return rc;
    }
    /*---(enqueue)------------------------*/
    rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
       return rc;
    }
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_exit    (a_func);
    return 0;
 }
 
-char yPARSE_pushempty   (void)          { return yparse__push_string  ("");    }
-char yPARSE_pushstr     (uchar  *a_str) { return yparse__push_string  (a_str); }
+char yPARSE_pushempty   (void)                  { return yparse__push_string  (__FUNCTION__, "");    }
+char yPARSE_pushstr     (char a_str [LEN_RECD]) { return yparse__push_string  (__FUNCTION__, a_str); }
 
 
 
@@ -481,7 +481,7 @@ char yPARSE_pushstr     (uchar  *a_str) { return yparse__push_string  (a_str); }
 static void      o___NUMERIC_________________o (void) {;};
 
 char
-yparse__push_numeric    (double a_val)
+yparse__push_numeric    (char a_func [LEN_TITLE], double a_val)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -491,20 +491,20 @@ yparse__push_numeric    (double a_val)
    char        s           [LEN_RECD];
    llong       v           =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   DEBUG_YPARSE  yLOG_sdouble (a_val);
+   DEBUG_YPARSE  yLOG_enter   (a_func);
+   DEBUG_YPARSE  yLOG_double  ("a_val"     , a_val);
    /*---(defense)------------------------*/
    rc = yparse_out__defense ('p');
    DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
    --rce;  if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
    DEBUG_YPARSE  yLOG_point   ("q_file"    , s_qout.q_file);
    DEBUG_YPARSE  yLOG_value   ("q_iverb"   , s_qout.q_iverb);
    DEBUG_YPARSE  yLOG_value   ("q_count"   , s_qout.q_count);
    --rce;  if (s_qout.q_file == NULL || s_qout.q_iverb < 0 || s_qout.q_count < 1)  {
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(prepare)------------------------*/
@@ -514,43 +514,43 @@ yparse__push_numeric    (double a_val)
    DEBUG_YPARSE   yLOG_value   ("check"     , rc);
    --rce;  if (rc < 0) {
       s_qout.q_good = 'n';
-      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
    /*---(format)-------------------------*/
    --rce;  switch (x_spec) {
    case  'c' :
-      DEBUG_YPARSE   yLOG_snote   ("char");
+      DEBUG_YPARSE   yLOG_note    ("char");
       if      (a_val < 31)            ystrlcpy (t, "¬", LEN_RECD);
       else if (a_val > 255)           ystrlcpy (t, "¬", LEN_RECD);
       else                            sprintf (t, "%c"       , (uchar) a_val);
       break;
    case  's'  :
-      DEBUG_YPARSE   yLOG_snote   ("short");
+      DEBUG_YPARSE   yLOG_note    ("short");
       if      (a_val < -99)           ystrlcpy (t, "¬¬¬", LEN_RECD);
       else if (a_val > 999)           ystrlcpy (t, "¬¬¬", LEN_RECD);
       else                            sprintf (t, "%3d"      , (int) a_val);
       break;
    case  'i'  :
-      DEBUG_YPARSE   yLOG_snote   ("integer");
+      DEBUG_YPARSE   yLOG_note    ("integer");
       if      (a_val < -99999)        ystrlcpy (t, "¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 999999)        ystrlcpy (t, "¬¬¬¬¬¬", LEN_RECD);
       else                            sprintf (t, "%6d"      , (int) a_val);
       break;
    case  'l'  :
-      DEBUG_YPARSE   yLOG_snote   ("long");
+      DEBUG_YPARSE   yLOG_note    ("long");
       if      (a_val < -999999999LL)  ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 9999999999LL)  ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else                            sprintf (t, "%10ld"    , (llong) a_val);
       break;
    case  'h'  :
-      DEBUG_YPARSE   yLOG_snote   ("huge");
+      DEBUG_YPARSE   yLOG_note    ("huge");
       if      (a_val < -999999999999998LL)  ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 9999999999999998LL)  ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else                                  sprintf (t, "%16ld"    , (llong) a_val);
       break;
    case  ','  :
-      DEBUG_YPARSE   yLOG_snote   ("comma");
+      DEBUG_YPARSE   yLOG_note    ("comma");
       if      (a_val < -9999999)      ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 99999999)      ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else  {
@@ -559,7 +559,7 @@ yparse__push_numeric    (double a_val)
       }
       break;
    case  ';'  :
-      DEBUG_YPARSE   yLOG_snote   ("hcomma");
+      DEBUG_YPARSE   yLOG_note    ("hcomma");
       if      (a_val < -99999999999998LL)  ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 999999999999998LL)  ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else {
@@ -568,62 +568,62 @@ yparse__push_numeric    (double a_val)
       }
       break;
    case  'k'  :
-      DEBUG_YPARSE   yLOG_snote   ("ykine");
+      DEBUG_YPARSE   yLOG_note    ("ykine");
       if      (a_val < -999.9)        ystrlcpy (t, "¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 9999.9)        ystrlcpy (t, "¬¬¬¬¬¬", LEN_RECD);
       else                            sprintf (t, "%6.1lf"   , a_val);
       break;
    case  'f'  :
-      DEBUG_YPARSE   yLOG_snote   ("float");
+      DEBUG_YPARSE   yLOG_note    ("float");
       if      (a_val < -9999.99)      ystrlcpy (t, "¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 99999.99)      ystrlcpy (t, "¬¬¬¬¬¬¬¬", LEN_RECD);
       else                            sprintf (t, "%8.2lf"   , a_val);
       break;
    case  'd'  :
-      DEBUG_YPARSE   yLOG_snote   ("double");
+      DEBUG_YPARSE   yLOG_note    ("double");
       if      (a_val < -99999.999)    ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 999999.999)    ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else                            sprintf (t, "%10.3lf"  , a_val);
       break;
    case  't'  :
-      DEBUG_YPARSE   yLOG_snote   ("technical");
+      DEBUG_YPARSE   yLOG_note    ("technical");
       if      (a_val < -9999999999.999990)   ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else if (a_val > 99999999999.999990)   ystrlcpy (t, "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬", LEN_RECD);
       else                                   sprintf (t, "%18.6lf"  , a_val);
       break;
    case  'e'  :
-      DEBUG_YPARSE   yLOG_snote   ("small exponent");
+      DEBUG_YPARSE   yLOG_note    ("small exponent");
       sprintf (t, "%+2.3e"      , a_val);
       break;
    case  'm'  :
-      DEBUG_YPARSE   yLOG_snote   ("medium exponent");
+      DEBUG_YPARSE   yLOG_note    ("medium exponent");
       sprintf (t, "%+2.7e"      , a_val);
       break;
    case  'b'  :
-      DEBUG_YPARSE   yLOG_snote   ("big exponent");
+      DEBUG_YPARSE   yLOG_note    ("big exponent");
       sprintf (t, "%+2.12e"    , a_val);
       break;
    default    :
-      DEBUG_YPARSE   yLOG_snote   ("unknown");
+      DEBUG_YPARSE   yLOG_note    ("unknown");
       s_qout.q_good = 'n';
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rce);
       return rce;
       break;
    }
    /*---(enqueue)------------------------*/
    rc = yparse_queue_enqueue (&s_qout, t);
    if (rc < 0) {
-      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rc);
+      DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
       return rc;
    }
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   DEBUG_YPARSE  yLOG_exit    (a_func);
    return 0;
 }
 
-char yPARSE_pushchar    (uchar   a_val) { return yparse__push_numeric ((double) a_val); }
-char yPARSE_pushint     (llong  a_val)  { return yparse__push_numeric ((double) a_val); }
-char yPARSE_pushfloat   (double a_val)  { return yparse__push_numeric (a_val); }
+char yPARSE_pushchar    (uchar  a_val)  { return yparse__push_numeric (__FUNCTION__, (double) a_val); }
+char yPARSE_pushint     (llong  a_val)  { return yparse__push_numeric (__FUNCTION__, (double) a_val); }
+char yPARSE_pushfloat   (double a_val)  { return yparse__push_numeric (__FUNCTION__, a_val); }
 
 
 
@@ -639,30 +639,30 @@ yparse__popout           (char *a_item)
    char        rce         =  -10;
    char        rc          =    0;
    /*---(header)-------------------------*/
-   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   DEBUG_YPARSE yLOG_enter   (__FUNCTION__);
    /*---(prepare)------------------------*/
    if (a_item != NULL)  ystrlcpy (a_item, "", LEN_LABEL);
    /*---(defense)------------------------*/
    rc = yparse_out__defense ('-');
-   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
+   DEBUG_YPARSE yLOG_value   ("defense"   , rc);
    if (rc < 0)  {
-      DEBUG_YPARSE   yLOG_sexitr  (__FUNCTION__, rc);
+      DEBUG_YPARSE yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
    /*---(defense)------------------------*/
-   DEBUG_YPARSE  yLOG_spoint  (a_item);
+   DEBUG_YPARSE yLOG_point   ("a_item"    , a_item);
    --rce;  if (a_item == NULL) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_YPARSE yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(dequeue)------------------------*/
    rc = yparse_queue_dequeue (&s_qout, a_item);
    --rce;  if (rc < 0) {
-      DEBUG_YPARSE  yLOG_sexitr  (__FUNCTION__, rc);
+      DEBUG_YPARSE yLOG_exitr   (__FUNCTION__, rc);
       return rc;
    }
    /*---(complete)-----------------------*/
-   DEBUG_YPARSE  yLOG_sexit   (__FUNCTION__);
+   DEBUG_YPARSE yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -738,6 +738,7 @@ yPARSE_write            (int *n, int *c)
    }
    /*---(aggregate)----------------------*/
    rc = yparse_aggregate ();
+   DEBUG_YPARSE  yLOG_value   ("aggregate" , rc);
    if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rc);
       return rc;

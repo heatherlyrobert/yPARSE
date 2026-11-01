@@ -102,7 +102,7 @@ yPARSE_close            (void)
    yPARSE_wrap ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-   return 0;
+   return RC_POSITIVE;
 }
 
 char
@@ -117,7 +117,7 @@ yPARSE_uwrap            (void)
    yPARSE_wrap ();
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
-   return 0;
+   return RC_POSITIVE;
 }
 
 
@@ -150,6 +150,7 @@ yPARSE_uconfig          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH])
       return rce;
    }
    /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;
 }
 

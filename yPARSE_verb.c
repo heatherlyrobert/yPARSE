@@ -52,8 +52,6 @@ char       *G_nada    = "";
 
 
 
-
-
 /*====================------------------------------------====================*/
 /*===----                       program level                          ----===*/
 /*====================------------------------------------====================*/
@@ -515,7 +513,7 @@ yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs,
    }
    /*---(check verb)---------------------*/
    --rce;  if (myPARSE.y_verbs  != YPARSE_MANUAL) {
-      rc = ystrlgood (a_verb, ySTR_ALNUM, LEN_USER);
+      rc = ystrlgood (a_verb, YSTR_VERBS, LEN_USER);
       if (rc < 0) {
          DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
          return rce;

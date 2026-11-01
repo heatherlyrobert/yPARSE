@@ -305,7 +305,7 @@ yparse_spec__search     (char a_func [LEN_TITLE], char a_spec, char a_dir, char 
 }
 
 char* yparse_spec_entry  (char a_spec, char a_dir, char a_index) { yparse_spec__search (__FUNCTION__, a_spec, a_dir, a_index, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, yparse_print);  return yparse_print; }
-int   yparse_spec_size   (char a_spec)             {  int  l = 0;  yparse_spec__search (__FUNCTION__, a_spec, NULL , NULL   , NULL, NULL, NULL, &l  , NULL, NULL, NULL, NULL, NULL        );  return l; }
+int   yparse_spec_size   (char a_spec)             {  int  l = 0;  yparse_spec__search (__FUNCTION__, a_spec, NULL , NULL   , NULL, NULL, NULL, NULL, NULL, NULL, &l  , NULL, NULL        );  return l; }
 
 char
 yparse_spec_string      (char a_spec)

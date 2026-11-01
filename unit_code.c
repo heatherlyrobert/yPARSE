@@ -455,8 +455,8 @@ yparse_mock_verber      (void)
 char
 yparse_mock_header      (void)
 {
-   yPARSE_uprintf  ("s_control", "cSO" , 'y', "0.6w", "testing integration");
-   yPARSE_uprintf  ("s_format" , "O"  , "mimecat");
+   yPARSE_uprintf  ("#]", "TcOO" , "control", 'y', "0.6w", "testing integration");
+   yPARSE_uprintf  ("#]", "TO"   , "format" , "mimecat");
    return 0;
 }
 

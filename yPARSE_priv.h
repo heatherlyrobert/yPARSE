@@ -354,7 +354,14 @@ char        yPARSE_out_close        (char a_fancy);
 /*········´ ´··············shared·´ ´·········································*/
 char        yparse_out__defense     (char a_type);
 /*········´ ´··············string·´ ´·········································*/
+char        yparse__push_string     (char a_func [LEN_TITLE], char a_str [LEN_RECD]);
+char        yPARSE_pushempty        (void);
+char        yPARSE_pushstr          (char a_str [LEN_RECD]);
 /*········´ ´·············numeric·´ ´·········································*/
+char        yparse__push_numeric    (char a_func [LEN_TITLE], double a_val);
+char        yPARSE_pushchar         (uchar  a_val);
+char        yPARSE_pushint          (llong  a_val);
+char        yPARSE_pushfloat        (double a_val);
 /*········´ ´···········aggregate·´ ´·········································*/
 /*········´ ´··············output·´ ´·········································*/
 /*········´ ´················DONE·´ ´·········································*/

@@ -104,60 +104,89 @@ static void      o___HEADER__________________o (void) {;};
 
 
 char
-yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void))
+yPARSE_header           (char a_basename [LEN_LABEL], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void))
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
    char        rc          =    0;
-   char        x_vernum    [LEN_TERSE] = "";
-   char        x_vertxt    [LEN_HUND]  = "";
-   char        s           [LEN_RECD]  = "";
-   char        t           [LEN_RECD]  = "";
+   char        s           [LEN_HUND]  = "·";
+   char        t           [LEN_HUND]  = "·";
    char       *p           = NULL;
    time_t      x_time;
    struct tm  *x_broke     = NULL;
    char        x_host      [LEN_HUND]  = "";
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
-   /*---(program)------------------------*/
-   DEBUG_YPARSE   yLOG_point   ("a_full"    , a_full);
-   if (a_full != NULL) {
-      DEBUG_YPARSE   yLOG_info    ("a_full"    , a_full);
-      DEBUG_YPARSE   yLOG_point   ("x_vernum"  , x_vernum);
-      if (a_vernum      != NULL)  ystrlcpy (x_vernum, a_vernum, LEN_TERSE);
-      DEBUG_YPARSE   yLOG_info    ("x_vernum"  , x_vernum);
-      DEBUG_YPARSE   yLOG_point   ("x_vertxt"  , x_vertxt);
-      if (a_vertxt      != NULL)  ystrlcpy (x_vertxt, a_vertxt, LEN_HUND);
-      DEBUG_YPARSE   yLOG_info    ("x_vertxt"  , x_vertxt);
-      p = strrchr (a_full, '/');
-      DEBUG_YPARSE   yLOG_point   ("p"         , p);
-      if (p != NULL) {
-         /*> snprintf (t, LEN_RECD, "#!%s", a_full);                                  <*/
-         /*> yparse_fancy__write  (t);                                                <*/
-         /*> yPARSE_spacer (1);                                                       <*/
-         /*> yPARSE_uprintf  ("#]", "LLSO", "program", p + 1 , x_vernum, x_vertxt);   <*/
-      } else {
-         rc = yPARSE_uprintf  ("#]", "LLSO", "program", a_full, x_vernum, x_vertxt);
-      }
-      DEBUG_YPARSE   yLOG_value   ("uprintf"   , rc);
+   /*---(defense)------------------------*/
+   rc = yparse_out__defense ('-');
+   DEBUG_YPARSE  yLOG_value   ("defense"   , rc);
+   --rce;  if (rc < 0)  {
+      DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
    }
-   /*> if (a_oneline     != NULL)  yPARSE_uprintf  ("#]", "LO"  , "oneline", a_oneline);   <*/
+   /*---(program)------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("a_basename", a_basename);
+   if (a_basename   != NULL) {
+      DEBUG_YPARSE   yLOG_info    ("a_basename", a_basename);
+      rc = yPARSE_uprintf  ("#]", "TO", "program", a_basename);
+      DEBUG_YPARSE   yLOG_value   ("program"   , rc);
+   }
+   /*---(version)------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("a_vernum"  , a_vernum);
+   if (a_vernum != NULL) {
+      ystrlcpy (s, a_vernum, LEN_TERSE);
+      DEBUG_YPARSE   yLOG_info    ("vernum"    , s);
+      DEBUG_YPARSE   yLOG_point   ("a_vertxt"  , a_vertxt);
+      if (a_vertxt      != NULL)  ystrlcpy  (t, a_vertxt, LEN_HUND);
+      DEBUG_YPARSE   yLOG_info    ("vertxt"    , t);
+      rc = yPARSE_uprintf  ("#]", "TOO" , "version", s, t);
+      DEBUG_YPARSE   yLOG_value   ("version"   , rc);
+   }
+   /*---(one-line)-----------------------*/
+   DEBUG_YPARSE   yLOG_point   ("a_oneline" , a_oneline);
+   if (a_oneline    != NULL) {
+      rc = yPARSE_uprintf ("#]", "TO"  , "oneline", a_oneline);
+      DEBUG_YPARSE   yLOG_value   ("oneline"   , rc);
+   }
    /*---(output file)--------------------*/
-   /*> if (s_qout.q_loc != NULL)   yPARSE_uprintf ("#]", "LO"  , "filename", s_qout.q_loc);   <*/
-   /*> if (a_content    != NULL)   yPARSE_uprintf ("#]", "LO"  , "content" , a_content);   <*/
+   DEBUG_YPARSE   yLOG_point   ("q_loc"     , s_qout.q_loc);
+   if (s_qout.q_loc != NULL) {
+      DEBUG_YPARSE   yLOG_info    ("q_loc"     , s_qout.q_loc);
+      rc = yPARSE_uprintf ("#]", "TO"  , "filename", s_qout.q_loc);
+      DEBUG_YPARSE   yLOG_value   ("file"      , rc);
+   }
+   DEBUG_YPARSE   yLOG_point   ("a_content" , a_content);
+   if (a_content    != NULL) {
+      DEBUG_YPARSE   yLOG_info    ("a_content" , a_content);
+      rc = yPARSE_uprintf ("#]", "TO"  , "content" , a_content);
+      DEBUG_YPARSE   yLOG_value   ("content"   , rc);
+   }
    /*---(timestamp)----------------------*/
-   /*> x_time  = time (NULL);                                                         <* 
-    *> x_broke = localtime (&x_time);                                                 <* 
-    *> strftime (s, LEN_HUND, "%y.%m.%d.%H.%M.%S.%u.%W.%j", x_broke);                 <* 
-    *> strftime (t, LEN_HUND, "%Y-%b-%d, %H:%M%P, %a, week %W, day %y", x_broke);     <* 
-    *> yPARSE_uprintf ("#]", "LTO"  , "written"  , s, t);                             <*/
-   /*---(specific)-----------------------*/
-   /*> gethostname (x_host, LEN_HUND);                                                <* 
-    *> yPARSE_uprintf ("#]  machine" , "Oi"  , t, getpid ());                        <* 
-    *> if (a_cmdline != NULL)  yPARSE_uprintf  ("#]  cmdline", "O"  , a_cmdline);    <* 
-    *> yPARSE_spacer (1);                                                             <*/
+   x_time  = time (NULL);
+   x_broke = localtime (&x_time);
+   strftime (s  , LEN_HUND, "%y.%m.%d.%H.%M.%S.%u.%W.%j", x_broke);
+   DEBUG_YPARSE   yLOG_info    ("stamp"     , s);
+   strftime (t, LEN_HUND, "%Y-%b-%d (%a) %H:%M%P", x_broke);
+   DEBUG_YPARSE   yLOG_info    ("english"   , t);
+   rc = yPARSE_uprintf ("#]", "TOO"  , "written"  , s, t);
+   DEBUG_YPARSE   yLOG_value   ("written"   , rc);
+   /*---(host/pid)-----------------------*/
+   gethostname (s, LEN_HUND);
+   DEBUG_YPARSE   yLOG_info    ("host"      , s);
+   rc = yPARSE_uprintf ("#]", "TOi"  , "machine", s, getpid ());
+   DEBUG_YPARSE   yLOG_value   ("machine"   , rc);
+   /*---(cmdline)------------------------*/
+   DEBUG_YPARSE   yLOG_point   ("a_cmdline" , a_cmdline);
+   if (a_cmdline != NULL) {
+      DEBUG_YPARSE   yLOG_info    ("a_cmdline" , a_cmdline);
+      rc = yPARSE_uprintf  ("#]", "TO", "cmdline"  , a_cmdline);
+      DEBUG_YPARSE   yLOG_value   ("cmdline"   , rc);
+   }
    /*---(call for more)------------------*/
-   /*> if (a_additional != NULL)   a_additional ();                                   <* 
-    *> yPARSE_spacer (1);                                                             <*/
+   if (a_additional != NULL) {
+      fprintf  (s_qout.q_file, "##\n");
+      a_additional   ();
+   }
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
    return RC_POSITIVE;

@@ -113,7 +113,7 @@ char        yPARSE_close            (void);
 char        yPARSE_autoread         (uchar *a_in, uchar *a_out, void *a_verber);
 /*---(planned)--------------*/
 char        yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber);
-char        yPARSE_header           (char a_full [LEN_PATH], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void));
+char        yPARSE_header           (char a_basename [LEN_LABEL], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void));
 char        yPARSE_vscanf           (uchar *a_verb, ...);
 char        yPARSE_vprintf          (int c, uchar *a_verb, ...);
 /*---(planned)--------------*/
@@ -200,7 +200,7 @@ char        yPARSE_qout_info         (char r_label [LEN_SHORT], char r_loc [LEN_
 char        yPARSE_pushverb         (char a_verb [LEN_LABEL]);
 char        yPARSE_pushempty        (void);
 char        yPARSE_pushval          (double  a_val);
-char        yPARSE_pushstr          (uchar  *a_str);
+char        yPARSE_pushstr          (char a_str [LEN_RECD]);
 char        yPARSE_pushchar         (uchar   a_val);
 char        yPARSE_pushint          (llong   a_val);
 char        yPARSE_pushfloat        (double  a_val);
