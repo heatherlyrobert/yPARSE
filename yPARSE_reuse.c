@@ -498,15 +498,15 @@ yparse_reusable         (char a_masked)
     *>    DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);                             <* 
     *>    return rce;                                                                 <* 
     *> }                                                                              <*/
-   DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.y_verb);
+   DEBUG_YPARSE  yLOG_info    ("verb"      , s_qin.q_verb);
    DEBUG_YPARSE  yLOG_value   ("iverb"     , s_qin.q_iverb);
-   --rce;  if (s_qin.q_iverb < 0 || strcmp (myPARSE.y_verb, "") == 0) {
+   --rce;  if (s_qin.q_iverb < 0 || strcmp (s_qin.q_verb, "") == 0) {
       DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
    /*---(start)--------------------------*/
    /*> sprintf (x_recd, "%s (", yPARSE_verb (s_qin.q_iverb));                           <*/
-   sprintf (x_recd, "%s (", myPARSE.y_verb);
+   sprintf (x_recd, "%s (", s_qin.q_verb);
    /*> DEBUG_YPARSE  yLOG_info    ("reusable"  , x_recd);                             <*/
    /*---(clear)--------------------------*/
    x_curr = s_qin.q_head;

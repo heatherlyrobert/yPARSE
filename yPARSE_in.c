@@ -525,7 +525,7 @@ char yPARSE_load        (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD])    
 char yPARSE_reload      (int *r_nused, int *r_ncurr, int a_line, char a_label [LEN_HUND])   { return yparse_read (__FUNCTION__, a_line, NULL  , a_label, NULL   , r_nused, r_ncurr, NULL  , NULL); }
 char yPARSE_hidden      (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD])                { return yparse_read (__FUNCTION__, -1    , a_recd, NULL   , NULL   , r_nused, r_ncurr, NULL  , NULL); }
 
-char yPARSE_inrecd      (char a_recd [LEN_RECD]) { ystrlcpy (a_recd, myPARSE.y_recd, LEN_RECD); }
+char yPARSE_inrecd      (char a_recd [LEN_RECD]) { ystrlcpy (a_recd, s_qin.q_recd, LEN_RECD); }
 
 
 

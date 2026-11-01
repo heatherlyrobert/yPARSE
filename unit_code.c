@@ -85,7 +85,6 @@ yparse_queue_rando      (tQUEUE *a_queue)
    a_queue->q_dir      =  '*';
    strcpy (a_queue->q_label, "abc");
    a_queue->q_handler  = 0x01;
-   a_queue->q_iverb    =    2;
    a_queue->q_good     =  'g';
    a_queue->q_hidden   =  'h';
    /*---(file)---------------------------*/
@@ -94,9 +93,14 @@ yparse_queue_rando      (tQUEUE *a_queue)
    a_queue->q_nfull    =    6;
    a_queue->q_nused    =    7;
    a_queue->q_ncurr    =    8;
-   /*---(record)-------------------------*/
+   /*---(verb)---------------------------*/
+   a_queue->q_iverb    =   14;
+   strcpy (a_queue->q_verb , "hope");
+   strcpy (a_queue->q_spec , "ciiO");
+   a_queue->q_nspec    =   16;
    strcpy (a_queue->q_recd , "lots of fields");
    a_queue->q_len      =    9;
+   a_queue->q_nfield   =   15;
    /*---(fields)-------------------------*/
    a_queue->q_head     = NULL;
    a_queue->q_tail     = NULL;
@@ -118,6 +122,8 @@ yparse_queue_status     (tQUEUE *a_queue)
    char        x_handler   [LEN_SHORT] = "···";
    char        x_loc       [LEN_DESC]  = "´·······································";
    char        x_file      [LEN_SHORT] = "···";
+   char        x_verb      [LEN_LABEL] = "´···········";
+   char        x_spec      [LEN_LABEL] = "´···········";
    char        x_recd      [LEN_DESC]  = "´·······································";
    char        x_head      [LEN_LABEL] = "´·········";
    char        x_tail      [LEN_LABEL] = "´·········";
@@ -126,7 +132,7 @@ yparse_queue_status     (tQUEUE *a_queue)
    /*---(quick-out)----------------------*/
    if (a_queue == 'T') {
       DEBUG_YPARSE  yLOG_note    ("requested titles");
-      strcpy (yparse_print, "D label vrb had  G H  ---location--------- ptr ful use cur  len ---record-------------------------------  ---head--- ---tail--- cnt fst lst cur  Ï");
+      strcpy (yparse_print, "D label hnd  G H  ---location--------- ful use cur  nv ---verb----- ---specs---- ns len ---record------------------------------- nf  ---head--- ---tail--- cnt fst lst cur  Ï");
       DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
       return yparse_print;
    }
@@ -140,31 +146,28 @@ yparse_queue_status     (tQUEUE *a_queue)
       return yparse_print;
    }
    /*---(defaults)-----------------------*/
-   strcpy (yparse_print, "- ´···· ··- ···  - -  ´··················· ··· ··- ··- ··-  ··- ´·······································  ´········· ´········· ··- ··- ··- ··-  Ï");
+   strcpy (yparse_print, "- ´···· ···  - -  ´··················· ··- ··- ··-  ·- ´··········· ´··········· ·- ··- ´······································· ·-  ´········· ´········· ··- ··- ··- ··-  Ï");
    /*---(prepare)------------------------*/
-   if (a_queue->q_label    != NULL)  snprintf (x_label, LEN_TERSE, "%s·····", a_queue->q_label);
+   if (a_queue->q_label    != NULL)  ystrldisplay (a_queue->q_label, LEN_TERSE, x_label);
    if (a_queue->q_handler  != NULL)  strcpy   (x_handler, "SET");
-   if (a_queue->q_loc  [0] != '\0')  snprintf (x_loc  , 21       , "%s········································", a_queue->q_loc);
+   if (a_queue->q_loc  [0] != '\0')  ystrldisplay (a_queue->q_loc  , LEN_LABEL, x_loc  );
    if (a_queue->q_file     != NULL)  strcpy   (x_file   , "SET");
-   if (a_queue->q_recd [0] != '\0')  snprintf (x_recd , 41       , "%s········································", a_queue->q_recd);
-   if (a_queue->q_head     != NULL) {
-      snprintf (x_head , 11, "%s··········", a_queue->q_head->n_item);
-      if (x_head [ 9] != '·')  x_head [ 9] = '>';
-   }
-   if (a_queue->q_tail     != NULL) {
-      snprintf (x_tail , 11, "%s··········", a_queue->q_tail->n_item);
-      if (x_tail [ 9] != '·')  x_tail [ 9] = '>';
-   }
-   sprintf (yparse_print, "%c %-5.5s %3d %-3.3s  %c %c  %-20.20s %-3.3s %3d %3d %3d  %3d %-40.40s  %-10.10s %-10.10s %3d %3d %3d %3d  Ï",
-         a_queue->q_dir, x_label, a_queue->q_iverb, x_handler,
+   if (a_queue->q_verb     != NULL)  ystrldisplay (a_queue->q_verb , LEN_USER , x_verb );
+   if (a_queue->q_spec     != NULL)  ystrldisplay (a_queue->q_spec , LEN_USER , x_spec );
+   if (a_queue->q_recd [0] != '\0')  ystrldisplay (a_queue->q_recd , 40       , x_recd );
+   if (a_queue->q_head     != NULL)  ystrldisplay (a_queue->q_head->n_item , LEN_TERSE, x_head );
+   if (a_queue->q_tail     != NULL)  ystrldisplay (a_queue->q_tail->n_item , LEN_TERSE, x_tail );
+   sprintf (yparse_print, "%c %-5.5s %-3.3s  %c %c  %-20.20s %3d %3d %3d  %2d %-12.12s %-12.12s %2d %3d %-40.40s %2d  %-10.10s %-10.10s %3d %3d %3d %3d  Ï",
+         a_queue->q_dir, x_label, x_handler,
          a_queue->q_good, a_queue->q_hidden,
-         x_loc, x_file, a_queue->q_nfull, a_queue->q_nused, a_queue->q_ncurr,
-         a_queue->q_len, x_recd,
+         x_loc, a_queue->q_nfull, a_queue->q_nused, a_queue->q_ncurr,
+         a_queue->q_iverb, x_verb, x_spec, a_queue->q_nspec, a_queue->q_len, x_recd, a_queue->q_nfield,
          x_head, x_tail, a_queue->q_count, a_queue->q_first, a_queue->q_last, a_queue->q_curr);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return yparse_print;
 }
+
 
 /*> char*                                                                                                                                                <* 
  *> yparse_queue_by_cursor  (tQUEUE *a_queue, char a_dir)                                                                                                <* 
@@ -447,7 +450,7 @@ yparse_mock_verber      (void)
    char       *x_masking   = " ik_pure ik_from fk_pure fk_from ";
    char        t           [LEN_LABEL];
    yPARSE_toss ();
-   sprintf (t, " %s ", myPARSE.y_verb);
+   sprintf (t, " %s ", s_qin.q_verb);
    /*> if (strstr (x_masking, t) != NULL)  return 1;                                  <*/
    return 0;
 }
@@ -631,11 +634,11 @@ char
 yparse_mock_writer      (void)
 {
    yPARSE_vprintf   (-1, "macro"        , 'A', 32726, "jub jub"       , 3.1416, "hey"          );
-   ystrlcpy (s_mocks [s_nmock++].d_recd, myPARSE.y_recd, LEN_RECD);
+   ystrlcpy (s_mocks [s_nmock++].d_recd, s_qout.q_recd, LEN_RECD);
    yPARSE_vprintf   (-1, "macro"        , 'z',    12, "testing"       , 14.46 , "hey back"     );
-   ystrlcpy (s_mocks [s_nmock++].d_recd, myPARSE.y_recd, LEN_RECD);
+   ystrlcpy (s_mocks [s_nmock++].d_recd, s_qout.q_recd, LEN_RECD);
    yPARSE_vprintf   (-1, "macro"        , 'f', -4922, "another string", 186.0 , "hey one last" );
-   ystrlcpy (s_mocks [s_nmock++].d_recd, myPARSE.y_recd, LEN_RECD);
+   ystrlcpy (s_mocks [s_nmock++].d_recd, s_qout.q_recd, LEN_RECD);
    return 0;
 }
 
@@ -645,8 +648,8 @@ yparse_mock_reader      (void)
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    DEBUG_YPARSE  yLOG_value   ("s_nmock"   , s_nmock);
    yPARSE_vscanf    ("macro", &(s_mocks[s_nmock].d_char), &(s_mocks[s_nmock].d_int), &(s_mocks[s_nmock].d_label), &(s_mocks[s_nmock].d_float), &(s_mocks[s_nmock].d_desc));
-   DEBUG_YPARSE  yLOG_info    ("recd"      , myPARSE.y_recd);
-   ystrlcpy (s_mocks [s_nmock++].d_recd, myPARSE.y_recd, LEN_RECD);
+   DEBUG_YPARSE  yLOG_info    ("recd"      , s_qin.q_recd);
+   ystrlcpy (s_mocks [s_nmock++].d_recd, s_qin.q_recd, LEN_RECD);
    DEBUG_YPARSE  yLOG_value   ("s_nmock"   , s_nmock);
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 1;

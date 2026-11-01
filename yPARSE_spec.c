@@ -55,50 +55,51 @@ struct cTYPES {
    llong       t_lmax;                      /* maximum allowed (int/long)     */
    double      t_dmin;                      /* minimum allowed (float/double) */
    double      t_dmax;                      /* maximum allowed (float/double) */
+   char        t_mask      [LEN_TITLE];     /* masking for output when wrong  */
    /*---(done)--------------*/
 };
 static const tTYPES  S_specs [MAX_TYPES] = {
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   { '-' , "nothing"     , 'n' , "spacer"          , '-' , '-' ,     1 , ""                , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   { 'c' , "char"        , 'n' , "single char"     , 'i' , 'c' ,     1 , "%c"              , 'u' ,               31   ,              255   ,                0.0 ,                0.0 },
-   { 's' , "short"       , 'n' , "short integer"   , 'i' , 's' ,     3 , "%3d"             , 'i' ,              -99   ,              999   ,                0.0 ,                0.0 },
-   { 'i' , "integer"     , 'n' , "normal integer"  , 'i' , 'i' ,     6 , "%6d"             , 'i' ,           -99999   ,           999999   ,                0.0 ,                0.0 },
-   { 'l' , "long"        , 'n' , "long integer"    , 'L' , 'L' ,    10 , "%10d"            , 'L' ,       -999999999LL ,       9999999999LL ,                0.0 ,                0.0 },
-   { 'h' , "huge"        , 'n' , "long integer"    , 'L' , 'L' ,    16 , "%16ld"           , 'L' , -999999999999998LL , 9999999999999998LL ,                0.0 ,                0.0 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   { ',' , "comma"       , 'n' , "comma"           , 'i' , 'i' ,    10 , "%10d"            , 'i' ,          -999999   ,           999999   ,                0.0 ,                0.0 },
-   { ';' , "hcomma"      , 'n' , "long comma"      , 'L' , 'L' ,    19 , "%19ld"           , 'L' , -999999999999998LL , 9999999999999998LL ,                0.0 ,                0.0 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   { 'u' , "micro"       , 'n' , "micro float"     , 'f' , 'f' ,     6 , "%6.3f"           , 'f' ,                0   ,                0   ,             -9.999 ,             99.999 },
-   { 'n' , "nano"        , 'n' , "nano float"      , 'f' , 'f' ,     9 , "%9.6f"           , 'f' ,                0   ,                0   ,          -9.999999 ,          99.999999 },
-   { 'k' , "ykine"       , 'n' , "short float"     , 'f' , 'f' ,     6 , "%6.1f"           , 'f' ,                0   ,                0   ,             -999.9 ,             9999.9 },
-   { 'f' , "float"       , 'n' , "normal float"    , 'f' , 'f' ,     8 , "%8.2f"           , 'f' ,                0   ,                0   ,           -9999.99 ,           99999.99 },
-   { 'd' , "double"      , 'n' , "double float"    , 'd' , 'd' ,    10 , "%10.3lf"         , 'f' ,                0   ,                0   ,         -99999.999 ,         999999.999 },
-   { 't' , "technical"   , 'n' , "technical"       , 'd' , 'd' ,    18 , "%18.6lf"         , 'D' ,                0   ,                0   , -9999999999.999990 , 99999999999.999990 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   { 'e' , "sml-exp"     , 'n' , "tech float"      , 'd' , 'd' ,    10 , "%2.3e"           , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'm' , "med-exp"     , 'n' , "tech float"      , 'd' , 'd' ,    14 , "%2.7e"           , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'b' , "big-exp"     , 'n' , "exponent"        , 'd' , 'd' ,    19 , "%2.12e"          , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   { 'C' , "one-char"    , 's' , "1 char string"   , 's' , 's' ,     1 , "%-1.1s"          , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'S' , "short"       , 's' , "short string"    , 's' , 's' ,     5 , "%-5.5s"          , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'T' , "terse"       , 's' , "terse string"    , 's' , 's' ,    10 , "%-10.10s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'U' , "user"        , 's' , "user string"     , 's' , 's' ,    12 , "%-12.12s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'L' , "label"       , 's' , "label string"    , 's' , 's' ,    20 , "%-20.20s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { '3' , "thirty"      , 's' , "thirty string"   , 's' , 's' ,    30 , "%-30.30s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { '4' , "forty"       , 's' , "forty string"    , 's' , 's' ,    40 , "%-40.40s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'D' , "desc"        , 's' , "desc string"     , 's' , 's' ,    50 , "%-50.50s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { '6' , "sixty"       , 's' , "sixty string"    , 's' , 's' ,    60 , "%-40.40s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { '7' , "seventy"     , 's' , "seventy string"  , 's' , 's' ,    70 , "%-70.70s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { '8' , "eighty"      , 's' , "eighty string"   , 's' , 's' ,    80 , "%-80.80s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'H' , "hundred"     , 's' , "hundred string"  , 's' , 's' ,   100 , "%-100.100s"      , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'F' , "full"        , 's' , "two-hundred"     , 's' , 's' ,   200 , "%-200.200s"      , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'R' , "recd"        , 's' , "two-thousand"    , 's' , 's' ,  2000 , "%-2000.2000s"    , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   { 'O' , "open"        , 's' , "open string"     , 's' , 's' ,    60 , "%s"              , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
-   {  0  , "end-of-types", '-' , ""                , '-' , '-' ,     0 , ""                , '-' ,                0   ,                0   ,                0.0 ,                0.0 },
-   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float--- */
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   { '-' , "nothing"     , '-' , "spacer"          , '-' , '-' ,     0 , ""                , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   { 'c' , "char"        , 'n' , "single char"     , 'i' , 'c' ,     1 , "%c"              , 'u' ,               31   ,              255   ,                0.0 ,                0.0 , "¬"                   },
+   { 's' , "short"       , 'n' , "short integer"   , 'i' , 's' ,     3 , "%3d"             , 'i' ,              -99   ,              999   ,                0.0 ,                0.0 , "¬¬¬"                 },
+   { 'i' , "integer"     , 'n' , "normal integer"  , 'i' , 'i' ,     6 , "%6d"             , 'i' ,           -99999   ,           999999   ,                0.0 ,                0.0 , "¬¬¬¬¬¬"              },
+   { 'l' , "long"        , 'n' , "long integer"    , 'L' , 'L' ,    10 , "%10d"            , 'L' ,       -999999999LL ,       9999999999LL ,                0.0 ,                0.0 , "¬¬¬¬¬¬¬¬¬¬"          },
+   { 'h' , "huge"        , 'n' , "long integer"    , 'L' , 'L' ,    16 , "%16ld"           , 'L' , -999999999999998LL , 9999999999999998LL ,                0.0 ,                0.0 , "¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬¬"    },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   { ',' , "comma"       , 'n' , "comma"           , 'i' , 'i' ,    10 , "%10d"            , 'i' ,          -999999   ,           999999   ,                0.0 ,                0.0 , "¬¬,¬¬¬,¬¬¬"          },
+   { ';' , "hcomma"      , 'n' , "long comma"      , 'L' , 'L' ,    19 , "%19ld"           , 'L' , -999999999999998LL , 9999999999999998LL ,                0.0 ,                0.0 , "¬¬¬,¬¬¬,¬¬¬,¬¬¬,¬¬¬" },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   { 'u' , "micro"       , 'n' , "micro float"     , 'f' , 'f' ,     6 , "%6.3f"           , 'f' ,                0   ,                0   ,             -9.999 ,             99.999 , "¬¬á¬¬¬"              },
+   { 'n' , "nano"        , 'n' , "nano float"      , 'f' , 'f' ,     9 , "%9.6f"           , 'f' ,                0   ,                0   ,          -9.999999 ,          99.999999 , "¬¬á¬¬¬¬¬¬"           },
+   { 'k' , "ykine"       , 'n' , "short float"     , 'f' , 'f' ,     6 , "%6.1f"           , 'f' ,                0   ,                0   ,             -999.9 ,             9999.9 , "¬¬¬¬á¬"              },
+   { 'f' , "float"       , 'n' , "normal float"    , 'f' , 'f' ,     8 , "%8.2f"           , 'f' ,                0   ,                0   ,           -9999.99 ,           99999.99 , "¬¬¬¬¬á¬¬"            },
+   { 'd' , "double"      , 'n' , "double float"    , 'd' , 'd' ,    10 , "%10.3lf"         , 'f' ,                0   ,                0   ,         -99999.999 ,         999999.999 , "¬¬¬¬¬¬á¬¬¬"          },
+   { 't' , "technical"   , 'n' , "technical"       , 'd' , 'd' ,    18 , "%18.6lf"         , 'D' ,                0   ,                0   , -9999999999.999990 , 99999999999.999990 , "¬¬¬¬¬¬¬¬¬¬¬á¬¬¬¬¬¬"  },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   { 'e' , "sml-exp"     , 'n' , "small exponent"  , 'd' , 'd' ,    10 , "%2.3e"           , '-' ,                0   ,                0   ,                0.0 ,                0.0 , "¬¬á¬¬¬e¬¬"           },
+   { 'm' , "med-exp"     , 'n' , "normal exponent" , 'd' , 'd' ,    14 , "%2.7e"           , '-' ,                0   ,                0   ,                0.0 ,                0.0 , "¬¬á¬¬¬¬¬¬¬e¬¬"       },
+   { 'b' , "big-exp"     , 'n' , "large exponent"  , 'd' , 'd' ,    19 , "%2.12e"          , '-' ,                0   ,                0   ,                0.0 ,                0.0 , "¬¬á¬¬¬¬¬¬¬¬¬¬¬¬e¬¬"  },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   { 'C' , "one-char"    , 's' , "1 char string"   , 's' , 's' ,     1 , "%-1.1s"          , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'S' , "short"       , 's' , "short string"    , 's' , 's' ,     5 , "%-5.5s"          , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'T' , "terse"       , 's' , "terse string"    , 's' , 's' ,    10 , "%-10.10s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'U' , "user"        , 's' , "user string"     , 's' , 's' ,    12 , "%-12.12s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'L' , "label"       , 's' , "label string"    , 's' , 's' ,    20 , "%-20.20s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { '3' , "thirty"      , 's' , "thirty string"   , 's' , 's' ,    30 , "%-30.30s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { '4' , "forty"       , 's' , "forty string"    , 's' , 's' ,    40 , "%-40.40s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'D' , "desc"        , 's' , "desc string"     , 's' , 's' ,    50 , "%-50.50s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { '6' , "sixty"       , 's' , "sixty string"    , 's' , 's' ,    60 , "%-40.40s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { '7' , "seventy"     , 's' , "seventy string"  , 's' , 's' ,    70 , "%-70.70s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { '8' , "eighty"      , 's' , "eighty string"   , 's' , 's' ,    80 , "%-80.80s"        , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'H' , "hundred"     , 's' , "hundred string"  , 's' , 's' ,   100 , "%-100.100s"      , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'F' , "full"        , 's' , "two-hundred"     , 's' , 's' ,   200 , "%-200.200s"      , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'R' , "recd"        , 's' , "two-thousand"    , 's' , 's' ,  2000 , "%-2000.2000s"    , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   { 'O' , "open"        , 's' , "open string"     , 's' , 's' ,    60 , "%s"              , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
+   {  0  , "end-of-types", '-' , ""                , '-' , '-' ,     0 , ""                , '-' ,                0   ,                0   ,                0.0 ,                0.0 , ""                    },
+   /*-A-   ---name-------  -C-   ---description----  -V-   -S-  -size-   ---format--------   -R-   ---------min-int---  ---------max-int---  -------min-float---  -------max-float---  ---mask------------- */
 };
 static char  S_strings     [LEN_LABEL]  = "";
 static char  S_numbers     [LEN_LABEL]  = "";

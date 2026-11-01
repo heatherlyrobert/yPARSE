@@ -226,7 +226,8 @@ yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], cha
    }
    DEBUG_YPARSE yLOG_info    ("a_dellist" , a_dellist);
    /*---(prepare recd)-------------------*/
-   ystrlcpy (x_recd, a_recd, LEN_RECD);
+   ystrlcpy  (x_recd, a_recd   , LEN_RECD);
+   ystrltrim (x_recd, ySTR_BOTH, LEN_RECD);
    x_len = ystrllen   (x_recd, LEN_RECD);
    DEBUG_YPARSE yLOG_value   ("x_len"     , x_len);
    /*---(prepare field count)------------*/
@@ -362,8 +363,8 @@ yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char 
    /*---(header)-------------------------*/
    DEBUG_YPARSE yLOG_enter   (__FUNCTION__);
    /*---(default)------------------------*/
-   if (r_recd  != NULL)  strcpy (r_recd, "");
-   if (r_len   != NULL)  *r_len = 0;
+   if (r_recd   != NULL)  strcpy (r_recd, "");
+   if (r_len    != NULL)  *r_len    = 0;
    /*---(defense)------------------------*/
    DEBUG_YPARSE yLOG_point   ("b_tline"   , b_tline);
    --rce;  if (b_tline == NULL) {
@@ -393,7 +394,7 @@ yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char 
       /*> rc = yparse_read_next (a_file, b_tline, r_recd, r_len);                     <*/
       rc = yENV_read (a_file, '-', '-', 'y', '-', b_tline, NULL, r_recd, NULL, r_len);
       DEBUG_YPARSE yLOG_value   ("read"      , rc);
-      if (rc == RC_DONE)      rc = 1;
+      if (rc == RC_DONE)      rc = RC_DONE;
       if (rc == RC_POSITIVE)  rc = 0;
    }
    /*---(using eisting record)-----------*/
@@ -482,12 +483,14 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
    rc = yparse_read_source (s_qin.q_file, a_line, a_recd, a_label, &(s_qin.q_nfull), s_qin.q_recd, &(s_qin.q_len));
    DEBUG_YPARSE   yLOG_point   ("source"    , rc);
    --rce;  if (rc < 0) {
+      DEBUG_YPARSE   yLOG_note    ("drastic problem with reading source");
       DEBUG_YPARSE   yLOG_exitr   (a_func, rce);
       return rce;
    }
-   if (rc == 1) {
+   if (rc == RC_DONE) {
+      DEBUG_YPARSE   yLOG_note    ("read the end-of-file");
       DEBUG_YPARSE   yLOG_exit    (a_func);
-      return 1;
+      return RC_DONE;
    }
    /*> DEBUG_YPARSE   yLOG_point   ("a_recd"    , a_recd);                            <*/
    /*> --rce;  if (a_recd == NULL) {                                                                 <* 
@@ -515,9 +518,9 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
     *> }                                                                                             <*/
    if (r_nread != NULL)  *r_nread = s_qin.q_nfull;
    /*---(load the queue)-----------------*/
-   strcpy (myPARSE.y_recd, s_qin.q_recd);
-   ystrldchg (myPARSE.y_recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
-   rc = yparse_read_parse (myPARSE.y_recd, myPARSE.y_dellist, myPARSE.y_fill, &(myPARSE.y_nfield));
+   ystrlcpy  (x_recd, s_qin.q_recd, LEN_RECD);
+   ystrldchg (x_recd, G_KEY_FIELD, G_CHAR_FIELD, LEN_RECD);
+   rc = yparse_read_parse (x_recd, myPARSE.y_dellist, myPARSE.y_fill, &(s_qin.q_nfield));
    DEBUG_YPARSE  yLOG_value   ("queue"     , rc);
    --rce;  if (rc < 0) {
       yparse_read_rollback  (a_line);
@@ -528,7 +531,7 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
    s_qin.q_good = 'y';
    DEBUG_YPARSE  yLOG_char    ("q_good"    , s_qin.q_good);
    /*---(peek at verb)----------------*/
-   rc = yparse_peek_in   (0, myPARSE.y_verb);
+   rc = yparse_peek_in   (0, s_qin.q_verb);
    yPARSE_toss ();  /* verb */
    DEBUG_YPARSE  yLOG_value   ("peek"      , rc);
    if (rc < 0) {
@@ -536,11 +539,11 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
       DEBUG_YPARSE  yLOG_exitr   (a_func, rc);
       return rce;
    }
-   DEBUG_YPARSE  yLOG_info    ("verb"      , myPARSE.y_verb);
+   DEBUG_YPARSE  yLOG_info    ("verb"      , s_qin.q_verb);
    /*---(auto process verb)-----------*/
    DEBUG_YPARSE  yLOG_char    ("verbs"     , myPARSE.y_verbs);
    --rce;  if (myPARSE.y_verbs == YPARSE_AUTO) {
-      x_index = yparse_verb_find (&s_qin, myPARSE.y_verb);
+      x_index = yparse_verb_find (&s_qin, s_qin.q_verb);
       DEBUG_YPARSE  yLOG_value   ("find"      , x_index);
       if (x_index < 0) {
          if (myPARSE.y_verber == NULL) {
@@ -556,7 +559,7 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
    DEBUG_YPARSE  yLOG_point   ("verber"    , myPARSE.y_verber);
    --rce;  if (myPARSE.y_verber != NULL) {
       if (x_index >= 0)  x_exist = 'y';
-      rc = myPARSE.y_verber (s_qin.q_nfull, myPARSE.y_verb, x_exist, s_qin.q_handler);
+      rc = myPARSE.y_verber (s_qin.q_nfull, s_qin.q_verb, x_exist, s_qin.q_handler);
       DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
       if (rc < 0) {
          yparse_read_rollback  (a_line);
@@ -568,7 +571,7 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
    DEBUG_YPARSE  yLOG_complex ("reusing"   , "%c, %d, %c", myPARSE.y_reusing, a_line, s_qin.q_hidden);
    --rce;  if (myPARSE.y_reusing == 'y' && a_line < 0 && s_qin.q_hidden != 'y') {
       DEBUG_YPARSE  yLOG_note    ("preparing/saving for reuse");
-      if (x_index < 0)  x_index = yparse_verb_find (&s_qin, myPARSE.y_verb);
+      if (x_index < 0)  x_index = yparse_verb_find (&s_qin, s_qin.q_verb);
       x_mask = yparse_verb_mask (x_index);
       rc = yparse_reusable (x_mask);
       if (rc < 0) {
@@ -578,8 +581,8 @@ yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_R
    }
    /*---(result)-------------------------*/
    DEBUG_YPARSE   yLOG_value   ("count"     , s_qin.q_count);
-   if (r_verb  != NULL)  ystrlcpy (r_verb, myPARSE.y_verb, LEN_LABEL);
-   if (r_recd  != NULL)  ystrlcpy (r_verb, myPARSE.y_recd, LEN_RECD);
+   if (r_verb  != NULL)  ystrlcpy (r_verb, s_qin.q_verb, LEN_LABEL);
+   if (r_recd  != NULL)  ystrlcpy (r_recd, x_recd, LEN_RECD);
    /*---(complete)-----------------------*/
    DEBUG_YPARSE   yLOG_exit    (a_func);
    return s_qin.q_count;

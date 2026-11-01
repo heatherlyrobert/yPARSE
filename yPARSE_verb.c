@@ -477,7 +477,7 @@ char yparse_verb_mask        (int n) { return G_verbs [n].v_mask; }
  *> }                                                                                               <*/
 
 char
-yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc)
+yPARSE_handler_max      (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], char a_mode, char a_mask, void *a_reader, void *a_writer, float a_seq, char a_flags [LEN_TITLE], char a_labels [LEN_RECD], char a_desc [LEN_DESC])
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -657,7 +657,6 @@ yPARSE_read_all         (void)
          DEBUG_YPARSE   yLOG_note    ("end-of-file");
          break;
       }
-      /*> printf ("%s\n", myPARSE.y_recd);                                              <*/
       if (rc <  0)  {
          DEBUG_YPARSE   yLOG_note    ("trouble reading record");
          continue;

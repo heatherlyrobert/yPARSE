@@ -71,6 +71,9 @@ yparse_queue__wipe      (tQUEUE *a_queue, char a_type)
    /*---(master data)--------------------*/
    if (a_type != 0 && strchr ("*ipr", a_type) != 0) {
       a_queue->q_iverb    =   -1;
+      strcpy (a_queue->q_verb, "");
+      strcpy (a_queue->q_spec, "");
+      a_queue->q_nspec    =    0;
       a_queue->q_good     =  '-';
       a_queue->q_hidden   =  '-';
    }
@@ -89,6 +92,7 @@ yparse_queue__wipe      (tQUEUE *a_queue, char a_type)
    if (a_type != 0 && strchr ("*ipr", a_type) != 0) {
       ystrlcpy (a_queue->q_recd , ""     , LEN_RECD);
       a_queue->q_len      =    0;
+      a_queue->q_nfield   =    0;
    }
    /*---(fields)-------------------------*/
    if (a_type != 0 && strchr ("pr", a_type) != 0) {

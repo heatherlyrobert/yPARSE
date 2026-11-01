@@ -121,7 +121,7 @@ yPARSE_wrap             (void)
 char
 yPARSE_force            (void)
 {
-   myPARSE.y_good = 'y';
+   /*> myPARSE.y_good = 'y';                                                          <*/
    return 0;
 }
 

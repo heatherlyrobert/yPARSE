@@ -93,10 +93,10 @@ char        yPARSE_force            (void);
 /*········´ ´··············config·´ ´·········································*/
 char        yPARSE_uconfig          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH]);
 /*········´ ´···········incomming·´ ´·········································*/
-char        yPARSE_uread            (int *r_ncurr, char r_verb [LEN_LABEL], char r_recd [LEN_RECD]);
-char        yPARSE_uscanf           (char a_verb [LEN_LABEL], uchar *a_format, ...);
+char        yPARSE_uread            (int *r_nread, char r_verb [LEN_LABEL], char r_recd [LEN_RECD]);
+char        yPARSE_uscanf           (char a_verb [LEN_LABEL], char *a_specs, ...);
 /*········´ ´············outgoing·´ ´·········································*/
-char        yPARSE_uprintf          (char a_verb [LEN_LABEL], uchar *a_format, ...);
+char        yPARSE_uprintf          (char a_verb [LEN_LABEL], char *a_specs, ...);
 /*········´ ´··············finish·´ ´·········································*/
 char        yPARSE_uwrap            (void);
 /*········´ ´················DONE·´ ´·········································*/
@@ -212,9 +212,9 @@ char        yPARSE_sect_end         (int c);
 
 
 char*       yPARSE_verb             (int a_num);
-char        yPARSE_handler          (uchar *a_verb, char *a_specs, void *a_reader);
-char        yPARSE_handler_plus     (uchar *a_verb, uchar *a_specs, float a_seq, void *a_reader, void *a_writer, uchar *a_labels);
-char        yPARSE_handler_max      (char a_mode, char *a_verb, float a_seq, uchar *a_specs, char a_mask, void *a_reader, void *a_writer, uchar *a_flags, uchar *a_labels, uchar *a_desc);
+char        yPARSE_handler_max      (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], char a_mode, char a_mask, void *a_reader, void *a_writer, float a_seq, char a_flags [LEN_TITLE], char a_labels [LEN_RECD], char a_desc [LEN_DESC]);
+char        yPARSE_handler_plus     (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader, void *a_writer, float a_seq, char a_labels [LEN_RECD]);
+char        yPARSE_handler          (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader);
 
 char        yPARSE_outclear         (void);
 char*       yPARSE_outrecd          (void);

@@ -161,13 +161,13 @@ yPARSE_simple           (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH])
 }
 
 char
-yPARSE_uread            (int *r_ncurr, char r_verb [LEN_LABEL], char r_recd [LEN_RECD])
+yPARSE_uread            (int *r_nread, char r_verb [LEN_LABEL], char r_recd [LEN_RECD])
 {
-   return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , NULL   , NULL   , r_ncurr, r_verb, r_recd);
+   return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , r_nread, NULL   , NULL   , r_verb, r_recd);
 }
 
 char
-yPARSE_uprintf          (char a_verb [LEN_LABEL], uchar *a_format, ...)
+yPARSE_uprintf          (char a_verb [LEN_LABEL], char *a_specs, ...)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -177,7 +177,7 @@ yPARSE_uprintf          (char a_verb [LEN_LABEL], uchar *a_format, ...)
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
    /*---(handler)------------------------*/
-   rc = yPARSE_handler (a_verb, a_format, NULL);
+   rc = yPARSE_handler (a_verb, a_specs, NULL);
    DEBUG_YPARSE   yLOG_value   ("handler"   , rc);
    --rce;  if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -198,7 +198,7 @@ yPARSE_uprintf          (char a_verb [LEN_LABEL], uchar *a_format, ...)
       return rce;
    }
    /*---(create variadic)----------------*/
-   va_start (x_vlist, a_format);
+   va_start (x_vlist, a_specs);
    DEBUG_YPARSE   yLOG_note    ("va_start successful");
    /*---(cycle fields)-------------------*/
    rc = yparse_out_variadic (x_vlist, n);
@@ -223,7 +223,7 @@ yPARSE_uprintf          (char a_verb [LEN_LABEL], uchar *a_format, ...)
 }
 
 char
-yPARSE_uscanf           (char a_verb [LEN_LABEL], uchar *a_format, ...)
+yPARSE_uscanf           (char a_verb [LEN_LABEL], char *a_specs, ...)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
@@ -232,7 +232,7 @@ yPARSE_uscanf           (char a_verb [LEN_LABEL], uchar *a_format, ...)
    va_list     x_vlist;
    /*---(header)-------------------------*/
    DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
-   rc = yPARSE_handler (a_verb, a_format, NULL);
+   rc = yPARSE_handler (a_verb, a_specs, NULL);
    DEBUG_YPARSE   yLOG_value   ("handler"   , rc);
    --rce;  if (rc < 0)  {
       DEBUG_YPARSE   yLOG_exitr   (__FUNCTION__, rce);
@@ -254,7 +254,7 @@ yPARSE_uscanf           (char a_verb [LEN_LABEL], uchar *a_format, ...)
       return rce;
    }
    /*---(create variadic)----------------*/
-   va_start (x_vlist, a_format);
+   va_start (x_vlist, a_specs);
    DEBUG_YPARSE   yLOG_note    ("va_start successful");
    /*---(cycle fields)-------------------*/
    rc = yparse_in_variadic (x_vlist, n);
@@ -304,15 +304,15 @@ yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber)
 }
 
 char
-yPARSE_handler          (uchar *a_verb, char *a_specs, void *a_reader)
+yPARSE_handler          (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader)
 {
-   return yPARSE_handler_max ('-', a_verb, 0.0, a_specs, -1, a_reader, NULL, NULL, NULL, NULL);
+   return yPARSE_handler_max (a_verb, a_specs, '-', -1, a_reader, NULL, 0.0, NULL, NULL, NULL);
 }
 
 char
-yPARSE_handler_plus    (uchar *a_verb, uchar *a_specs, float a_seq, void *a_reader, void *a_writer, uchar *a_labels)
+yPARSE_handler_plus    (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader, void *a_writer, float a_seq, char a_labels [LEN_RECD])
 {
-   return yPARSE_handler_max ('-', a_verb, a_seq, a_specs, -1, a_reader, a_writer, NULL, a_labels, NULL);
+   return yPARSE_handler_max (a_verb, a_specs, '-', -1, a_reader, a_writer, a_seq, NULL, a_labels, NULL);
 }
 
 char
