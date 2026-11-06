@@ -74,56 +74,135 @@ yPARSE_version          (void)
 
 
 /*====================------------------------------------====================*/
-/*===----                         program level                        ----===*/
+/*===----                       program level                          ----===*/
 /*====================------------------------------------====================*/
 static void      o___PROGRAM_________________o (void) {;}
 
-/*> char                                                                                        <* 
- *> yPARSE_init             (char a_auto, void *a_verber, char a_reusing)                       <* 
- *> {                                                                                           <* 
- *>    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);                                               <* 
- *>    DEBUG_YPARSE  yLOG_char    ("a_reusing" , a_reusing);                                    <* 
- *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
- *>    myPARSE.y_verbs   = a_auto;                                                                <* 
- *>    myPARSE.y_verber  = a_verber;                                                              <* 
- *>    myPARSE.y_ready   = 'y';                                                                   <* 
- *>    myPARSE.y_reusing = a_reusing;                                                             <* 
- *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
- *>    yparse_spec_init  ();                                                                    <* 
- *>    yparse_verb_init  ();                                                                    <* 
- *>    yparse_init_in    ();                                                                    <* 
- *>    yparse_out_init   ();                                                                    <* 
- *>    yparse_reuse_init ();                                                                    <* 
- *>    /+> yPARSE_delimiters (YPARSE_FIELD);                                              <+/   <* 
- *>    DEBUG_YPARSE  yLOG_char    ("reusing"   , myPARSE.y_reusing);                              <* 
- *>    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);                                               <* 
- *>    return 0;                                                                                <* 
- *> }                                                                                           <*/
-
 char
-yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler)
+yparse_init             (void)
 {
-   return 0;
-}
-
-char
-yPARSE_wrap             (void)
-{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   /*---(header)-------------------------*/
    DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
-   /*> yPARSE_close_in  ();                                                           <*/
-   /*> yPARSE_out_close ();                                                           <*/
-   yparse_reuse_init   ();
-   yparse_config_clear ();
+   /*---(specifications)-----------------*/
+   rc = yparse_spec_init  ();
+   DEBUG_YPARSE  yLOG_value   ("spec"      , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(verbs)--------------------------*/
+   rc = yparse_verb_init  ();
+   DEBUG_YPARSE  yLOG_value   ("verb"      , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(in queue)-----------------------*/
+   rc = yparse_in_init    ();
+   DEBUG_YPARSE  yLOG_value   ("in"        , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(out queue)----------------------*/
+   rc = yparse_out_init   ();
+   DEBUG_YPARSE  yLOG_value   ("out"       , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(reuse)--------------------------*/
+   rc = yparse_reuse_init ();
+   DEBUG_YPARSE  yLOG_value   ("reuse"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
-   return 0;
+   return RC_POSITIVE;
 }
 
 char
-yPARSE_force            (void)
+yparse_wrap             (char a_type)
 {
-   /*> myPARSE.y_good = 'y';                                                          <*/
-   return 0;
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
+   /*---(reuse)--------------------------*/
+   if (a_type == '*') {
+      rc = yparse_reuse_wrap ();
+      DEBUG_YPARSE  yLOG_value   ("reuse"     , rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   /*---(out queue)----------------------*/
+   rc = yparse_out_wrap ();
+   DEBUG_YPARSE  yLOG_value   ("out"       , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(in queue)-----------------------*/
+   rc = yparse_in_wrap ();
+   DEBUG_YPARSE  yLOG_value   ("in"        , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(verbs)--------------------------*/
+   if (a_type == '*') {
+      rc = yparse_verb_wrap ();
+      DEBUG_YPARSE  yLOG_value   ("verb"      , rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   /*---(specifications)-----------------*/
+   if (a_type == '*') {
+      rc = yparse_spec_wrap  ();
+      DEBUG_YPARSE  yLOG_value   ("spec"      , rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   /*---(configuration)------------------*/
+   if (a_type == '*') {
+      rc = yparse_config_clear ();
+      DEBUG_YPARSE  yLOG_value   ("config"    , rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YPARSE  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+   return RC_POSITIVE;
 }
+
+char yPARSE_close_all (void) { return yparse_wrap ('-'); }
+
+char yPARSE_wrap      (void) { return yparse_wrap ('*'); }
+
+
+
+/*====================------------------------------------====================*/
+/*===----                        other general                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___OTHER___________________o (void) {;}
+
+char yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler) { return 0; }
+
+char yPARSE_force            (void) { /* myPARSE.y_good = 'y'; */ return 0; }
 
 char*      /*----: unit testing accessor for clean validation interface ------*/
 yparse_base__unit       (char *a_question, int a_num)

@@ -36,9 +36,19 @@
 
 
 
-/*--------- ----------- ----------- ----------- ------------------------------*/
 tQUEUE      s_qin;
 
+
+
+/*====================------------------------------------====================*/
+/*===----                        program level                         ----===*/
+/*====================------------------------------------====================*/
+static void      o___PROGRAM_________________o (void) {;};
+
+char yparse_in_init          (void) { return yparse_queue_init  (&s_qin, 'I', "IN"); }
+char yPARSE_in_purge         (void) { return yparse_queue_purge (&s_qin);            }
+char yPARSE_in_reset         (void) { return yparse_queue_reset (&s_qin);            }
+char yparse_in_wrap          (void) { return yparse_queue_purge (&s_qin);            }
 
 
 
@@ -81,9 +91,6 @@ yparse__popable         (void)
    return 1;
 }
 
-char yparse_init_in          (void) { return yparse_queue_init  (&s_qin, 'I', "IN"); }
-char yPARSE_purge_in         (void) { return yparse_queue_purge (&s_qin);            }
-char yPARSE_reset_in         (void) { return yparse_queue_reset (&s_qin);            }
 char yparse_good_in          (void) { s_qin.q_good = 'y'; return 0; }
 
 char
@@ -509,27 +516,6 @@ yPARSE_popexp           (double *a_new)
 
 
 /*====================------------------------------------====================*/
-/*===----                         full records                         ----===*/
-/*====================------------------------------------====================*/
-static void      o___RECORDS_________________o (void) {;};
-
-
-/*====================------------------------------------====================*/
-/*===----                       getting lines                          ----===*/
-/*====================------------------------------------====================*/
-static void      o___PARSING_________________o (void) {;};
-
-char yPARSE_read        (int *r_nfull, int *r_nused, int *r_ncurr, char r_verb [LEN_LABEL]) { return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , r_nfull, r_nused, r_ncurr, r_verb, NULL); }
-char yPARSE_read_one    (int *r_nused, char r_verb [LEN_LABEL])                             { return yparse_read (__FUNCTION__, -1    , NULL  , NULL   , NULL   , r_nused, NULL   , r_verb, NULL); }
-char yPARSE_load        (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD])                { return yparse_read (__FUNCTION__, -1    , a_recd, NULL   , NULL   , r_nused, r_ncurr, NULL  , NULL); }
-char yPARSE_reload      (int *r_nused, int *r_ncurr, int a_line, char a_label [LEN_HUND])   { return yparse_read (__FUNCTION__, a_line, NULL  , a_label, NULL   , r_nused, r_ncurr, NULL  , NULL); }
-char yPARSE_hidden      (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD])                { return yparse_read (__FUNCTION__, -1    , a_recd, NULL   , NULL   , r_nused, r_ncurr, NULL  , NULL); }
-
-char yPARSE_inrecd      (char a_recd [LEN_RECD]) { ystrlcpy (a_recd, s_qin.q_recd, LEN_RECD); }
-
-
-
-/*====================------------------------------------====================*/
 /*===----                           file control                       ----===*/
 /*====================------------------------------------====================*/
 static void      o___FILES___________________o (void) {;};
@@ -537,7 +523,7 @@ static void      o___FILES___________________o (void) {;};
 char yPARSE_stdin      (void)                    { return yparse_queue_open  (&s_qin, "stdin"); }
 char yPARSE_tmpin      (void)                    { return yparse_queue_open  (&s_qin, "/tmp/yparse.txt"); };
 char yPARSE_open_in    (char a_name [LEN_PATH])  { return yparse_queue_open  (&s_qin, a_name);  }
-char yPARSE_close_in   (void)                    { return yparse_queue_close (&s_qin);          }
+char yPARSE_in_close   (void)                    { return yparse_queue_close (&s_qin);          }
 
 char         /*===[[ read a node ]]=======================[ ------ [ ------ ]=*/
 yPARSE_stdin_peek       (void)

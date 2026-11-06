@@ -87,8 +87,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "0.--, preparing for prime-time"
 #define     P_VERMINOR  "0.5-, recreate to pull in latest standards and better unit testing"
-#define     P_VERNUM    "0.5j"
-#define     P_VERTXT    "upgraded tQUEUE, its status, and all of its unit-testing passes"
+#define     P_VERNUM    "0.5k"
+#define     P_VERTXT    "created and unit-tested new, cleaner output variadic and push functions"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -180,7 +180,7 @@ struct      cQUEUE {
    char        q_dir;                     /* I=in, O=out                      */
    char        q_label     [LEN_SHORT];   /* queue descriptive label          */
    /*---(verb)--------------*/
-   int         q_iverb;                   /* verb index                       */
+   char        q_iverb;                   /* verb index                       */
    char        q_verb      [LEN_LABEL];   /* current verb                     */
    char        q_spec      [LEN_TITLE];   /* current verb specs               */
    char        q_nspec;                   /* count of verb spec entries       */
@@ -225,7 +225,7 @@ struct      cREUSE {
 
 
 #define     MAX_COLS      29
-#define     MAX_VERBS     50
+#define     MAX_VERBS     98 
 typedef     struct cVERBS   tVERBS;
 struct cVERBS {
    /*---(master)------------*/
@@ -234,12 +234,12 @@ struct cVERBS {
    char        v_mode;                      /* one char yvikeys mode id       */
    char        v_mask;                      /* field for reload/change        */
    /*---(handlers)----------*/
-   int         (*v_reader)   (int n, char *a_verb);
-   int         (*v_writer)   (int n, char *a_verb);
+   int         (*v_reader)   (int n, char a_verb [LEN_LABEL]);  /* auto-processing       */
+   int         (*v_writer)   (int n, char a_verb [LEN_LABEL]);  /* auto-processing       */
    float       v_seq;                       /* writing sequence               */
    char        v_done;                      /* written (y/n)                  */
    /*---(descriptive)-------*/
-   char        v_flags     [LEN_TITLE];     /* flags for use by program       */
+   char        v_flags     [LEN_TITLE];     /* flags for source-program       */
    char        v_labels    [LEN_RECD];      /* field labels for headers       */
    char        v_desc      [LEN_DESC ];     /* long verb description          */
    /*---(done)--------------*/
@@ -254,28 +254,16 @@ extern char       *G_nada;
 /*===[[ yPARSE_base.c ]]======================================================*/
 /*········´ ´·············utility·´ ´·········································*/
 char       *yPARSE_version          (void);
+/*········´ ´·············program·´ ´·········································*/
+char        yparse_init             (void);
+char        yparse_wrap             (char a_type);
+char        yPARSE_close_all        (void);
+char        yPARSE_wrap             (void);
 /*········´ ´··············config·´ ´·········································*/
 char        yPARSE_delimiters       (char a_delim, char a_fill);
 char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
-/*········´ ´·············program·´ ´·········································*/
-char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
-char        yPARSE_wrap             (void);
 /*········´ ´···········unit-test·´ ´·········································*/
 char        yPARSE_force            (void);
-/*········´ ´················DONE·´ ´·········································*/
-
-
-
-/*===[[ yPARSE_simple.c ]]====================================================*/
-/*········´ ´··············config·´ ´·········································*/
-char        yPARSE_uconfig          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH]);
-/*········´ ´···········incomming·´ ´·········································*/
-char        yPARSE_uread            (int *r_nread, char r_verb [LEN_LABEL], char r_recd [LEN_RECD]);
-char        yPARSE_uscanf           (char a_verb [LEN_LABEL], char *a_specs, ...);
-/*········´ ´············outgoing·´ ´·········································*/
-char        yPARSE_uprintf          (char a_verb [LEN_LABEL], char *a_specs, ...);
-/*········´ ´··············finish·´ ´·········································*/
-char        yPARSE_uwrap            (void);
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -291,6 +279,36 @@ char        yPARSE_delimiters       (char a_delim, char a_fill);
 char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
 char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 char        yPARSE_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_simple.c ]]====================================================*/
+/*········´ ´·············support·´ ´·········································*/
+char        yparse_opener           (char a_auto, char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber, char a_read, char a_reuse);
+/*········´ ´··············config·´ ´·········································*/
+char        yPARSE_uconfig          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH]);
+char        yparse_uhandler         (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE]);
+/*········´ ´···········incomming·´ ´·········································*/
+char        yPARSE_uread            (int *r_nread, char r_verb [LEN_LABEL], char r_recd [LEN_RECD]);
+char        yPARSE_uscanf           (char a_verb [LEN_LABEL], char *a_specs, ...);
+/*········´ ´············outgoing·´ ´·········································*/
+char        yPARSE_uprintf          (char a_verb [LEN_LABEL], char *a_specs, ...);
+/*········´ ´··············finish·´ ´·········································*/
+char        yPARSE_uwrap            (void);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_enmass.c ]]====================================================*/
+/*········´ ´··············config·´ ´·········································*/
+char        yPARSE_autoread         (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber);
+char        yPARSE_justread         (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber);
+char        yPARSE_planned          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber);
+/*········´ ´··················in·´ ´·········································*/
+char        yPARSE_read_all         (void);
+/*········´ ´·················out·´ ´·········································*/
+char        yPARSE_write_all        (void);
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -320,14 +338,21 @@ char        yparse_queue_peek       (tQUEUE *a_queue, char a_seq, char r_item [L
 
 /*===[[ yPARSE_read.c ]]======================================================*/
 /*········´ ´·············parsing·´ ´·········································*/
-char        yparse_read_skip        (char a_recd [LEN_RECD]);
-char        yparse_read_next        (FILE *a_file, int *b_tline, char r_recd [LEN_RECD], int *r_len);
-char        yparse_read_parse       (char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], char a_fill, char *r_nfield);
+char        yparse_read__nfield     (char b_recd [LEN_RECD], char a_dellist [LEN_TERSE], char *r_field);
+char        yparse_read__parse      (tQUEUE *a_queue, char a_recd [LEN_RECD], char a_dellist [LEN_TERSE], char a_fill);
 /*········´ ´············handling·´ ´·········································*/
-char        yparse_read_lineno      (int a_line, int *b_nline, int *b_cline, char *r_hidden);
-char        yparse_read_rollback    (int a_line);
-char        yparse_read_source      (FILE *a_file, int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *b_tline, char r_recd [LEN_RECD], int *r_len);
-char        yparse_read             (char a_func [LEN_TITLE], int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *r_nfull, int *r_nused, int *r_ncurr, char r_verb [LEN_LABEL], char r_recd [LEN_RECD]);
+char        yparse_read__lineno     (int a_line, int *b_nline, int *b_cline, char *r_hidden);
+char        yparse_read__rollback   (tQUEUE *a_queue, int a_line);
+char        yparse_read__source     (FILE *a_file, int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *b_tline, char r_recd [LEN_RECD], int *r_len);
+char        yparse_read             (char a_func [LEN_TITLE], tQUEUE *a_queue, int a_line, char a_recd [LEN_RECD], char a_label [LEN_HUND], int *r_nread, int *r_nused, int *r_ncurr, char r_verb [LEN_LABEL], char r_recd [LEN_RECD]);
+/*········´ ´·········simplifier·´ ´·········································*/
+char        yPARSE_read             (int *r_nfull, int *r_nused, int *r_ncurr, char r_verb [LEN_LABEL]);
+char        yPARSE_read_one         (int *r_nused, char r_verb [LEN_LABEL]);
+char        yPARSE_load             (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD]);
+char        yPARSE_reload           (int *r_nused, int *r_ncurr, int a_line, char a_label [LEN_HUND]);
+char        yPARSE_hidden           (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD]);
+char        yPARSE_inrecd           (char r_recd [LEN_RECD]);
+/*········´ ´················DONE·´ ´·········································*/
 
 
 
@@ -335,6 +360,7 @@ char        yparse_read             (char a_func [LEN_TITLE], int a_line, char a
 /*········´ ´·············program·´ ´·········································*/
 char        yparse_reuse__purge     (void);
 char        yparse_reuse_init       (void);
+char        yparse_reuse_wrap       (void);
 /*········´ ´··············saving·´ ´·········································*/
 char        yparse_reuse__wipe      (tREUSE *a_line);
 char        yparse_reuse_add        (int a_line, char a_recd [LEN_RECD]);
@@ -354,8 +380,9 @@ char        yPARSE_reuse_set        (void);
 /*===[[ yPARSE_spec.c ]]======================================================*/
 /*········´ ´·············program·´ ´·········································*/
 char        yparse_spec_init        (void);
+char        yparse_spec_wrap        (void);
 /*········´ ´··············search·´ ´·········································*/
-char        yparse_spec__search     (char a_func [LEN_TITLE], char a_spec, char a_dir, char a_index, char *r_spec, char r_name [LEN_LABEL], char *r_cat, char *r_size, char r_desc [LEN_LABEL], char *r_varg, char *r_save, char r_format [LEN_LABEL], char d_entry [LEN_RECD]);
+char        yparse_spec__search     (char a_func [LEN_TITLE], char a_spec, char a_dir, char a_index, char *r_spec, char r_name [LEN_LABEL], char *r_cat, char r_desc [LEN_LABEL], char *r_varg, char *r_save, char *r_size, char r_format [LEN_LABEL], char *r_ranged, llong *r_lmin, llong *r_lmax, double *r_dmin, double *r_dmax, char r_mask [LEN_TITLE], char d_entry [LEN_RECD]);
 char*       yparse_spec_entry       (char a_spec, char a_dir, char a_index);
 int         yparse_spec_size        (char a_spec);
 /*········´ ´············checking·´ ´·········································*/
@@ -367,7 +394,10 @@ char        yparse_spec_len         (tQUEUE *a_queue);
 char        yparse_spec__in_next    (void);
 /*········´ ´··············output·´ ´·········································*/
 char        yparse_spec__out_next   (void);
-char        yparse_spec_output      (va_list a_vlist, int n);
+char        yparse_spec__out_int    (char a_spec, llong a_val, char r_out [LEN_RECD]);
+char        yparse_spec__out_float  (char a_spec, double a_val, char r_out [LEN_RECD]);
+char        yparse_spec__out_string (char a_spec, char a_string [LEN_RECD], char r_out [LEN_RECD]);
+char        yparse_spec_output      (tQUEUE *a_queue, va_list a_vlist, char a_speclist [LEN_LABEL]);
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -378,11 +408,14 @@ char        yPARSE_handler_max      (char a_verb [LEN_LABEL], char a_specs [LEN_
 char        yPARSE_handler          (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader);
 /*········´ ´················DONE·´ ´·········································*/
 
+
+
 /*===[[ yPARSE_out.c ]]=======================================================*/
 /*········´ ´·············program·´ ´·········································*/
 char        yparse_out_init         (void);
 char        yPARSE_out_purge        (void);
 char        yPARSE_out_reset        (void);
+char        yparse_out_wrap         (void);
 /*········´ ´················file·´ ´·········································*/
 char        yPARSE_out_open         (char a_name [LEN_PATH], char a_prog [LEN_PATH]);
 char        yPARSE_out_close        (char a_fancy);
@@ -403,6 +436,15 @@ char        yPARSE_pushfloat        (double a_val);
 
 
 
+/*===[[ yPARSE_in.c ]]========================================================*/
+/*········´ ´·············program·´ ´·········································*/
+char        yparse_in_init          (void);
+char        yPARSE_in_purge         (void);
+char        yPARSE_in_reset         (void);
+char        yparse_in_wrap          (void);
+
+
+
 /*===[[ yPARSE_verb.c ]]======================================================*/
 /*········´ ´·············program·´ ´·········································*/
 char        yparse_verb__wipe       (char n);
@@ -411,14 +453,15 @@ char        yparse_verb_init        (void);
 char        yparse_verb_wrap        (void);
 /*········´ ´···········searching·´ ´·········································*/
 char        yparse_verb_count       (void);
-char        yparse_verb_by_name     (char a_verb [LEN_LABEL]);
+/*> char        yparse_verb_by_name     (char a_verb [LEN_LABEL]);                    <*/
 char        yparse_verb__search     (char a_verb [LEN_LABEL], char a_dir, char a_index, char r_verb [LEN_LABEL], char r_specs [LEN_LABEL], uchar *r_mode, char *r_mask, void **r_reader, void **r_writer, float *r_seq, char *r_done, char r_flags [LEN_TITLE], char r_labels [LEN_RECD], char r_desc [LEN_DESC], char d_entry [LEN_RECD]);
 char*       yparse_verb_entry       (char a_verb [LEN_LABEL], char a_dir, char a_index);
-/*> char        yparse_verb_data        (char n, char r_verb [LEN_LABEL], char r_specs [LEN_LABEL], uchar *r_mode, char *r_mask, void **r_reader, void **r_writer, float *r_seq, char *r_done, char r_flags [LEN_TITLE], char r_labels [LEN_RECD], char r_desc [LEN_DESC], char d_entry [LEN_RECD]);   <*/
+char        yparse_verb_find        (tQUEUE *a_queue, char a_verb [LEN_LABEL]);
 /*········´ ´············handlers·´ ´·········································*/
 char*       yPARSE_verb             (int a_num);
 char        yPARSE_handler_max      (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], char a_mode, char a_mask, void *a_reader, void *a_writer, float a_seq, char a_flags [LEN_TITLE], char a_labels [LEN_RECD], char a_desc [LEN_DESC]);
 char        yPARSE_handler_plus     (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader, void *a_writer, float a_seq, char a_labels [LEN_RECD]);
+char        yPARSE_handler_min      (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader, void *a_writer);
 char        yPARSE_handler          (char a_verb [LEN_LABEL], char a_specs [LEN_TITLE], void *a_reader);
 /*········´ ´················DONE·´ ´·········································*/
 
@@ -440,9 +483,7 @@ char        yparse_good_in          (void);
 /*> char        yparse_queue_tail       (tQUEUE *a_queue);                            <*/
 
 
-char        yparse_verb_find        (tQUEUE *a_queue, char *a_verb);
 char        yparse_verb_mask        (int n);
-char        yparse_verb_init        (void);
 char        yparse__verb_divider    (int a_iverb);
 char*       yparse__unit_verb       (char *a_question, char *a_verb, int a_seq);
 
@@ -454,7 +495,6 @@ char        yparse_reusable         (char a_masked);
 
 char        yparse_in_fakeready     (void);
 char        yparse_enqueue_in       (char *a_item);
-char        yparse_init_in          (void);
 char        yparse_peek_in          (const int a_ref, char *a_item);
 
 char        yparse__popable         (void);

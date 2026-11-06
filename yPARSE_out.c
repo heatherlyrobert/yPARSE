@@ -48,6 +48,7 @@ static void      o___PROGRAM_________________o (void) {;};
 char yparse_out_init         (void) { return yparse_queue_init  (&s_qout, 'O', "OUT"); }
 char yPARSE_out_purge        (void) { return yparse_queue_purge (&s_qout);             }
 char yPARSE_out_reset        (void) { return yparse_queue_reset (&s_qout);             }
+char yparse_out_wrap         (void) { return yparse_queue_purge (&s_qout);             }
 
 
 

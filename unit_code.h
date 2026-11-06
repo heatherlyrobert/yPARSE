@@ -9,6 +9,7 @@ char       *yparse_config_status    (void);
 char        yparse_queue_rando      (tQUEUE *a_queue);
 char       *yparse_queue_status     (tQUEUE *a_queue);
 /*> char       *yparse_queue_by_cursor  (tQUEUE *a_queue, char a_dir);                <*/
+char        yparse_unit_printf      (char a_speclist [LEN_TITLE], ...);
 /*········´ ´········mock·support·´ ´·········································*/
 char        yparse_mock_clear       (void);
 /*········´ ´·········mock·shared·´ ´·········································*/

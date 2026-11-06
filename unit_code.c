@@ -168,6 +168,30 @@ yparse_queue_status     (tQUEUE *a_queue)
    return yparse_print;
 }
 
+char
+yparse_unit_printf      (tQUEUE *a_queue, char a_speclist [LEN_TITLE], ...)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   char        n           =    0;
+   va_list     x_vlist;
+   /*---(defense)------------------------*/
+   --rce;  if (a_queue    == NULL)  return rce;
+   --rce;  if (a_speclist == NULL)  return rce;
+   /*---(prepare)------------------------*/
+   n = strlen (a_speclist) + 1;
+   /*---(create variadic)----------------*/
+   va_start (x_vlist, a_speclist);
+   /*---(cycle fields)-------------------*/
+   rc = yparse_spec_output (a_queue, x_vlist, a_speclist);
+   --rce;  if (rc < 0)  return rce;
+   /*---(destroy variadic)---------------*/
+   va_end (x_vlist);
+   /*---(complete)-----------------------*/
+   return rc;
+}
+
 
 /*> char*                                                                                                                                                <* 
  *> yparse_queue_by_cursor  (tQUEUE *a_queue, char a_dir)                                                                                                <* 

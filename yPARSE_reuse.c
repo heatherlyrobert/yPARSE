@@ -106,6 +106,18 @@ yparse_reuse_init       (void)
    return 0;
 }
 
+char
+yparse_reuse_wrap       (void)
+{
+   /*---(header)-------------------------*/
+   DEBUG_YPARSE   yLOG_enter   (__FUNCTION__);
+   /*---(purge)--------------------------*/
+   yparse_reuse__purge ();
+   /*---(complete)-----------------------*/
+   DEBUG_YPARSE   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
 
 
 /*====================------------------------------------====================*/

@@ -44,6 +44,7 @@ static void      o___CONFIG__________________o (void) {;}
 char
 yparse_config_clear     (void)
 {
+   DEBUG_YPARSE  yLOG_enter   (__FUNCTION__);
    myPARSE.y_verbs   = YPARSE_MANUAL;
    myPARSE.y_verber  = NULL;
    myPARSE.y_reusing = YPARSE_ONETIME;
@@ -51,6 +52,7 @@ yparse_config_clear     (void)
    myPARSE.y_deltype = '-';
    myPARSE.y_fill    = '-';
    myPARSE.y_ready   = '-';
+   DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -137,6 +139,10 @@ yparse_config            (char a_1st, char a_auto, void *a_verber, char a_reusin
    /*---(reset all)----------------------*/
    rc = yparse_config_clear ();
    DEBUG_YPARSE  yLOG_value   ("clear"     , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+      return rce;
+   }
    /*---(verber)-------------------------*/
    rc = yparse_config__verber  (a_auto, a_verber, a_reusing);
    DEBUG_YPARSE  yLOG_value   ("verber"    , rc);
@@ -154,23 +160,21 @@ yparse_config            (char a_1st, char a_auto, void *a_verber, char a_reusin
       return rce;
    }
    /*---(initialize all areas)-----------*/
-   if (a_1st == 'y') {
+   --rce;  if (a_1st == 'y') {
       DEBUG_YPARSE  yLOG_note    ("first time run, intialize data structures");
-      rc = yparse_spec_init  ();
-      DEBUG_YPARSE  yLOG_value   ("init_types", rc);
-      rc = yparse_verb_init  ();
-      DEBUG_YPARSE  yLOG_value   ("verb_init" , rc);
-      rc = yparse_init_in    ();
-      DEBUG_YPARSE  yLOG_value   ("init_in"   , rc);
-      rc = yparse_out_init   ();
-      DEBUG_YPARSE  yLOG_value   ("init_out"  , rc);
-      rc = yparse_reuse_init ();
-      DEBUG_YPARSE  yLOG_value   ("initline"  , rc);
+      rc = yparse_init ();
+      DEBUG_YPARSE  yLOG_value   ("init"      , rc);
+      if (rc < 0) {
+         yparse_config_clear ();
+         DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
+         return rce;
+      }
    } else {
       DEBUG_YPARSE  yLOG_note    ("reconfig run, do not intialize data structures");
    }
    /*---(set ready)----------------------*/
    myPARSE.y_ready   = 'y';
+   DEBUG_YPARSE  yLOG_note    ("yPARSE library marked as ready");
    /*---(complete)-----------------------*/
    DEBUG_YPARSE  yLOG_exit    (__FUNCTION__);
    return 1;

@@ -82,9 +82,20 @@ char        yPARSE_delimiters       (char a_delim, char a_fill);
 char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
 /*········´ ´·············program·´ ´·········································*/
 char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+char        yPARSE_close_all        (void);
 char        yPARSE_wrap             (void);
 /*········´ ´···········unit-test·´ ´·········································*/
 char        yPARSE_force            (void);
+/*········´ ´················DONE·´ ´·········································*/
+
+
+
+/*===[[ yPARSE_config.c ]]====================================================*/
+/*········´ ´·········simplifiers·´ ´·········································*/
+char        yPARSE_delimiters       (char a_delim, char a_fill);
+char        yPARSE_verber           (char a_auto, void *a_verber, char a_reusing);
+char        yPARSE_config           (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
+char        yPARSE_reconfig         (char a_auto, void *a_verber, char a_reusing, char a_delim, char a_fill);
 /*········´ ´················DONE·´ ´·········································*/
 
 
@@ -103,16 +114,19 @@ char        yPARSE_uwrap            (void);
 
 
 
+/*===[[ yPARSE_enmass.c ]]====================================================*/
+/*········´ ´··············config·´ ´·········································*/
+char        yPARSE_autoread         (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber);
+char        yPARSE_justread         (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber);
+char        yPARSE_planned          (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH], void *a_verber);
+/*········´ ´··················in·´ ´·········································*/
+char        yPARSE_read_all         (void);
+/*········´ ´·················out·´ ´·········································*/
+char        yPARSE_write_all        (void);
+/*········´ ´················DONE·´ ´·········································*/
 
-/*===[[ SIMPLE ]]=========================================*/
 
-/*---(simple interface)-----*/
-char        yPARSE_simple           (char a_ifile [LEN_PATH], char a_ofile [LEN_PATH]);
-char        yPARSE_close            (void);
-/*---(auto-read)------------*/
-char        yPARSE_autoread         (uchar *a_in, uchar *a_out, void *a_verber);
-/*---(planned)--------------*/
-char        yPARSE_planned          (uchar *a_in, uchar *a_out, void *a_verber);
+
 char        yPARSE_header           (char a_basename [LEN_LABEL], char a_vernum [LEN_TERSE], char a_vertxt [LEN_HUND], char a_oneline [LEN_HUND], char a_content [LEN_DESC], char a_cmdline [LEN_RECD], void (*a_additional) (void));
 char        yPARSE_vscanf           (uchar *a_verb, ...);
 char        yPARSE_vprintf          (int c, uchar *a_verb, ...);
@@ -134,13 +148,9 @@ char        yPARSE_out_reset        (void);
 
 
 /*---(yPARSE_shared.c)------*/
-/*> char        yPARSE_init             (char a_verbs, void *a_verber, char a_reusing);   <*/
 char        yPARSE_verber_stub      (int n, uchar *a_verb, char a_exist, void *a_handler);
 
 
-
-/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yPARSE_write_all        (void);
 
 
 /*---(yPARSE_line.c)--------*/
@@ -149,7 +159,7 @@ char        yPARSE_stdin            (void);
 char        yPARSE_tmpin            (void);
 char        yPARSE_stdin_peek       (void);
 char        yPARSE_open_in          (char a_name [LEN_PATH]);
-char        yPARSE_close_in         (void);
+char        yPARSE_in_close         (void);
 
 char        yPARSE_out_open         (char a_name [LEN_PATH], char a_prog [LEN_PATH]);
 char        yPARSE_out_close        (char a_fancy);
@@ -167,15 +177,14 @@ char        yPARSE_load             (int *r_nused, int *r_ncurr, char a_recd [LE
 char        yPARSE_reload           (int *r_nused, int *r_ncurr, int a_line, char a_label [LEN_HUND]);
 char        yPARSE_hidden           (int *r_nused, int *r_ncurr, char a_recd [LEN_RECD]);
 
-char        yPARSE_read_all         (void);
 char        yparse_peek_verb        (int *a_index, char *a_verb);
-char        yPARSE_inrecd           (char a_recd [LEN_RECD]);
+char        yPARSE_inrecd           (char r_recd [LEN_RECD]);
 
 
 
 /*---(yPARSE_queue.c)-------*/
-char        yPARSE_purge_in         (void);
-char        yPARSE_reset_in         (void);
+char        yPARSE_in_purge         (void);
+char        yPARSE_in_reset         (void);
 
 /*---(yPARSE_in.c)----------*/
 char        yPARSE_ready            (int *a_count);
